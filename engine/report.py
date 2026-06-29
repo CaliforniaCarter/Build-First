@@ -7,7 +7,7 @@ from __future__ import annotations
 import difflib
 
 from .config import RUNS_DIR
-from .rubric.schemas import LevelResult, RunReport, Score
+from .rubric.schemas import DIM_NAMES, GATE_NAMES, LevelResult, RunReport, Score
 
 
 def _diff(prev: str, cur: str) -> str:
@@ -89,9 +89,9 @@ def build_report(report: RunReport) -> str:
         "",
         "Same idea held constant; one input tier added per level (online → +docs → +typed → "
         "+persona → +specifics → +eval pass). Each draft scored against the shared rubric "
-        "(six hard gates + eight 0–10 dimensions). The +eval pass is the Writer's Council "
-        "revising to a 9/10 target with a Reflexion stop rule. No facts or numbers were "
-        "invented; gaps are flagged above, not filled.",
+        f"({len(GATE_NAMES)} hard gates + {len(DIM_NAMES)} 0–10 dimensions). The +eval pass is "
+        "the Writer's Council revising to a 9/10 target with a Reflexion stop rule. No facts "
+        "or numbers were invented; gaps are flagged above, not filled.",
     ]
     return "\n".join(out).rstrip() + "\n"
 
