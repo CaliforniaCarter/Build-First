@@ -83,7 +83,11 @@ class Intake(BaseModel):
 
 
 def load_intake(path: Path | None = None) -> Intake:
-    path = path or (DATA_DIR / "intake.json")
+    if path is None:
+        # Personal intake.json wins if present; otherwise fall back to the committed
+        # synthetic sample so a fresh checkout runs cold with no setup.
+        primary = DATA_DIR / "intake.json"
+        path = primary if primary.exists() else (DATA_DIR / "intake.sample.json")
     if not path.exists():
         raise FileNotFoundError(f"intake not found at {path} — see data/intake.example.json")
     return Intake.model_validate_json(path.read_text(encoding="utf-8"))

@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import sys
+from pathlib import Path
 
 from .ablation import run_ablation
 from .blocks.intake import load_intake
@@ -24,6 +25,10 @@ def _provider(args):
     return get_provider(args.provider, RUNS_DIR / args.run_id)
 
 
+def _intake(args):
+    return load_intake(Path(args.intake) if args.intake else None)
+
+
 def _onboard(intake, provider):
     paths = write_profile_docs(intake)
     persona_md = build_persona(intake, provider)
@@ -31,13 +36,13 @@ def _onboard(intake, provider):
 
 
 def cmd_onboard(args):
-    intake = load_intake()
+    intake = _intake(args)
     paths, _ = _onboard(intake, _provider(args))
     print(f"wrote {paths['profile']} and {paths['context']} and {PROFILES_DIR / 'persona.md'}")
 
 
 def cmd_ablate(args):
-    intake = load_intake()
+    intake = _intake(args)
     provider = _provider(args)
     persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
     results = run_ablation(intake, persona_md, provider, args.run_id)
@@ -46,7 +51,7 @@ def cmd_ablate(args):
 
 
 def cmd_report(args):
-    intake = load_intake()
+    intake = _intake(args)
     provider = _provider(args)
     persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
     results = run_ablation(intake, persona_md, provider, args.run_id)
@@ -63,7 +68,7 @@ def cmd_report(args):
 
 
 def cmd_run(args):
-    intake = load_intake()
+    intake = _intake(args)
     provider = _provider(args)
     _onboard(intake, provider)
     persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
@@ -82,16 +87,31 @@ def cmd_run(args):
 
 
 def cmd_doctor(args):
-    intake = load_intake()
+    intake = _intake(args)
     print(f"intake ok: {intake.name}, topic={intake.idea.topic[:60]!r}")
     print(f"channels={intake.output.channels} hard_nevers={intake.output.hard_nevers}")
 
 
+def _load_env() -> None:
+    """Best-effort: load .env so the anthropic path sees ANTHROPIC_API_KEY / BF_MODEL."""
+    try:
+        from dotenv import load_dotenv
+    except ImportError:
+        return
+    load_dotenv()
+
+
 def main(argv=None):
+    _load_env()
     common = argparse.ArgumentParser(add_help=False)
-    common.add_argument("--provider", default="terminal", choices=["terminal", "anthropic"])
+    common.add_argument("--provider", default="terminal", choices=["terminal", "anthropic", "stub"])
     common.add_argument("--run-id", default=_dt.date.today().isoformat())
     common.add_argument("--date", default=_dt.date.today().isoformat())
+    common.add_argument(
+        "--intake",
+        default=None,
+        help="path to intake JSON (default: data/intake.json, else sample)",
+    )
 
     parser = argparse.ArgumentParser(prog="bf", description="Brand Voice Content Engine")
     sub = parser.add_subparsers(dest="cmd", required=True)
