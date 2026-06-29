@@ -12,33 +12,14 @@ import re
 
 from .schemas import DIM_NAMES, GATE_NAMES, Score
 
-# must-not-contain: AI/LinkedIn slop + Carter's banned register ("no AI jargon").
+# must-not-contain: the biggest AI/LinkedIn slop offenders. Kept short on purpose
+# (top 5) so it's a sharp filter, not a dictionary; tune the list over time.
 SLOP_PHRASES = [
-    "unlock",
-    "leverage",
-    "thrilled to announce",
-    "excited to announce",
-    "excited to share",
-    "game-changer",
-    "game changer",
-    "supercharge",
-    "revolutionize",
-    "seamless",
-    "robust",
-    "elevate",
-    "synergy",
     "delve",
-    "in today's fast-paced",
-    "needle-moving",
-    "at the end of the day",
-    "dive in",
-    "in conclusion",
-    "the power of",
-    "harness",
-    "paradigm",
-    "transformative",
-    "cutting-edge",
-    "best-in-class",
+    "leverage",
+    "game-changer",
+    "thrilled to announce",
+    "supercharge",
 ]
 
 GATE_DESCRIPTIONS = {
