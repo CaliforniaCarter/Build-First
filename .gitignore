@@ -12,6 +12,7 @@ __pycache__/
 profiles/*.md
 !profiles/.gitkeep
 runs/
+data/intake.json
 data/transcripts/
 
 # OS

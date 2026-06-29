@@ -1,0 +1,54 @@
+{
+  "name": "",
+  "idea": {
+    "topic": "",
+    "take": "",
+    "scene": "",
+    "number": "",
+    "lesson": "",
+    "only_you": "",
+    "mechanism": "",
+    "proof": [],
+    "close": ""
+  },
+  "online": {
+    "linkedin": "",
+    "x": "",
+    "other": "",
+    "existing_posts": "",
+    "cold_start": true
+  },
+  "docs": {
+    "resume": "",
+    "portfolio": ""
+  },
+  "typed": {
+    "identity": "",
+    "known_for": "",
+    "background": "",
+    "beliefs": "",
+    "lessons": ""
+  },
+  "voice": {
+    "answers": {},
+    "tone_words": [],
+    "look": "",
+    "sentence_length": "",
+    "banned": [],
+    "signatures": [],
+    "emojis": "",
+    "notes": ""
+  },
+  "audience": {
+    "writing_for": "",
+    "goal": "",
+    "play_to": ""
+  },
+  "output": {
+    "channels": ["LinkedIn"],
+    "length": "",
+    "format": "",
+    "hard_nevers": [],
+    "off_limits": ""
+  }
+}
