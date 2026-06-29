@@ -8,13 +8,20 @@ from __future__ import annotations
 
 import argparse
 import datetime as _dt
+import json
 import sys
 
-from .ablation import run_ablation
+from .ablation import load_layers, run_ablation
+from .blocks import council
+from .blocks import draft as draft_block
+from .blocks import receipts as receipts_block
+from .blocks.brief import build_brief, load_brief, write_brief
+from .blocks.gate import human_gate
 from .blocks.intake import load_intake
 from .blocks.persona import build_persona
 from .blocks.profile import write_profile_docs
 from .config import PROFILES_DIR, RUNS_DIR
+from .posttypes import get_post_type
 from .providers import get_provider
 from .providers.base import NeedsCompletion
 from .report import RunReport, build_report, compute_places_to_refine, write_report
@@ -81,6 +88,44 @@ def cmd_run(args):
     print(f"\n--- report written to {path} ---")
 
 
+def cmd_generate(args):
+    """The shippable path: intake + post type -> editable brief -> the final post.
+
+    Two-step and resumable (same idea as the terminal provider). First run writes the
+    brief and stops so you can hand-edit it; re-run drafts from the edited brief.
+    """
+    intake = load_intake()
+    run_dir = RUNS_DIR / args.run_id
+    brief_path = run_dir / "brief.json"
+
+    if not brief_path.exists():
+        paths = write_brief(build_brief(intake, args.type), run_dir)
+        print(
+            f"brief  -> {paths['json']}\nreadable -> {paths['md']}\n"
+            f"edit {paths['json']}, then re-run `bf generate` to draft."
+        )
+        return
+
+    provider = _provider(args)
+    brief = load_brief(run_dir)
+    persona_path = PROFILES_DIR / "persona.md"
+    persona_md = persona_path.read_text(encoding="utf-8") if persona_path.exists() else ""
+    layers = load_layers(get_post_type(brief.post_type).layer_files)
+
+    prompt = draft_block.build_draft_prompt_from_brief(brief, persona_md or None, layers)
+    text = draft_block.draft("draft", prompt, provider)
+    text, clog = council.revise(text, persona_md, layers, provider)
+    (run_dir / "council_log.json").write_text(json.dumps(clog, indent=2), encoding="utf-8")
+
+    text, proof, redactions = receipts_block.attach_receipts(text, intake)
+    if proof or redactions:
+        (run_dir / "receipts.json").write_text(
+            json.dumps({"proof": proof, "redacted": redactions}, indent=2), encoding="utf-8"
+        )
+    out = human_gate(text, run_dir)
+    print(f"post -> {out}  (copied to clipboard; review before posting)")
+
+
 def cmd_doctor(args):
     intake = load_intake()
     print(f"intake ok: {intake.name}, topic={intake.idea.topic[:60]!r}")
@@ -103,6 +148,10 @@ def main(argv=None):
         ("doctor", cmd_doctor),
     ):
         sub.add_parser(name, parents=[common]).set_defaults(func=fn)
+
+    gen = sub.add_parser("generate", parents=[common])
+    gen.add_argument("--type", default="linkedin_build", help="post type (see engine/posttypes.py)")
+    gen.set_defaults(func=cmd_generate)
 
     args = parser.parse_args(argv)
     try:

@@ -39,10 +39,11 @@ LEVELS = [
 ]
 
 
-def load_layers() -> str:
-    fmt = (LAYERS_DIR / "format.md").read_text(encoding="utf-8")
-    aud = (LAYERS_DIR / "audience_tenex.md").read_text(encoding="utf-8")
-    return f"{fmt}\n\n{aud}"
+DEFAULT_LAYERS = ("format.md", "audience_tenex.md")
+
+
+def load_layers(names: tuple[str, ...] | list[str] = DEFAULT_LAYERS) -> str:
+    return "\n\n".join((LAYERS_DIR / n).read_text(encoding="utf-8") for n in names)
 
 
 def context_for(inputs: list[str], intake: Intake) -> str:
