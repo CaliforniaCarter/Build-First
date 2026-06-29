@@ -35,7 +35,8 @@ def test_parse_score_from_fenced_json():
         '{"name":"ownability","score":7,"reason":"x"},'
         '{"name":"voice_match","score":7,"reason":"x"},'
         '{"name":"format_adherence","score":7,"reason":"x"},'
-        '{"name":"audience_fit","score":7,"reason":"x"}],'
+        '{"name":"audience_fit","score":7,"reason":"x"},'
+        '{"name":"stakes_turn","score":7,"reason":"x"}],'
         '"delta_vs_prev":"baseline"}'
         "\n```"
     )

@@ -39,6 +39,7 @@ DIM_DESCRIPTIONS = {
     "voice_match": "matches persona.md (diction, cadence, tics, never-do list)",
     "format_adherence": "hook in first line, one idea, short lines, real close, no bait",
     "audience_fit": "fits the audience's values without losing the voice",
+    "stakes_turn": "a real cost, risk, admission, or contrarian turn — not just pleasant and safe",
 }
 
 

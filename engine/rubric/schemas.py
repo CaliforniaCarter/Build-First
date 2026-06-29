@@ -25,6 +25,7 @@ DIM_NAMES = [
     "voice_match",
     "format_adherence",
     "audience_fit",
+    "stakes_turn",
 ]
 
 
