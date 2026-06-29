@@ -21,11 +21,11 @@ from .intake import ContentIdea, Intake
 
 class Brief(BaseModel):
     post_type: str
-    channel: str
+    output: str  # what to write, in plain language — e.g. "a LinkedIn post" (model interprets)
+    constraints: list[str] = []  # hard rules only (char limits, etc.); soft form is interpreted
     content_idea: ContentIdea  # reuse the intake model — no new idea fields
-    structure: list[str]  # the post skeleton (from the post type; edit freely)
+    tone: list[str] = []  # soft voice hints, from the intake
     cadence: str = ""
-    tone: list[str] = []
     length: str = ""
     voice_ref: str = ""  # pointer to the prose voice doc (kept out of the JSON)
     banned: list[str] = []
@@ -38,12 +38,12 @@ def build_brief(intake: Intake, post_type: str, voice_ref: str = "profiles/perso
     v, o = intake.voice, intake.output
     return Brief(
         post_type=pt.key,
-        channel=pt.channel,
+        output=o.format or pt.output,  # intake.output.format overrides the type's label
+        constraints=list(pt.constraints),
         content_idea=intake.idea,
-        structure=list(pt.structure),
-        cadence=v.sentence_length or pt.cadence,
         tone=list(v.tone_words),
-        length=o.length or pt.length,
+        cadence=v.sentence_length,
+        length=o.length,
         voice_ref=voice_ref,
         banned=list(v.banned),
         hard_nevers=list(o.hard_nevers),
@@ -59,16 +59,14 @@ def render_brief_md(brief: Brief) -> str:
         "_The post spec. Edit `brief.json`, then re-run `bf generate`. Deterministic — nothing invented._",
         "",
         f"- **Post type:** {brief.post_type}",
-        f"- **Channel:** {brief.channel}",
+        f"- **Output:** {brief.output}",
+        f"- **Constraints (hard):** {'; '.join(brief.constraints) or '—'}",
         f"- **Cadence:** {brief.cadence or '—'}",
         f"- **Tone:** {', '.join(brief.tone) or '—'}",
         f"- **Length:** {brief.length or '—'}",
         f"- **Voice ref:** {brief.voice_ref or '—'}",
         f"- **Banned:** {', '.join(brief.banned) or '—'}",
         f"- **Hard nevers:** {', '.join(brief.hard_nevers) or '—'}",
-        "",
-        "## Structure",
-        *[f"{n}. {s}" for n, s in enumerate(brief.structure, 1)],
         "",
         "## Content idea",
         f"- Topic: {i.topic or '—'}",

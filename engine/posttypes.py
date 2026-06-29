@@ -1,10 +1,11 @@
-"""Post types — the deterministic seam for 'grab different fields by post type'.
+"""Post types — kept light and AI-interpreted on purpose.
 
-Each type names the swappable knobs (structure, cadence, length, channel) and which
-prose layer files apply. The structure is the post skeleton, promoted out of the prose
-in `layers/audience_tenex.md` so it can be selected and edited as data, not buried text.
+A post type is mostly a plain-language label ("a LinkedIn post") that the model reads
+and interprets, plus the prose layers it should follow. We only pin down *hard*
+constraints when they actually exist (e.g. an X character limit) — everything softer
+(structure, rhythm) is left for the model to interpret from the layers, not prescribed.
 
-V1 ships one type. Adding `x_thread` / `lesson` later is one more entry in POST_TYPES.
+V1 ships two. Adding another is one more entry in POST_TYPES.
 """
 
 from __future__ import annotations
@@ -14,30 +15,26 @@ from pydantic import BaseModel
 
 class PostType(BaseModel):
     key: str
-    channel: str
-    structure: list[str]  # ordered skeleton for this kind of post
-    cadence: str  # default sentence rhythm (intake.voice.sentence_length overrides)
-    length: str  # default length (intake.output.length overrides)
-    layer_files: list[str]  # prose layers to load for this type
+    output: str  # plain-language label the model interprets, e.g. "a LinkedIn post"
+    constraints: list[str] = []  # hard rules ONLY when they exist (char limits, etc.)
+    layer_files: list[str]  # prose the model interprets for structure/voice
 
 
-LINKEDIN_BUILD = PostType(
-    key="linkedin_build",
-    channel="LinkedIn",
-    structure=[
-        "Hook — a real moment or admission, or the build plus an analogy; front-load it",
-        "The pain / the turn — concrete, with a real cost or something that didn't work",
-        "The mechanism — in plain language, shown not just claimed",
-        "What it looks like in practice — scannable",
-        "One spiky, ownable claim plus the honest lesson, or the number",
-        "A soft close — a real question — plus the proof / receipt",
-    ],
-    cadence="Short lines, one idea per line, generous white space; restraint wins.",
-    length="As long as it needs and no longer; front-load the value.",
+LINKEDIN = PostType(
+    key="linkedin",
+    output="a LinkedIn post",
+    constraints=[],
     layer_files=["format.md", "audience_tenex.md"],
 )
 
-POST_TYPES: dict[str, PostType] = {LINKEDIN_BUILD.key: LINKEDIN_BUILD}
+X = PostType(
+    key="x",
+    output="an X / Twitter post",
+    constraints=["under 300 characters", "no thread — a single post"],
+    layer_files=["format.md", "audience_tenex.md"],
+)
+
+POST_TYPES: dict[str, PostType] = {LINKEDIN.key: LINKEDIN, X.key: X}
 
 
 def get_post_type(key: str) -> PostType:

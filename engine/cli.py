@@ -150,7 +150,7 @@ def main(argv=None):
         sub.add_parser(name, parents=[common]).set_defaults(func=fn)
 
     gen = sub.add_parser("generate", parents=[common])
-    gen.add_argument("--type", default="linkedin_build", help="post type (see engine/posttypes.py)")
+    gen.add_argument("--type", default="linkedin", help="post type (see engine/posttypes.py)")
     gen.set_defaults(func=cmd_generate)
 
     args = parser.parse_args(argv)

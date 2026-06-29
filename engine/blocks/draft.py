@@ -58,7 +58,6 @@ def build_draft_prompt_from_brief(brief: Brief, persona_md: str | None, layers: 
             idea.append(f"{label}: {val}")
     if i.proof:
         idea.append("Proof: " + "; ".join(i.proof))
-    structure = "\n".join(f"  {n}. {s}" for n, s in enumerate(brief.structure, 1))
 
     if persona_md:
         voice = f"VOICE — write in this voice and obey its never-do list:\n{persona_md}\n\n"
@@ -67,18 +66,19 @@ def build_draft_prompt_from_brief(brief: Brief, persona_md: str | None, layers: 
             "VOICE: none yet — write a clean, plain professional post (no fake personality).\n\n"
         )
 
+    constraints = "\n".join(f"  - {c}" for c in brief.constraints) or "  - (none)"
+
     return (
-        f"Write one post for {brief.channel or 'LinkedIn'}. Output ONLY the post text, "
-        "no preamble, no title, no hashtags.\n\n"
+        f"Write {brief.output}. Output ONLY the post text, no preamble, no title, no hashtags.\n\n"
         "CONTENT IDEA (use only this — do not invent facts, numbers, or quotes):\n"
         + "\n".join(idea)
         + "\n\n"
-        f"STRUCTURE — follow this skeleton:\n{structure}\n\n"
+        f"HARD CONSTRAINTS (must obey):\n{constraints}\n\n"
         f"CADENCE: {brief.cadence or '—'}\n"
         f"TONE: {', '.join(brief.tone) or '—'}\n"
         f"LENGTH: {brief.length or '—'}\n\n"
         f"{voice}"
-        f"LAYERS:\n{layers}\n\n"
+        f"LAYERS (interpret the structure and shape from these):\n{layers}\n\n"
         f"BANNED: {', '.join(brief.banned) or '—'}\n"
         f"HARD NEVERS: {', '.join(brief.hard_nevers) or '—'}\n"
         "Rules: no invented facts or numbers — if there's no real number, don't fake one. "
