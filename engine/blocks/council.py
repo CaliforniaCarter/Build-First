@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+from typing import Callable
 
 from ..config import COUNCIL_MAX_PASSES
 from ..providers.base import Provider
@@ -63,6 +64,7 @@ def revise(
     layers: str,
     provider: Provider,
     max_passes: int = COUNCIL_MAX_PASSES,
+    on_pass: Callable[[int, dict], None] | None = None,
 ) -> tuple[str, list[dict]]:
     log: list[dict] = []
     current = draft
@@ -73,14 +75,15 @@ def revise(
         parsed = _parse_pass(out)
         current = (parsed.get("revised_draft") or current).strip()
         stop = bool(parsed.get("stop"))
-        log.append(
-            {
-                "pass": n,
-                "critique": parsed.get("critique", ""),
-                "reason": parsed.get("reason", ""),
-                "stop": stop,
-            }
-        )
+        entry = {
+            "pass": n,
+            "critique": parsed.get("critique", ""),
+            "reason": parsed.get("reason", ""),
+            "stop": stop,
+        }
+        log.append(entry)
+        if on_pass:
+            on_pass(n, entry)
         if stop:
             break
     return current, log

@@ -1,0 +1,24 @@
+/* Tenex brand tokens. Everything else references these — swap a value here, the app follows.
+ *
+ * NOTE: tenex.co's exact hex/fonts live in their external CSS. These are a close
+ * Tenex-style starting point, not confirmed brand values. To lock them: open tenex.co,
+ * DevTools color-pick the real yellow + black and read the wordmark font-family, then
+ * update the five tokens below. (One line each — that's the point of tokenizing.) */
+
+:root {
+  --tnx-black: #0e0e0e;        /* canvas / primary surface (rich near-black, not pure #000) */
+  --tnx-black-2: #161616;      /* raised surface: cards, inputs */
+  --tnx-ink: #0a0a0a;          /* deepest text, used on yellow */
+  --tnx-yellow: #ffd400;       /* THE accent — CTAs, focus, the brand mark. Used sparingly. */
+  --tnx-yellow-dim: #e6be00;   /* hover / pressed */
+  --tnx-paper: #f7f7f5;        /* light reading surface (the final-draft view) */
+  --tnx-fg: #ffffff;           /* text on black */
+  --tnx-muted: #9a9a9a;        /* secondary text */
+  --tnx-line: #262626;         /* hairline borders on dark */
+  --tnx-danger: #ff5a4d;
+
+  --radius: 4px;               /* sharp, near-square corners */
+  --font-display: "Space Grotesk", "Inter Tight", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --maxw: 760px;
+}

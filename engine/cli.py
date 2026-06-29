@@ -82,14 +82,27 @@ def cmd_run(args):
 
 
 def cmd_doctor(args):
-    intake = load_intake()
+    if args.provider == "claudecode":
+        from .providers.claudecode import check_claude
+
+        st = check_claude()
+        mark = "ok" if st.logged_in else ("installed" if st.installed else "missing")
+        print(f"claude: {mark}" + (f" ({st.version})" if st.version else ""))
+        print(f"  {st.detail}")
+    try:
+        intake = load_intake()
+    except FileNotFoundError as exc:
+        print(f"intake: not found yet — {exc}")
+        return
     print(f"intake ok: {intake.name}, topic={intake.idea.topic[:60]!r}")
     print(f"channels={intake.output.channels} hard_nevers={intake.output.hard_nevers}")
 
 
 def main(argv=None):
     common = argparse.ArgumentParser(add_help=False)
-    common.add_argument("--provider", default="terminal", choices=["terminal", "anthropic"])
+    common.add_argument(
+        "--provider", default="terminal", choices=["terminal", "claudecode", "anthropic"]
+    )
     common.add_argument("--run-id", default=_dt.date.today().isoformat())
     common.add_argument("--date", default=_dt.date.today().isoformat())
 

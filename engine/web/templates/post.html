@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Write · Content{% endblock %}
+{% block body %}
+<p class="eyebrow">Write a post</p>
+<h1>What did you build?</h1>
+<p class="lede">{% if persona %}Voice: {{ persona }}. {% endif %}One question at a time — then Content drafts and revises it. You decide what gets posted.</p>
+
+<form id="ideaform" data-wizard>
+  <div class="bar"><span data-bar></span></div>
+
+  <section class="step">
+    <p class="q">What did you build or do?</p>
+    <p class="sub">The topic, in your words.</p>
+    <input type="text" name="idea__topic" value="{{ idea.topic }}" required />
+  </section>
+
+  <section class="step">
+    <p class="q">What’s your take on it?</p>
+    <input type="text" name="idea__take" value="{{ idea.take }}" />
+  </section>
+
+  <section class="step">
+    <p class="q">How does it actually work?</p>
+    <p class="sub">The real mechanism — what most people skip.</p>
+    <textarea name="idea__mechanism">{{ idea.mechanism }}</textarea>
+  </section>
+
+  <section class="step">
+    <p class="q">Set the scene — a real moment.</p>
+    <textarea name="idea__scene">{{ idea.scene }}</textarea>
+  </section>
+
+  <section class="step">
+    <p class="q">A real number?</p>
+    <p class="sub">Leave blank if you don’t have one — Content never fakes a number.</p>
+    <input type="text" name="idea__number" value="{{ idea.number }}" />
+  </section>
+
+  <section class="step">
+    <p class="q">The non-obvious lesson?</p>
+    <input type="text" name="idea__lesson" value="{{ idea.lesson }}" />
+  </section>
+
+  <section class="step">
+    <p class="q">The only-you angle?</p>
+    <p class="sub">What could only you say here?</p>
+    <input type="text" name="idea__only_you" value="{{ idea.only_you }}" />
+  </section>
+
+  <section class="step">
+    <p class="q">How would you close it?</p>
+    <input type="text" name="idea__close" value="{{ idea.close }}" />
+  </section>
+
+  <section class="step">
+    <p class="q">Proof / receipts</p>
+    <p class="sub">One per line — links, metrics, anything to back it up.</p>
+    <textarea name="idea__proof">{{ proof }}</textarea>
+  </section>
+
+  <div class="wizardnav">
+    <div class="wizrow">
+      <button type="button" class="btn btn-ghost" data-back>Back</button>
+      <button type="button" id="gen" class="btn btn-primary" data-next data-next-label="Next" data-finish-label="Generate post">Next</button>
+      <span data-progress></span>
+    </div>
+  </div>
+</form>
+
+<section id="panel" style="display:none">
+  <h2>Building your post</h2>
+  <div class="bar"><span id="bar"></span></div>
+  <ul class="stages">
+    <li id="s-draft"><span class="dot"></span> Draft</li>
+    <li id="s-council"><span class="dot"></span> Writer’s Council</li>
+    <li id="s-score"><span class="dot"></span> Score</li>
+  </ul>
+  <p class="muted" id="councillog"></p>
+  <div id="live" class="stream caret"></div>
+  <div class="banner error" id="err" style="display:none"></div>
+
+  <div id="finalwrap" style="display:none">
+    <h2>Your draft <span class="score muted" id="headline"></span></h2>
+    <div id="final" class="paper"></div>
+    <div class="toolbar">
+      <button class="btn btn-primary" id="copy">Copy</button>
+      <a class="btn btn-ghost" id="export" href="#">Export .md</a>
+      <a class="btn btn-ghost" id="permalink" href="#">Permalink</a>
+      <button class="btn btn-ghost" id="again" type="button">Write another</button>
+    </div>
+    <p class="muted">Paste it into LinkedIn yourself when you’re happy. Content never posts for you.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/wizard.js"></script>
+<script src="/static/app.js"></script>
+{% endblock %}

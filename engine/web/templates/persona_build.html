@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Reading your voice · Content{% endblock %}
+{% block body %}
+<p class="eyebrow">Onboarding</p>
+<h1>Reading your voice</h1>
+<p class="lede">Content is studying how you write{% if name %}, {{ name }}{% endif %} — extracting your persona. This takes a few seconds.</p>
+
+<div class="bar"><span id="bar"></span></div>
+<ul class="stages" id="stages">
+  <li id="s-persona" class="active"><span class="dot"></span> Extracting persona</li>
+  <li id="s-done"><span class="dot"></span> Done</li>
+</ul>
+
+<div class="banner error" id="err" style="display:none"></div>
+
+<div class="toolbar" id="next" style="display:none">
+  <a class="btn btn-primary" href="/post">Write your first post →</a>
+</div>
+
+<script>
+  const jobId = {{ job_id|tojson }};
+  const bar = document.getElementById('bar');
+  const err = document.getElementById('err');
+  if (!jobId) {
+    err.style.display = 'block';
+    err.textContent = 'That build session expired. Head back to onboarding and save again.';
+  } else {
+    const es = new EventSource('/onboarding/stream/' + jobId);
+    bar.style.width = '20%';
+    es.onmessage = (e) => {
+      const d = JSON.parse(e.data);
+      if (d.event === 'token') bar.style.width = '70%';
+      if (d.event === 'error') {
+        err.style.display = 'block';
+        err.textContent = d.message || 'Something went wrong.';
+      }
+    };
+    es.addEventListener('end', (e) => {
+      es.close();
+      const d = JSON.parse(e.data);
+      if (d.status === 'done') {
+        bar.style.width = '100%';
+        document.getElementById('s-persona').className = 'done';
+        document.getElementById('s-done').className = 'done';
+        document.getElementById('next').style.display = 'flex';
+        setTimeout(() => { window.location = '/post'; }, 900);
+      } else if (err.style.display === 'none') {
+        err.style.display = 'block';
+        err.textContent = 'The persona build didn’t finish. Check /status and try again.';
+      }
+    });
+    es.onerror = () => { es.close(); };
+  }
+</script>
+{% endblock %}

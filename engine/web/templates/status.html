@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Status · Content{% endblock %}
+{% block body %}
+<p class="eyebrow">Status</p>
+<h1>How Content is wired</h1>
+<p class="lede">Everything runs on your machine, on your Claude subscription — no API key.</p>
+
+<div class="card">
+  <span class="chip">
+    <span class="dot {{ 'ok' if claude.logged_in else 'bad' }}"></span>
+    {% if claude.logged_in %}Claude: logged in{% elif claude.installed %}Claude: not logged in{% else %}Claude: not installed{% endif %}
+    {% if claude.version %}<span class="muted">· {{ claude.version }}</span>{% endif %}
+  </span>
+  <p class="kv" style="margin-top:10px">{{ claude.detail }}</p>
+  {% if not claude.logged_in %}
+  <div class="banner">Run <code>claude login</code> in your terminal, then refresh this page.</div>
+  {% endif %}
+</div>
+
+<div class="card">
+  <p class="kv">Data home: <code>{{ home }}</code></p>
+  <p class="kv">Intake: <code>{{ data_dir }}/intake.json</code></p>
+  <p class="kv">Profiles: <code>{{ profiles_dir }}</code></p>
+  <p class="kv">Runs: <code>{{ runs_dir }}</code></p>
+  <p class="kv">Onboarded: <code>{{ "yes" if onboarded else "no" }}</code></p>
+</div>
+
+<div class="toolbar">
+  {% if onboarded %}
+  <a class="btn btn-primary" href="/post">Write a post</a>
+  <a class="btn btn-ghost" href="/onboarding">Edit profile</a>
+  {% else %}
+  <a class="btn btn-primary" href="/onboarding">Start onboarding</a>
+  {% endif %}
+</div>
+{% endblock %}

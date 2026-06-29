@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Content{% endblock %}</title>
+  <!-- brand tokens first, then components that reference them -->
+  <link rel="stylesheet" href="/static/brand.css" />
+  <link rel="stylesheet" href="/static/app.css" />
+  <!-- Display + body type. System-ui fallback keeps it working offline (local-first). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="mark"></span>
+      <span class="word">Content</span>
+    </a>
+    <nav class="nav">
+      <a href="/onboarding">Profile</a>
+      <a href="/post">Write</a>
+      <a href="/status">Status</a>
+    </nav>
+  </header>
+  <main class="wrap">
+    {% block body %}{% endblock %}
+  </main>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

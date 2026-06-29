@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Draft · Content{% endblock %}
+{% block body %}
+<p class="eyebrow">Draft</p>
+<h1>Your post <span class="score muted">{{ headline }}</span></h1>
+
+<div id="final" class="paper">{{ draft }}</div>
+
+<div class="toolbar">
+  <button class="btn btn-primary" id="copy">Copy</button>
+  <a class="btn btn-ghost" href="/post/draft/{{ run_id }}/export">Export .md</a>
+  <a class="btn btn-ghost" href="/post">Write another</a>
+</div>
+<p class="muted">Paste it into LinkedIn yourself when you’re happy. Content never posts for you.</p>
+
+<script>
+  document.getElementById('copy').addEventListener('click', async (e) => {
+    await navigator.clipboard.writeText(document.getElementById('final').innerText);
+    e.target.textContent = 'Copied ✓';
+    setTimeout(() => { e.target.textContent = 'Copy'; }, 1500);
+  });
+</script>
+{% endblock %}

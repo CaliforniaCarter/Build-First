@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Onboarding · Content{% endblock %}
+{% block body %}
+<p class="eyebrow">Onboarding</p>
+<h1>Let’s learn your voice</h1>
+<p class="lede">A few questions, one at a time. Answer like you’d tell a friend — that’s what teaches Content to sound like you. Saved to your machine; nothing is posted.</p>
+
+{% if error %}<div class="banner error">Couldn’t save: {{ error }}</div>{% endif %}
+
+<form method="post" action="/onboarding" data-wizard>
+  <div class="bar"><span data-bar></span></div>
+
+  <section class="step">
+    <p class="q">What’s your name?</p>
+    <input type="text" name="name" value="{{ f.get('name','') }}" required />
+  </section>
+
+  <section class="step">
+    <p class="q">In one line, who are you?</p>
+    <p class="sub">e.g. “infra engineer turned founder”</p>
+    <input type="text" name="typed__identity" value="{{ f.get('typed__identity','') }}" />
+  </section>
+
+  <section class="step">
+    <p class="q">What are you known for?</p>
+    <input type="text" name="typed__known_for" value="{{ f.get('typed__known_for','') }}" />
+  </section>
+
+  <section class="step">
+    <p class="q">What’s your background?</p>
+    <textarea name="typed__background">{{ f.get('typed__background','') }}</textarea>
+  </section>
+
+  <section class="step">
+    <p class="q">A belief about your field others would push back on?</p>
+    <textarea name="typed__beliefs">{{ f.get('typed__beliefs','') }}</textarea>
+  </section>
+
+  <section class="step">
+    <p class="q">A lesson you learned the hard way?</p>
+    <textarea name="typed__lessons">{{ f.get('typed__lessons','') }}</textarea>
+  </section>
+
+  <section class="step">
+    <p class="q">Where are you online?</p>
+    <p class="sub">Optional — helps ground your footprint.</p>
+    <div class="row"><label>LinkedIn</label><input type="text" name="online__linkedin" value="{{ f.get('online__linkedin','') }}" /></div>
+    <div class="row"><label>X / Twitter</label><input type="text" name="online__x" value="{{ f.get('online__x','') }}" /></div>
+    <div class="row"><label>Other</label><input type="text" name="online__other" value="{{ f.get('online__other','') }}" /></div>
+    <label class="checkline"><input type="checkbox" name="online__cold_start" {% if f.get('online__cold_start') %}checked{% endif %} /> Cold start (no existing posts)</label>
+    <div class="row"><label>Existing posts (if any)</label><textarea name="online__existing_posts">{{ f.get('online__existing_posts','') }}</textarea></div>
+  </section>
+
+  <section class="step">
+    <p class="q">Any docs to pull from?</p>
+    <div class="row"><label>Résumé (plain text)</label><textarea name="docs__resume">{{ f.get('docs__resume','') }}</textarea></div>
+    <div class="row"><label>Portfolio</label><input type="text" name="docs__portfolio" value="{{ f.get('docs__portfolio','') }}" /></div>
+  </section>
+
+  {% for q in voice_questions %}
+  <section class="step">
+    <p class="eyebrow">Voice · {{ loop.index }} of {{ voice_questions|length }}</p>
+    <p class="q">{{ q }}</p>
+    <textarea name="voice_a__{{ loop.index0 }}">{{ voice_answers.get(q,'') }}</textarea>
+  </section>
+  {% endfor %}
+
+  <section class="step">
+    <p class="q">How does your writing sound?</p>
+    <div class="row"><label>Tone words (comma-separated)</label><input type="text" name="voice__tone_words" value="{{ f.get('voice__tone_words','') }}" /></div>
+    <div class="row"><label>How it looks on the page</label><input type="text" name="voice__look" value="{{ f.get('voice__look','') }}" /></div>
+    <div class="row"><label>Sentence length</label><input type="text" name="voice__sentence_length" value="{{ f.get('voice__sentence_length','') }}" /></div>
+    <div class="row"><label>Emojis</label><input type="text" name="voice__emojis" value="{{ f.get('voice__emojis','') }}" placeholder="e.g. none" /></div>
+  </section>
+
+  <section class="step">
+    <p class="q">Any banned words or signature phrases?</p>
+    <div class="row"><label>Banned words (comma-separated)</label><input type="text" name="voice__banned" value="{{ f.get('voice__banned','') }}" /></div>
+    <div class="row"><label>Signature phrases (comma-separated)</label><input type="text" name="voice__signatures" value="{{ f.get('voice__signatures','') }}" /></div>
+    <div class="row"><label>Anything else about your voice</label><textarea name="voice__notes">{{ f.get('voice__notes','') }}</textarea></div>
+  </section>
+
+  <section class="step">
+    <p class="q">Who are you writing for?</p>
+    <div class="row"><label>Audience</label><input type="text" name="audience__writing_for" value="{{ f.get('audience__writing_for','') }}" /></div>
+    <div class="row"><label>Your goal</label><input type="text" name="audience__goal" value="{{ f.get('audience__goal','') }}" /></div>
+    <div class="row"><label>What to play to</label><input type="text" name="audience__play_to" value="{{ f.get('audience__play_to','') }}" /></div>
+  </section>
+
+  <section class="step">
+    <p class="q">Output preferences</p>
+    <div class="row"><label>Channels (comma-separated)</label><input type="text" name="output__channels" value="{{ f.get('output__channels','LinkedIn') }}" /></div>
+    <div class="row"><label>Length</label><input type="text" name="output__length" value="{{ f.get('output__length','') }}" /></div>
+    <div class="row"><label>Format notes</label><input type="text" name="output__format" value="{{ f.get('output__format','') }}" /></div>
+    <div class="row"><label>Hard nevers (one per line)</label><textarea name="output__hard_nevers">{{ f.get('output__hard_nevers','') }}</textarea></div>
+    <div class="row"><label>Off-limits topics</label><input type="text" name="output__off_limits" value="{{ f.get('output__off_limits','') }}" /></div>
+  </section>
+
+  <div class="wizardnav">
+    <div class="wizrow">
+      <button type="button" class="btn btn-ghost" data-back>Back</button>
+      <button type="button" class="btn btn-primary" data-next data-next-label="Next" data-finish-label="Save &amp; build my voice">Next</button>
+      <span data-progress></span>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/wizard.js"></script>
+{% endblock %}
