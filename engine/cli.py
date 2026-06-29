@@ -1,7 +1,8 @@
-"""CLI — onboard, ablate, report, run, doctor.
+"""CLI — onboard, ablate, report, run, generate, settings, doctor.
 
 Default provider is `terminal` (no API key): each reasoning step writes a prompt and
-waits for an answer file. `run` does the whole thing: onboard -> ablation -> report.
+waits for an answer file. `run` is the calibration ladder (onboard -> ablation -> report);
+`generate` is the shippable path (brief -> pause to edit -> final post).
 """
 
 from __future__ import annotations
@@ -15,13 +16,13 @@ from .ablation import load_layers, run_ablation
 from .blocks import council
 from .blocks import draft as draft_block
 from .blocks import receipts as receipts_block
-from .blocks.brief import build_brief, load_brief, write_brief
+from .blocks.brief import build_brief, load_brief, over_limit, write_brief
 from .blocks.gate import human_gate
 from .blocks.intake import load_intake
 from .blocks.persona import build_persona
 from .blocks.profile import write_profile_docs
-from .config import PROFILES_DIR, RUNS_DIR
-from .posttypes import get_post_type
+from .config import COUNCIL_MAX_PASSES, COUNCIL_TARGET, DEFAULT_MODEL, PROFILES_DIR, RUNS_DIR
+from .posttypes import load_post_types
 from .providers import get_provider
 from .providers.base import NeedsCompletion
 from .report import RunReport, build_report, compute_places_to_refine, write_report
@@ -110,7 +111,7 @@ def cmd_generate(args):
     brief = load_brief(run_dir)
     persona_path = PROFILES_DIR / "persona.md"
     persona_md = persona_path.read_text(encoding="utf-8") if persona_path.exists() else ""
-    layers = load_layers(get_post_type(brief.post_type).layer_files)
+    layers = load_layers()
 
     prompt = draft_block.build_draft_prompt_from_brief(brief, persona_md or None, layers)
     text = draft_block.draft("draft", prompt, provider)
@@ -124,6 +125,26 @@ def cmd_generate(args):
         )
     out = human_gate(text, run_dir)
     print(f"post -> {out}  (copied to clipboard; review before posting)")
+    over = over_limit(text, brief)
+    if over:
+        print(
+            f"⚠️  over the {brief.character_count}-char cap by {over} "
+            f"({len(text)} chars) — trim before posting (left intact, not auto-cut)."
+        )
+
+
+def cmd_settings(args):
+    """Print the settings page: post types (data/posttypes.json), voice, engine tunables."""
+    print("POST TYPES  (edit data/posttypes.json)")
+    for key, pt in load_post_types().items():
+        cap = f"{pt.character_count} chars" if pt.character_count else "no cap"
+        print(f"  {key:16s} {pt.describe():28s} [{cap}] · {pt.content} · {pt.length}")
+    print("\nVOICE  (edit data/intake.json -> voice / output)")
+    print("  tone_words, sentence_length, banned, signatures, emojis, hard_nevers")
+    print("\nENGINE  (edit engine/config.py)")
+    print(
+        f"  quality_target={COUNCIL_TARGET}  max_passes={COUNCIL_MAX_PASSES}  model={DEFAULT_MODEL}"
+    )
 
 
 def cmd_doctor(args):
@@ -146,11 +167,12 @@ def main(argv=None):
         ("report", cmd_report),
         ("run", cmd_run),
         ("doctor", cmd_doctor),
+        ("settings", cmd_settings),
     ):
         sub.add_parser(name, parents=[common]).set_defaults(func=fn)
 
     gen = sub.add_parser("generate", parents=[common])
-    gen.add_argument("--type", default="linkedin", help="post type (see engine/posttypes.py)")
+    gen.add_argument("--type", default="linkedin_post", help="post type (see `bf settings`)")
     gen.set_defaults(func=cmd_generate)
 
     args = parser.parse_args(argv)

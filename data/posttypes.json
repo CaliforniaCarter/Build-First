@@ -1,0 +1,23 @@
+{
+  "linkedin_post": {
+    "output": "LinkedIn",
+    "type": "post",
+    "content": "words",
+    "character_count": 3000,
+    "length": "medium — front-load the value, as long as it needs and no longer"
+  },
+  "x_post": {
+    "output": "X/Twitter",
+    "type": "post",
+    "content": "words",
+    "character_count": 280,
+    "length": "one breath — very short"
+  },
+  "instagram_post": {
+    "output": "Instagram",
+    "type": "post",
+    "content": "words",
+    "character_count": 2200,
+    "length": "short, punchy caption"
+  }
+}

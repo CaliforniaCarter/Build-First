@@ -39,11 +39,9 @@ LEVELS = [
 ]
 
 
-DEFAULT_LAYERS = ("format.md", "audience_tenex.md")
-
-
-def load_layers(names: tuple[str, ...] | list[str] = DEFAULT_LAYERS) -> str:
-    return "\n\n".join((LAYERS_DIR / n).read_text(encoding="utf-8") for n in names)
+def load_layers() -> str:
+    """All prose layers, applied to every post type. Add a .md to engine/layers to extend."""
+    return "\n\n".join(f.read_text(encoding="utf-8") for f in sorted(LAYERS_DIR.glob("*.md")))
 
 
 def context_for(inputs: list[str], intake: Intake) -> str:

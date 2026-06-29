@@ -21,33 +21,42 @@ from .intake import ContentIdea, Intake
 
 class Brief(BaseModel):
     post_type: str
-    output: str  # what to write, in plain language — e.g. "a LinkedIn post" (model interprets)
-    constraints: list[str] = []  # hard rules only (char limits, etc.); soft form is interpreted
+    output: str  # what to write, in plain language — e.g. "a post for LinkedIn" (model interprets)
+    content: str = "words"  # modality; "words" today, "carousel"/"video" later
+    character_count: int = 0  # hard max chars; 0 = no limit. Always enforced when > 0.
+    length: str = ""  # soft target
     content_idea: ContentIdea  # reuse the intake model — no new idea fields
     tone: list[str] = []  # soft voice hints, from the intake
     cadence: str = ""
-    length: str = ""
     voice_ref: str = ""  # pointer to the prose voice doc (kept out of the JSON)
     banned: list[str] = []
     hard_nevers: list[str] = []
 
 
 def build_brief(intake: Intake, post_type: str, voice_ref: str = "profiles/persona.md") -> Brief:
-    """Compose a Brief from the intake + the post-type template. Intake wins on overlap."""
+    """Compose a Brief from the intake + the post-type settings. Intake wins on overlap."""
     pt = get_post_type(post_type)
     v, o = intake.voice, intake.output
     return Brief(
         post_type=pt.key,
-        output=o.format or pt.output,  # intake.output.format overrides the type's label
-        constraints=list(pt.constraints),
+        output=o.format or pt.describe(),  # intake.output.format overrides the derived label
+        content=pt.content,
+        character_count=pt.character_count,
+        length=o.length or pt.length,
         content_idea=intake.idea,
         tone=list(v.tone_words),
         cadence=v.sentence_length,
-        length=o.length,
         voice_ref=voice_ref,
         banned=list(v.banned),
         hard_nevers=list(o.hard_nevers),
     )
+
+
+def over_limit(text: str, brief: Brief) -> int:
+    """Chars the post is over its hard character cap; 0 if within (or no cap). Never trims."""
+    if brief.character_count and len(text) > brief.character_count:
+        return len(text) - brief.character_count
+    return 0
 
 
 def render_brief_md(brief: Brief) -> str:
@@ -60,10 +69,11 @@ def render_brief_md(brief: Brief) -> str:
         "",
         f"- **Post type:** {brief.post_type}",
         f"- **Output:** {brief.output}",
-        f"- **Constraints (hard):** {'; '.join(brief.constraints) or '—'}",
+        f"- **Content:** {brief.content}",
+        f"- **Character cap (enforced):** {brief.character_count or 'none'}",
+        f"- **Length:** {brief.length or '—'}",
         f"- **Cadence:** {brief.cadence or '—'}",
         f"- **Tone:** {', '.join(brief.tone) or '—'}",
-        f"- **Length:** {brief.length or '—'}",
         f"- **Voice ref:** {brief.voice_ref or '—'}",
         f"- **Banned:** {', '.join(brief.banned) or '—'}",
         f"- **Hard nevers:** {', '.join(brief.hard_nevers) or '—'}",

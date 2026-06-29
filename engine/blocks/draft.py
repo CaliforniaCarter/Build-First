@@ -66,7 +66,12 @@ def build_draft_prompt_from_brief(brief: Brief, persona_md: str | None, layers: 
             "VOICE: none yet — write a clean, plain professional post (no fake personality).\n\n"
         )
 
-    constraints = "\n".join(f"  - {c}" for c in brief.constraints) or "  - (none)"
+    rules = []
+    if brief.character_count:
+        rules.append(f"at most {brief.character_count} characters — hard limit, do not exceed")
+    if brief.content and brief.content != "words":
+        rules.append(f"this is a {brief.content} post — write for that format")
+    constraints = "\n".join(f"  - {c}" for c in rules) or "  - (none)"
 
     return (
         f"Write {brief.output}. Output ONLY the post text, no preamble, no title, no hashtags.\n\n"
