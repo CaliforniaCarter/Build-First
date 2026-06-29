@@ -14,13 +14,31 @@ from ..providers.base import Provider
 from ..rubric.shared import rubric_text
 
 
+# Best-in-class moves (adapt the move, NOT the wording — never imitate another person's voice).
+PLAYBOOK = (
+    "PLAYBOOK — optimize toward these (adapt the move in the author's own voice; never copy):\n"
+    "  1. Open on a real moment or admission, not a thesis. Never 'excited to share.'\n"
+    "  2. Lead with the number / ship the receipts. One real metric beats ten adjectives.\n"
+    "  3. Vulnerability beats the flex. 'I was wrong' / 'this didn't work' outperforms 'I crushed it.'\n"
+    "  4. Show the mechanism, don't just claim the result.\n"
+    "  5. 'How,' not 'wow' — explain the workflow behind it.\n"
+    "  6. Teach something saveable (a guide, a rule, a checklist).\n"
+    "  7. One spiky, ownable claim per post — debatable and only-you.\n"
+    "  8. Plain language, zero jargon.\n"
+    "  9. Give the playbook away; generosity is the flex.\n"
+    "  10. Human and imperfect beats buffed and lifeless."
+)
+
+
 def build_council_prompt(draft: str, persona_md: str, layers: str) -> str:
     return (
         "You are the Writer's Council: Shaan Puri (hooks), Morgan Housel (clarity), "
-        "David Perell (resonance). Critique the draft against the rubric, then rewrite it to "
-        "fix the issues WITHOUT changing the central claim or the voice. Decide whether to "
+        "David Perell (resonance). Critique the draft against the rubric and the playbook, then "
+        "rewrite it to fix the issues WITHOUT changing the central claim or the voice. The most "
+        "common miss is no turn: add a real admission, cost, or contrarian edge. Decide whether to "
         "stop (it passes, or another pass won't help) or continue.\n\n"
         f"{rubric_text()}\n\n"
+        f"{PLAYBOOK}\n\n"
         f"PERSONA (keep this voice):\n{persona_md}\n\n"
         f"LAYERS:\n{layers}\n\n"
         f"DRAFT:\n{draft}\n\n"

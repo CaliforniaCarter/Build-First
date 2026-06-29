@@ -5,23 +5,28 @@ Tenex team writes for (operators and execs going AI-native), tone modeled on Ale
 Lieberman, Arman Hezarkhani, and Brett Franklin. Goal (from intake): leave them
 inspired and curious about how Carter could add value — without selling.
 
-## The build-post anatomy (how Alex and Arman actually write)
-1. Hook — the build + an analogy, or a vivid scene. Front-loaded.
-2. The pain — concrete and step-by-step (what was annoying, exactly).
-3. The spark / build moment — with real specifics (tools, time).
-4. How it works — in plain language.
-5. What it looks like in practice — scannable use cases.
-6. The honest lesson, or the number.
-7. A soft close (a real question), plus the proof/receipt.
+> **Adapt the move, don't copy the post.** These are reference *moves*, not a voice to
+> imitate. If the draft starts sounding like Alex, that's the clone trap — Alex is allergic
+> to AI-slop and spots imitation instantly. Run the move in Carter's own register
+> (warm, lowercase, plain, "take it easy"). The persona always wins. Never feed another
+> person's posts in as voice samples.
 
-## Levers
-- Open on a real moment, not a thesis (Alex).
-- Show the actual mechanism and attach proof (Arman).
-- Land one real number when you have one.
-- Specific and ownable — only you could have written it. No generic trend takes.
-- Show you shipped it and used it yourself (customer zero).
+## The build-post anatomy
+1. Hook — a real moment or admission, or the build + an analogy. Front-loaded.
+2. The pain / the turn — concrete, with a cost or a thing that didn't work.
+3. The mechanism — in plain language, shown not claimed.
+4. What it looks like in practice — scannable.
+5. One spiky, ownable claim + the honest lesson, or the number.
+6. A soft close (a real question), plus the proof/receipt.
 
-## Real openers
-- "I built a tool that makes any website multiplayer. Think google docs for the internet."
-- "Six months ago, I started building what I call McKinsey for AI."
+## The playbook (optimize toward these)
+- Open on a real moment, not a thesis. Vulnerability beats the flex ("I was wrong" > "I crushed it").
+- Lead with a number / ship receipts. One real metric beats ten adjectives.
+- "How," not "wow" — explain the workflow; teach something saveable.
+- One spiky, ownable claim per post. Plain language, zero jargon.
+- Give the playbook away. Human and imperfect beats buffed and lifeless.
+
+## Real openers (moves to adapt, not lines to copy)
+- "I was wrong." (admission → trust + curiosity)
+- "I reverse-engineered the X algorithm so you don't have to." (done-for-you value)
 - Bad: "AI can analyze your writing style and save you tons of time!"
