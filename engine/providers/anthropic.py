@@ -3,6 +3,7 @@
 Enable the re-eval path with:  uv pip install -e '.[api]'  and  ANTHROPIC_API_KEY.
 Kept deliberately thin: it is the drop-in that lets the same evals re-run with a key.
 """
+
 from __future__ import annotations
 
 import os

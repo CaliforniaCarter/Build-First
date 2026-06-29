@@ -1,4 +1,5 @@
 """Slop detection and PII redaction behave."""
+
 from engine.blocks.receipts import redact
 from engine.rubric.shared import find_slop, parse_score
 

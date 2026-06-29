@@ -4,6 +4,7 @@ A panel critiques the draft against the rubric and rewrites it without changing 
 central claim or the voice. Reflexion stop rule: stop when it passes, or when another
 pass won't help. Bounded by COUNCIL_MAX_PASSES so it never loops forever.
 """
+
 from __future__ import annotations
 
 import json
@@ -66,7 +67,9 @@ def revise(
     log: list[dict] = []
     current = draft
     for n in range(1, max_passes + 1):
-        out = provider.complete(f"council_pass{n}", build_council_prompt(current, persona_md, layers))
+        out = provider.complete(
+            f"council_pass{n}", build_council_prompt(current, persona_md, layers)
+        )
         parsed = _parse_pass(out)
         current = (parsed.get("revised_draft") or current).strip()
         stop = bool(parsed.get("stop"))

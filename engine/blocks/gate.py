@@ -1,4 +1,5 @@
 """Human gate — the engine never auto-posts. It writes a draft and copies it for review."""
+
 from __future__ import annotations
 
 import subprocess

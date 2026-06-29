@@ -1,4 +1,5 @@
 """Pydantic schemas — every machine output is validated against these or rejected."""
+
 from __future__ import annotations
 
 from statistics import mean
@@ -7,12 +8,12 @@ from pydantic import BaseModel, Field, model_validator
 
 # The six hard gates (must-contain / must-be-true). Pass/fail.
 GATE_NAMES = [
-    "only_you",                 # an observation only this person could make
+    "only_you",  # an observation only this person could make
     "real_number_or_specific",  # a real number or a concrete, checkable detail
-    "concrete_scene",           # a real moment, shown not summarized
-    "non_obvious_lesson",       # a takeaway most people would miss
-    "no_slop",                  # none of the banned slop phrases
-    "central_claim_human",      # the core claim is the human's, not the model's
+    "concrete_scene",  # a real moment, shown not summarized
+    "non_obvious_lesson",  # a takeaway most people would miss
+    "no_slop",  # none of the banned slop phrases
+    "central_claim_human",  # the core claim is the human's, not the model's
 ]
 
 # The eight 0-10 quality dimensions, each scored with a one-line reason.
@@ -79,9 +80,9 @@ class Score(BaseModel):
 
 
 class LevelResult(BaseModel):
-    level: str          # e.g. "L0"
-    label: str          # e.g. "Online"
-    adds: str           # what this tier adds
+    level: str  # e.g. "L0"
+    label: str  # e.g. "Online"
+    adds: str  # what this tier adds
     inputs_active: list[str]
     draft: str
     score: Score

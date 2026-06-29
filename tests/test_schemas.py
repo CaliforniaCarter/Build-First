@@ -1,4 +1,5 @@
 """Schemas reject malformed scores and accept complete ones."""
+
 import pytest
 from pydantic import ValidationError
 

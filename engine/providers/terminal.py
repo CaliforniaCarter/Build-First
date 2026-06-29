@@ -4,6 +4,7 @@ For each stage it writes the assembled prompt to `runs/<id>/prompts/<stage>.md`
 and reads the answer from `runs/<id>/completions/<stage>.txt`. Missing answer ->
 NeedsCompletion (resumable). Every prompt and answer is kept as an audit trail.
 """
+
 from __future__ import annotations
 
 from pathlib import Path

@@ -3,6 +3,7 @@
 The real file (`data/intake.json`) is personal and gitignored. `intake.example.json`
 shows the shape. Nothing here is invented: every field is something the user gave.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -16,11 +17,11 @@ class ContentIdea(BaseModel):
     topic: str
     take: str = ""
     scene: str = ""
-    number: str = ""          # leave blank if no real number was given
+    number: str = ""  # leave blank if no real number was given
     lesson: str = ""
     only_you: str = ""
-    mechanism: str = ""       # how it actually works (real specifics)
-    proof: list[str] = []     # receipts to attach / cite
+    mechanism: str = ""  # how it actually works (real specifics)
+    proof: list[str] = []  # receipts to attach / cite
     close: str = ""
 
 
@@ -33,7 +34,7 @@ class Online(BaseModel):
 
 
 class Docs(BaseModel):
-    resume: str = ""          # plain text
+    resume: str = ""  # plain text
     portfolio: str = ""
 
 
@@ -46,13 +47,13 @@ class Typed(BaseModel):
 
 
 class Voice(BaseModel):
-    answers: dict[str, str] = {}   # question -> raw, unpolished answer
+    answers: dict[str, str] = {}  # question -> raw, unpolished answer
     tone_words: list[str] = []
     look: str = ""
     sentence_length: str = ""
     banned: list[str] = []
     signatures: list[str] = []
-    emojis: str = ""               # e.g. "none"
+    emojis: str = ""  # e.g. "none"
     notes: str = ""
 
 

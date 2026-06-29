@@ -1,6 +1,7 @@
 """Assemble the run report: post progression, scores, per-dimension reasons, diffs,
 and a places-to-refine list. Output is Markdown (also what gets posted to Notion).
 """
+
 from __future__ import annotations
 
 import difflib
@@ -10,9 +11,11 @@ from .rubric.schemas import LevelResult, RunReport, Score
 
 
 def _diff(prev: str, cur: str) -> str:
-    lines = list(difflib.unified_diff(
-        prev.splitlines(), cur.splitlines(), lineterm="", n=1, fromfile="prev", tofile="this"
-    ))
+    lines = list(
+        difflib.unified_diff(
+            prev.splitlines(), cur.splitlines(), lineterm="", n=1, fromfile="prev", tofile="this"
+        )
+    )
     return "\n".join(lines[:40]) if lines else "(no textual change)"
 
 
@@ -66,7 +69,12 @@ def build_report(report: RunReport) -> str:
 
     prev = None
     for lvl in report.levels:
-        out += [f"## {lvl.level} — {lvl.label}", "", f"*Adds: {lvl.adds}. Inputs: {', '.join(lvl.inputs_active)}.*", ""]
+        out += [
+            f"## {lvl.level} — {lvl.label}",
+            "",
+            f"*Adds: {lvl.adds}. Inputs: {', '.join(lvl.inputs_active)}.*",
+            "",
+        ]
         out += ["**Post:**", "", "```", lvl.draft, "```", ""]
         out += [_score_block(lvl.score), ""]
         if prev is not None:

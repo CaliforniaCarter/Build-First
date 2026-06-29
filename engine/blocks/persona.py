@@ -3,6 +3,7 @@
 Recognition > description: people can't describe their voice but the model can read
 it from raw, unpolished answers. The prompt forbids inventing traits not in evidence.
 """
+
 from __future__ import annotations
 
 from ..config import PROFILES_DIR

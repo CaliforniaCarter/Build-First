@@ -4,6 +4,7 @@ Framing borrowed from Tenex's 5-stage eval framework: must-contain (the hard
 gates) + must-not-contain (the slop list) + an LLM-as-judge rubric calibrated to
 one human (Carter corrects the scores each morning, which tunes the weights).
 """
+
 from __future__ import annotations
 
 import json
@@ -13,12 +14,31 @@ from .schemas import DIM_NAMES, GATE_NAMES, Score
 
 # must-not-contain: AI/LinkedIn slop + Carter's banned register ("no AI jargon").
 SLOP_PHRASES = [
-    "unlock", "leverage", "thrilled to announce", "excited to announce",
-    "excited to share", "game-changer", "game changer", "supercharge",
-    "revolutionize", "seamless", "robust", "elevate", "synergy", "delve",
-    "in today's fast-paced", "needle-moving", "at the end of the day",
-    "dive in", "in conclusion", "the power of", "harness", "paradigm",
-    "transformative", "cutting-edge", "best-in-class",
+    "unlock",
+    "leverage",
+    "thrilled to announce",
+    "excited to announce",
+    "excited to share",
+    "game-changer",
+    "game changer",
+    "supercharge",
+    "revolutionize",
+    "seamless",
+    "robust",
+    "elevate",
+    "synergy",
+    "delve",
+    "in today's fast-paced",
+    "needle-moving",
+    "at the end of the day",
+    "dive in",
+    "in conclusion",
+    "the power of",
+    "harness",
+    "paradigm",
+    "transformative",
+    "cutting-edge",
+    "best-in-class",
 ]
 
 GATE_DESCRIPTIONS = {

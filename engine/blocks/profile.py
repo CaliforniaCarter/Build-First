@@ -3,6 +3,7 @@
 profile.md = stable identity (who you are). context.md = today's specific work.
 These are templated straight from the intake so they can never hallucinate.
 """
+
 from __future__ import annotations
 
 from ..config import PROFILES_DIR
@@ -29,7 +30,9 @@ def build_profile(intake: Intake) -> str:
         foot.append(f"- X: {o.x}")
     if o.other:
         foot.append(f"- Other: {o.other}")
-    foot.append(f"- Start: {'cold start (no existing posts)' if o.cold_start else o.existing_posts}")
+    foot.append(
+        f"- Start: {'cold start (no existing posts)' if o.cold_start else o.existing_posts}"
+    )
     out += ["## Public footprint", *foot, ""]
     if t.background:
         out += ["## Unique background", t.background, ""]

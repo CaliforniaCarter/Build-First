@@ -1,4 +1,5 @@
 """Paths and a few tunables. No magic — everything is relative to the repo root."""
+
 from __future__ import annotations
 
 from pathlib import Path

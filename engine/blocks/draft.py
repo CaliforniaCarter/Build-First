@@ -3,6 +3,7 @@
 The ablation passes a different `context_block` (and maybe a persona) per level; the
 prompt is otherwise identical, so the eval isolates what each input is worth.
 """
+
 from __future__ import annotations
 
 from ..providers.base import Provider
@@ -19,7 +20,9 @@ def build_draft_prompt(
     if persona_md:
         voice = f"VOICE — write in this voice and obey its never-do list:\n{persona_md}\n\n"
     else:
-        voice = "VOICE: none yet — write a clean, plain professional post (no fake personality).\n\n"
+        voice = (
+            "VOICE: none yet — write a clean, plain professional post (no fake personality).\n\n"
+        )
     return (
         f"Write one post for {', '.join(channels) or 'LinkedIn'}. Output ONLY the post text, "
         "no preamble, no title, no hashtags.\n\n"

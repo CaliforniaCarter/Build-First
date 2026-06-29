@@ -3,6 +3,7 @@
 Redaction matters even though the run is local: a post is public, so emails, phone
 numbers, and keys must never leak into the draft body.
 """
+
 from __future__ import annotations
 
 import re

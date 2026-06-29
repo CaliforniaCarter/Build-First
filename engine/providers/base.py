@@ -3,6 +3,7 @@
 This is the only place the pipeline talks to a 'model'. It lets the same code run
 through the terminal agent (no API key) tonight, or the Anthropic API later.
 """
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
