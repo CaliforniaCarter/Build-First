@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+*.egg-info/
+
+# Secrets (the API path is dormant; never commit a key)
+.env
+
+# Personal, local-first data — never leaves the machine, never committed
+profiles/*.md
+!profiles/.gitkeep
+runs/
+data/transcripts/
+
+# OS
+.DS_Store
