@@ -81,16 +81,18 @@ def cmd_doctor(args):
 
 
 def main(argv=None):
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--provider", default="terminal", choices=["terminal", "anthropic"])
+    common.add_argument("--run-id", default=_dt.date.today().isoformat())
+    common.add_argument("--date", default=_dt.date.today().isoformat())
+
     parser = argparse.ArgumentParser(prog="bf", description="Brand Voice Content Engine")
-    parser.add_argument("--provider", default="terminal", choices=["terminal", "anthropic"])
-    parser.add_argument("--run-id", default=_dt.date.today().isoformat())
-    parser.add_argument("--date", default=_dt.date.today().isoformat())
     sub = parser.add_subparsers(dest="cmd", required=True)
     for name, fn in (
         ("onboard", cmd_onboard), ("ablate", cmd_ablate), ("report", cmd_report),
         ("run", cmd_run), ("doctor", cmd_doctor),
     ):
-        sub.add_parser(name).set_defaults(func=fn)
+        sub.add_parser(name, parents=[common]).set_defaults(func=fn)
 
     args = parser.parse_args(argv)
     try:
