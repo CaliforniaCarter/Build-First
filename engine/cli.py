@@ -11,6 +11,7 @@ import datetime as _dt
 import sys
 
 from .ablation import run_ablation
+from .blocks.gate import human_gate
 from .blocks.intake import load_intake
 from .blocks.persona import build_persona
 from .blocks.profile import write_profile_docs
@@ -79,6 +80,8 @@ def cmd_run(args):
     path = write_report(report)
     print(build_report(report))
     print(f"\n--- report written to {path} ---")
+    draft_path = human_gate(results[-1].draft, RUNS_DIR / args.run_id)
+    print(f"--- final draft -> {draft_path} (copied to clipboard for review) ---")
 
 
 def cmd_doctor(args):
