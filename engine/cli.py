@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as _dt
+import json
 import sys
 from pathlib import Path
 
@@ -15,6 +16,7 @@ from .ablation import run_ablation
 from .blocks.gate import human_gate
 from .blocks.intake import load_intake
 from .blocks.persona import build_persona
+from .blocks.probe import unfilled_gaps
 from .blocks.profile import write_profile_docs
 from .config import PROFILES_DIR, RUNS_DIR
 from .post import make_post, open_gaps
@@ -109,6 +111,21 @@ def cmd_post(args):
     print(f"\nReady for your review (copied to clipboard): {out}")
 
 
+def cmd_gaps(args):
+    """The gap-driven probe: what a strong post still needs. The UI reads --json."""
+    intake = _intake(args)
+    gaps = unfilled_gaps(intake)
+    if args.json:
+        print(json.dumps(gaps, indent=2))
+        return
+    if not gaps:
+        print("No gaps — this idea already has a number, scene, lesson, and only-you angle.")
+        return
+    print("To make this post strong, the engine needs (it won't invent these):")
+    for g in gaps:
+        print(f"  [{g['key']}] {g['question']}")
+
+
 def cmd_doctor(args):
     intake = _intake(args)
     print(f"intake ok: {intake.name}, topic={intake.idea.topic[:60]!r}")
@@ -135,11 +152,15 @@ def main(argv=None):
         default=None,
         help="path to intake JSON (default: data/intake.json, else sample)",
     )
+    common.add_argument(
+        "--json", action="store_true", help="emit machine-readable JSON (for the UI)"
+    )
 
     parser = argparse.ArgumentParser(prog="bf", description="Brand Voice Content Engine")
     sub = parser.add_subparsers(dest="cmd", required=True)
     for name, fn in (
         ("post", cmd_post),
+        ("gaps", cmd_gaps),
         ("onboard", cmd_onboard),
         ("ablate", cmd_ablate),
         ("report", cmd_report),
