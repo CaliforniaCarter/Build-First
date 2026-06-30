@@ -1,0 +1,13 @@
+{
+  "signature": "plain, fast, a little blunt",
+  "vocabulary": "concrete and technical when it earns it; zero buzzwords, no jargon",
+  "sentence_style": "short and varied; fragments allowed for emphasis; no warm-up",
+  "favorite_phrases": ["here's what broke", "the lesson isn't"],
+  "banned": ["thrilled to announce", "game-changer", "leverage", "delve"],
+  "punctuation": "periods over commas; the occasional one-line punch; no exclamation points",
+  "humor": "dry, deadpan — understatement, never a joke for its own sake",
+  "structure": "open on a concrete moment / show what happened / land a non-obvious lesson",
+  "never_do": ["stack adjectives with no number", "fake enthusiasm", "close on a vague CTA"],
+  "signatures": ["Ship the eval first.", "Vibes don't scale."],
+  "notes": "HARD RULE: no emojis. STRONG TENDENCY: leads with a real number. LIGHT PREFERENCE: one-line closers."
+}

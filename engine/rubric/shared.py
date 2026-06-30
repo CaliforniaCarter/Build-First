@@ -11,7 +11,25 @@ import json
 import re
 
 from ..blocks.proof import load_proof_config
+from ..config import RUBRIC_PATH
 from .schemas import DIM_DESCRIPTIONS, DIM_NAMES, GATE_DESCRIPTIONS, GATE_NAMES, Score
+
+
+def _example_block() -> str:
+    """One worked example (from the editable rubric.json) — pins the tone + specificity bar of
+    the one-line reasons, so scores don't drift. Returns '' if the example was removed."""
+    try:
+        ex = json.loads(RUBRIC_PATH.read_text(encoding="utf-8")).get("example_reasons")
+    except (OSError, ValueError):
+        return ""
+    if not ex:
+        return ""
+    return (
+        "EXAMPLE — the tone + specificity bar for your one-line reasons (match how tough and "
+        "concrete these are; don't copy the content):\n"
+        f"  gate      -> {json.dumps(ex['gate'])}\n"
+        f"  dimension -> {json.dumps(ex['dimension'])}\n\n"
+    )
 
 
 def rubric_text() -> str:
@@ -41,6 +59,7 @@ def build_score_prompt(draft: str, persona_md: str, layers: str, prev_draft: str
         f"{prev}\n"
         "DRAFT:\n"
         f"{draft}\n\n"
+        f"{_example_block()}"
         "Return ONLY JSON with this shape — include EVERY gate and EVERY dimension, "
         "using these exact names:\n"
         f"  gates ({len(GATE_NAMES)}): {', '.join(GATE_NAMES)}\n"

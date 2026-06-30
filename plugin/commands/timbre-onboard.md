@@ -19,14 +19,14 @@ where each answer is stored). Ask those questions; never invent your own.
    print one question, wait for the answer, then the next. **Never batch them.** Above each
    question print a progress bar, e.g. `[▰▰▱▱▱▱▱] 2/7 · background`. Substitute `{name}` once you
    have it. **Before the three voice questions (weekend / lunch / teach), say a short
-   transition:** *"Now I'll ask you 3 quick questions — just type or dictate in your real voice;
-   it's the best way for me to capture how you actually write."*
+   transition:** *"Now I'll ask you 3 quick questions — just type or talk them out, however
+   feels natural; it's the easiest way for me to hear how you actually sound."*
    - **`deterministic`** — ask the `prompt` verbatim.
-   - **`ab_pick`** — show the TWO `options[].example` posts as **A** and **B** (the real little
-     examples, not the labels), ask which sounds more like them, and store the chosen option's
-     `value`.
-   - **`adaptive`** — write a short follow-up question yourself, based on their answer to the
-     `based_on` question. (Only if `enabled`.)
+   - **`adaptive_ab`** — the personalized this-or-that. Print the `prompt` to set it up, then
+     follow the question's `generate` instruction: using their **resume + the answers so far**,
+     write the TWO short example posts yourself (real facts only — invent nothing), show them as
+     **A** and **B**, and ask which sounds more like them. **Never label the difference** (no
+     "dry vs warm") — let them feel it. Store the chosen example's **text** at `writes_to`.
 
 3. **Be human between questions.** One short, genuine reaction per answer — and at most one
    grounded micro-observation mid-flow ("you keep it short and dry — noted"). Never invent

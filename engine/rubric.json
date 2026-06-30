@@ -17,5 +17,19 @@
     { "name": "format_adherence", "description": "hook in first line, one idea, short lines, real close, no bait" },
     { "name": "audience_fit", "description": "fits the audience's values without losing the voice" },
     { "name": "stakes_turn", "description": "a real cost, risk, admission, or contrarian turn — not just pleasant and safe" }
-  ]
+  ],
+
+  "example_reasons": {
+    "note": "Illustrative only — the tone + specificity bar for the one-line reasons. Match how tough and concrete these are; your real gates/dimensions are listed above. Edit freely.",
+    "gate": { "name": "concrete_scene", "passed": false, "reason": "opens on a thesis ('AI is changing PM'), not a moment you can picture" },
+    "dimension": { "name": "voice_match", "score": 6, "reason": "plain and dry like their samples, but the close drifts warmer than they'd ever write" }
+  },
+
+  "example_revision": {
+    "note": "Illustrative only — the JSON shape + the kind of critique to write. Match how the critique names ONE concrete fix; never copy the content. Edit freely.",
+    "critique": "Hook lands, but the post stays positive start to finish — there's no turn. Use the admission you already have (the first version broke) so it earns the lesson instead of just stating it.",
+    "revised_draft": "(the rewritten post — same claim, same voice, with the turn added and two filler lines cut)",
+    "stop": false,
+    "reason": "added the turn and tightened; one more pass could sharpen the close"
+  }
 }

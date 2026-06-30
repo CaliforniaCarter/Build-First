@@ -1,5 +1,5 @@
 {
-  "welcome": "Hey, welcome to Timbre. I'm going to ask you a few quick questions so I can learn your voice. Type or use dictation (Wispr Flow works great). No stress — you can always edit and refine your voice later.",
+  "welcome": "Hey, good to have you. I'll ask you a handful of quick questions — the whole point is to get how you actually sound when you write, so just answer like you'd text a friend. Type it or talk it out (dictation works great — Wispr Flow especially). Nothing here is permanent; you can change any of it later.",
 
   "defaults": {
     "audience": {
@@ -52,7 +52,7 @@
       "id": "writing_samples",
       "type": "deterministic",
       "order": 2.5,
-      "prompt": "Any writing you're proud of — a post, an essay, anything you've published? Paste one or two and I'll weight them heavily; your own writing is the strongest signal for your voice. Totally optional — just say 'skip' if you'd rather not.",
+      "prompt": "Got any writing you're proud of — a post, an essay, anything you've put out? Paste one or two. Honestly, your own words tell me more than anything else you could give me here. Totally optional, though — just say 'skip' if you'd rather not.",
       "purpose": "real writing samples, weighted above the easy answers (optional — skippable)",
       "writes_to": "voice.writing_samples"
     },
@@ -81,50 +81,13 @@
       "writes_to": "voice.answers.teach"
     },
     {
-      "id": "teach_followup",
-      "type": "adaptive",
-      "order": 5.5,
-      "enabled": false,
-      "prompt": null,
-      "based_on": "teach",
-      "purpose": "one smart follow-up to go a level deeper on what they just taught",
-      "writes_to": "voice.answers.teach_followup"
-    },
-    {
-      "id": "humor",
-      "type": "ab_pick",
+      "id": "style_pick",
+      "type": "adaptive_ab",
       "order": 6,
-      "prompt": "Two ways to say the same thing — pick the one that sounds more like you:",
-      "purpose": "humor axis",
-      "writes_to": "voice.humor",
-      "options": [
-        {
-          "value": "dry & deadpan",
-          "example": "shipped the thing. worked on the first try, which means something's broken i haven't found yet. i give it until tuesday."
-        },
-        {
-          "value": "warm & playful",
-          "example": "we shipped it — and yeah, i did a little lap around the kitchen. worked first try, which never happens, so i'm taking the win and worrying about tuesday on tuesday."
-        }
-      ]
-    },
-    {
-      "id": "shape",
-      "type": "ab_pick",
-      "order": 7,
-      "prompt": "Last one — which of these is more you?",
-      "purpose": "sentence shape axis",
-      "writes_to": "voice.shape",
-      "options": [
-        {
-          "value": "short & punchy",
-          "example": "cut onboarding from nine steps to four. shipped it friday. signups up 22%. turns out the fastest way to grow was to ask for less. do less. ship it."
-        },
-        {
-          "value": "flowing & connected",
-          "example": "we cut onboarding from nine steps down to four and shipped it friday, and by monday signups were up 22% — which taught me the fastest way to grow wasn't adding anything, it was having the nerve to ask for less."
-        }
-      ]
+      "prompt": "Last one. I'm going to write two short posts about your own work — two different feels — and you just tell me which sounds more like you. No labels, no right answer.",
+      "purpose": "a personalized this-or-that, written from THEIR own material — no leading style labels",
+      "writes_to": "voice.style_pick",
+      "generate": "Write TWO short posts (2-4 lines each) about ONE real thing from THEIR resume/answers. Same facts in both — only the FEEL differs. Pull every detail from their material; invent nothing, and NEVER show or name these reference feels to them (no 'dry vs warm'). Use these two as a guide for the kind of contrast — adapt to their facts, don't copy the wording: (A) understated & dry — 'shipped the new onboarding to the 800-user beta. worked first try, which usually means something's about to break. giving it till tuesday.' (B) warm & building — 'we got the new onboarding into 800 people's hands this week. watching it actually click for someone in real time — that's the part I'll remember.' Show yours as A and B, ask which is more them, and store the chosen one's text at writes_to."
     }
   ]
 }

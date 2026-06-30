@@ -17,6 +17,20 @@ from ..providers.base import Provider
 from .intake import Intake
 
 VOICE_PATH = PROFILES_DIR / "voice.json"
+VOICE_EXAMPLE_PATH = PROFILES_DIR / "voice.example.json"
+
+
+def _example_block() -> str:
+    """A well-formed profile for a DIFFERENT person (committed, editable) — pins the shape and
+    the specificity bar so extractions don't drift. Returns '' if the example was removed."""
+    if not VOICE_EXAMPLE_PATH.exists():
+        return ""
+    raw = VOICE_EXAMPLE_PATH.read_text(encoding="utf-8").strip()
+    return (
+        "EXAMPLE — a well-formed profile for a DIFFERENT person. Match this shape, the "
+        "second-person phrasing, and how specific each field is (especially the confidence "
+        f"labels in `notes`). NEVER copy its content:\n{raw}\n\n"
+    )
 
 
 class VoiceProfile(BaseModel):
@@ -50,12 +64,12 @@ def build_voice_prompt(intake: Intake) -> str:
         f"Tone words they picked: {', '.join(v.tone_words) or '—'}\n"
         f"Look: {v.look or '—'}\n"
         f"Sentence length: {v.sentence_length or '—'}\n"
-        f"Humor pick: {v.humor or '—'}\n"
-        f"Sentence-shape pick: {v.shape or '—'}\n"
+        f"Style they preferred (a personalized A/B pick — soft signal): {v.style_pick or '—'}\n"
         f"Emojis: {v.emojis or '—'}\n"
         f"Banned: {', '.join(v.banned) or '—'}\n"
         f"Signature phrases: {', '.join(v.signatures) or '—'}\n"
         f"Notes: {v.notes or '—'}\n\n"
+        f"{_example_block()}"
         "Return ONLY a JSON object with these keys:\n"
         '{"signature": "3-5 words", "vocabulary": "...", "sentence_style": "...", '
         '"favorite_phrases": ["..."], "banned": ["..."], "punctuation": "...", '

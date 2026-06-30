@@ -54,11 +54,11 @@ class Voice(BaseModel):
     tone_words: list[str] = []
     look: str = ""
     sentence_length: str = ""
-    banned: list[str] = []
+    banned: list[str] = []  # personal banned phrases — fed to the proof / slop check
     signatures: list[str] = []
     emojis: str = ""  # e.g. "none"
-    humor: str = ""  # the onboarding A/B pick, e.g. "dry & deadpan"
-    shape: str = ""  # the onboarding A/B pick, e.g. "short & punchy"
+    # the chosen example from the personalized this-or-that (LLM-written from their own material)
+    style_pick: str = ""
     notes: str = ""
 
 

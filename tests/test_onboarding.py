@@ -15,13 +15,15 @@ def test_onboarding_json_loads_and_is_ordered():
     assert "teach_followup" not in [q.id for q in qs]
 
 
-def test_ab_pick_questions_carry_two_real_examples():
+def test_personalized_pick_is_generated_not_hardcoded():
     cfg = load_onboarding()
-    ab = [q for q in cfg.active() if q.type == "ab_pick"]
-    assert ab, "expected ab_pick questions"
-    for q in ab:
-        assert len(q.options) == 2
-        assert all(o.example.strip() for o in q.options)  # real content, never bare labels
+    picks = [q for q in cfg.active() if q.type == "adaptive_ab"]
+    assert picks, "expected a personalized this-or-that question"
+    for q in picks:
+        # the two options are written from the person's own material, not shipped as leading
+        # hardcoded examples — so the question carries a `generate` instruction, not `options`
+        assert q.generate.strip(), "adaptive_ab must carry a generate instruction"
+        assert q.writes_to  # the chosen example lands somewhere in intake
 
 
 def test_audience_renders_to_the_draft_layer():

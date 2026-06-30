@@ -12,6 +12,7 @@ __pycache__/
 profiles/*.md
 profiles/*.json
 !profiles/.gitkeep
+!profiles/voice.example.json
 runs/
 posts/*
 !posts/.gitkeep

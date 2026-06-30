@@ -48,8 +48,7 @@
     "banned": ["thrilled to announce", "game-changer", "leverage", "delve"],
     "signatures": ["Ship the eval first.", "Vibes don't scale."],
     "emojis": "none",
-    "humor": "dry & deadpan",
-    "shape": "short & punchy",
+    "style_pick": "We shipped the eval harness today. Twenty lines. It already caught a confidently-wrong answer three of us missed. Reviewers grade fluency, not truth — so build the thing that grades truth.",
     "notes": "Writes like she talks: plain, fast, no warm-up."
   },
   "output": {

@@ -15,23 +15,19 @@ from pydantic import BaseModel
 
 from .config import ONBOARDING_PATH
 
-QuestionType = Literal["deterministic", "ab_pick", "adaptive"]
-
-
-class ABOption(BaseModel):
-    value: str  # the label stored into the voice field (e.g. "dry & deadpan")
-    example: str  # a real little post the user picks between — never a bare label
+QuestionType = Literal["deterministic", "adaptive_ab"]
 
 
 class Question(BaseModel):
     id: str
     type: QuestionType
     order: float
-    prompt: str | None = None  # null for `adaptive` — the LLM writes it
+    prompt: str | None = None  # the framing shown to the user
     purpose: str = ""  # plain-English why, so the flow stays self-documenting
     writes_to: str = ""  # dotted path into intake.json (e.g. "voice.answers.weekend")
-    options: list[ABOption] = []  # for `ab_pick`
-    based_on: str | None = None  # for `adaptive`: which prior answer it follows
+    # for `adaptive_ab`: how the model writes the two options FROM the person's own material —
+    # a personalized this-or-that, never a hardcoded/leading example
+    generate: str = ""
     enabled: bool = True
 
 

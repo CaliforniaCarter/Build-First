@@ -10,8 +10,23 @@ from __future__ import annotations
 import json
 import re
 
-from ..config import COUNCIL_MAX_PASSES
+from ..config import COUNCIL_MAX_PASSES, RUBRIC_PATH
 from ..providers.base import Provider
+
+
+def _example_block() -> str:
+    """One worked example (from the editable rubric.json) — pins the JSON shape and the kind of
+    critique to write, so the rewrite stays on-bar. Returns '' if the example was removed."""
+    try:
+        ex = json.loads(RUBRIC_PATH.read_text(encoding="utf-8")).get("example_revision")
+    except (OSError, ValueError):
+        return ""
+    if not ex:
+        return ""
+    return (
+        "EXAMPLE — the shape + the kind of critique to write (match how it names ONE concrete "
+        "fix; never copy the content):\n" + json.dumps(ex) + "\n\n"
+    )
 
 
 def build_council_prompt(draft: str, persona_md: str, layers: str) -> str:
@@ -25,6 +40,7 @@ def build_council_prompt(draft: str, persona_md: str, layers: str) -> str:
         f"VOICE (keep it):\n{persona_md}\n\n"
         f"FORMAT:\n{layers}\n\n"
         f"DRAFT:\n{draft}\n\n"
+        f"{_example_block()}"
         'Return ONLY JSON: {"critique":"...","revised_draft":"...","stop":true|false,"reason":"..."}'
     )
 
