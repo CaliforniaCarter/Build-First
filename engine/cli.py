@@ -13,7 +13,7 @@ import json
 import sys
 from pathlib import Path
 
-from .ablation import context_for, load_ladder, load_layers, run_ablation
+from .ablation import context_for, load_ladder, load_layers, run_ablation, run_field_ablation
 from .blocks.draft import build_draft_prompt
 from .blocks.gate import human_gate
 from .blocks.intake import load_intake
@@ -62,10 +62,24 @@ def cmd_onboard(args):
 
 
 def cmd_ablate(args):
-    """Timbre Labs: add context one tier at a time and watch the score move."""
+    """Timbre Labs: see what each input is worth. Default = add context one tier at a time;
+    --fields = leave-one-out over every individual field (does each field earn its place?)."""
     intake = _intake(args)
     provider = _provider(args)
     persona_md = _onboard(intake, provider)
+    if args.fields:
+        baseline, results = run_field_ablation(intake, persona_md, provider, args.run_id)
+        if args.json:
+            print(json.dumps({"baseline": baseline, "fields": results}, indent=2))
+            return
+        print(f"Baseline — every field in: {baseline}/10\n")
+        print("Drop one field, re-score — what does the post lose?")
+        for r in results:
+            print(
+                f"  {r['contribution']:>+5} ← {r['field']:22s} (without it: {r['score_without']}/10)"
+            )
+        print("\nA positive number = that field earns its place (dropping it hurt the score).")
+        return
     results = run_ablation(intake, persona_md, provider, args.run_id)
     for r in results:
         print(f"{r.level} {r.label:12s} {r.score.headline()}")
@@ -686,6 +700,9 @@ def main(argv=None):
     parsers["sample"].add_argument("--file", default=None, help="a file with your writing")
     parsers["proof"].add_argument(
         "--post", default=None, help="the post to check (default: last saved)"
+    )
+    parsers["ablate"].add_argument(
+        "--fields", action="store_true", help="leave-one-out per field (does each field help?)"
     )
 
     args = parser.parse_args(argv)

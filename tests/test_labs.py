@@ -3,8 +3,10 @@ the ablation ladder (engine/labs.json) load, validate, and stay in sync with the
 
 import json
 
-from engine.ablation import load_ladder
+from engine.ablation import ablatable_fields, load_ladder, run_field_ablation
+from engine.blocks.intake import ContentIdea, Intake
 from engine.config import LABS_PATH, RUBRIC_PATH
+from engine.providers.stub import StubProvider
 from engine.rubric.schemas import DIM_DESCRIPTIONS, DIM_NAMES, GATE_DESCRIPTIONS, GATE_NAMES
 
 
@@ -33,3 +35,21 @@ def test_ladder_loads_and_is_cumulative():
 def test_labs_json_matches_loader():
     data = json.loads(LABS_PATH.read_text(encoding="utf-8"))
     assert [t["level"] for t in data["ladder"]] == [t[0] for t in load_ladder()]
+
+
+def test_field_ablation_auto_discovers_and_scores_each_field():
+    intake = Intake(
+        name="T",
+        idea=ContentIdea(
+            topic="shipped a tool", number="cut it 22%", scene="friday 5pm", lesson="ship the eval"
+        ),
+    )
+    fields = ablatable_fields(intake)
+    # populated fields are discovered automatically; the topic (the seed) never is
+    assert {"idea.number", "idea.scene", "idea.lesson"} <= set(fields)
+    assert "idea.topic" not in fields
+
+    baseline, results = run_field_ablation(intake, "voice", StubProvider(), "qa")
+    assert isinstance(baseline, (int, float))
+    assert len(results) == len(fields)  # one leave-one-out result per field
+    assert all(set(r) == {"field", "score_without", "contribution"} for r in results)

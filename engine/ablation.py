@@ -143,3 +143,74 @@ def run_ablation(
         prev_draft = text
 
     return results
+
+
+# --- field-level ablation: prove what EACH field is worth, not just each tier ----------------
+# Leave-one-out: hold everything constant, drop one field, re-draft + re-score, measure the
+# loss. A positive contribution means the field earns its place. Fields are auto-discovered
+# from the intake, so adding a field to the schema makes it ablatable for free.
+
+_FULL_INPUTS = ["online", "docs", "typed", "persona", "specifics"]
+_ABLATE_SECTIONS = ("idea", "typed", "docs", "online")
+_ABLATE_SKIP = {"idea.topic"}  # the topic is the seed of the post — never ablated
+
+
+def ablatable_fields(intake: Intake) -> list[str]:
+    """Every populated content field worth ablating (idea/typed/docs/online), as dotted paths.
+    Auto-discovered from the intake — add a field to the schema and it shows up here for free.
+    Skips the topic (the seed), boolean flags, and empty fields (nothing to drop)."""
+    out: list[str] = []
+    for sec in _ABLATE_SECTIONS:
+        for field, val in getattr(intake, sec).model_dump().items():
+            path = f"{sec}.{field}"
+            if path in _ABLATE_SKIP or isinstance(val, bool) or val in ("", [], {}, None):
+                continue
+            out.append(path)
+    return out
+
+
+def _clear_field(intake: Intake, path: str) -> None:
+    sec, attr = path.split(".", 1)
+    obj = getattr(intake, sec)
+    cur = getattr(obj, attr)
+    setattr(obj, attr, [] if isinstance(cur, list) else {} if isinstance(cur, dict) else "")
+
+
+def _draft_score(
+    intake: Intake, persona_md: str, layers: str, provider: Provider, stage: str
+) -> float:
+    """One draft + one score with all inputs (no council) — the unit the field ablation compares."""
+    ctx = context_for(_FULL_INPUTS, intake)
+    prompt = draft_block.build_draft_prompt(
+        intake.idea.topic,
+        ctx,
+        persona_md,
+        layers,
+        intake.output.hard_nevers,
+        intake.output.channels,
+    )
+    text = draft_block.draft(stage, prompt, provider)
+    text, _proof, _red = receipts_block.attach_receipts(text, intake)
+    score = parse_score(
+        provider.complete(f"score_{stage}", build_score_prompt(text, persona_md, layers, None))
+    )
+    return score.quality_avg
+
+
+def run_field_ablation(intake: Intake, persona_md: str, provider: Provider, run_id: str):
+    """Leave-one-out over every field. Returns (baseline_score, [{field, score_without,
+    contribution}]) sorted by contribution (most valuable field first)."""
+    layers = load_layers()
+    baseline = _draft_score(intake, persona_md, layers, provider, "ablate_field_baseline")
+    results = []
+    for path in ablatable_fields(intake):
+        trimmed = intake.model_copy(deep=True)
+        _clear_field(trimmed, path)
+        without = _draft_score(
+            trimmed, persona_md, layers, provider, "ablate_field_" + path.replace(".", "_")
+        )
+        results.append(
+            {"field": path, "score_without": without, "contribution": round(baseline - without, 1)}
+        )
+    results.sort(key=lambda r: r["contribution"], reverse=True)
+    return baseline, results
