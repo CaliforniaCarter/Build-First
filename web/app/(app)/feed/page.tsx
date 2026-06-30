@@ -2,34 +2,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api, ApiError, type PostRecord } from "@/lib/api";
-import { getName } from "@/lib/onboarding-store";
+import { timeAgo } from "@/lib/time";
 
 type Tab = "all" | "drafts" | "approved";
 
-// honest relative timestamp — no faked "today · 2:14 pm"
-function timeAgo(iso: string): string {
-  const t = Date.parse(iso);
-  if (Number.isNaN(t)) return "";
-  const s = Math.max(0, Math.floor((Date.now() - t) / 1000));
-  if (s < 45) return "just now";
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  if (d < 7) return `${d}d ago`;
-  const w = Math.floor(d / 7);
-  if (w < 5) return `${w}w ago`;
-  const mo = Math.floor(d / 30);
-  if (mo < 12) return `${mo}mo ago`;
-  return `${Math.floor(d / 365)}y ago`;
+// title = what the post is about. topic if we have it, else the first line of the body.
+function titleOf(post: PostRecord): string {
+  const t = (post.topic ?? "").trim();
+  if (t) return t;
+  const first = (post.body.split("\n").find((l) => l.trim()) ?? "").trim();
+  return first || "untitled";
 }
-
-const AV_STYLE: React.CSSProperties = {
-  background: "linear-gradient(135deg,#FFE500,#FFB200)",
-  color: "#0B0B0C",
-  fontFamily: "var(--display)",
-};
 
 export default function FeedPage() {
   const [posts, setPosts] = useState<PostRecord[] | null>(null);
@@ -37,9 +20,6 @@ export default function FeedPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
-  const [name, setName] = useState("you");
-
-  useEffect(() => setName(getName() || "you"), []);
 
   useEffect(() => {
     let live = true;
@@ -60,10 +40,9 @@ export default function FeedPage() {
     };
   }, []);
 
-  const initial = (name || "y").trim().charAt(0).toUpperCase();
   const all = posts ?? [];
   const drafts = all.filter((p) => p.status === "draft");
-  const approved = all.filter((p) => p.status === "approved");
+  const approved = all.filter((p) => p.status !== "draft"); // approved + posted
   const shown = tab === "drafts" ? drafts : tab === "approved" ? approved : all;
 
   const tabs: { key: Tab; label: string; count: number }[] = [
@@ -152,86 +131,47 @@ export default function FeedPage() {
             </p>
           ) : (
             <div className="flex flex-col gap-3 max-w-[860px]">
-              {shown.map((post) => {
-                const appr = post.status === "approved" || post.status === "posted";
-                return (
-                  <article
-                    key={post.id}
-                    className="p-5 rounded-2xl"
-                    style={{ background: "var(--card)", border: "1px solid var(--border)" }}
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <span
-                        className="grid place-items-center w-[34px] h-[34px] rounded-full font-bold text-[13px]"
-                        style={AV_STYLE}
-                      >
-                        {initial}
-                      </span>
-                      <span className="leading-tight">
-                        <span className="block text-[13.5px] font-semibold">{name}</span>
-                        <span className="block text-[11.5px]" style={{ color: "var(--dim)" }}>
-                          {timeAgo(post.created_at)}
-                          {post.topic ? ` · ${post.topic}` : ""}
-                        </span>
-                      </span>
-                      <span className="ml-auto flex items-center gap-3">
-                        <span
-                          className="text-[11px] font-semibold px-[11px] py-1 rounded-full"
-                          style={
-                            appr
-                              ? {
-                                  background: "#16160c",
-                                  color: "var(--yellow)",
-                                  border: "1px solid #3a3a22",
-                                  fontFamily: "var(--display)",
-                                }
-                              : {
-                                  background: "#1a1a1e",
-                                  color: "var(--muted)",
-                                  border: "1px solid var(--border-hi)",
-                                  fontFamily: "var(--display)",
-                                }
-                          }
-                        >
-                          {post.status}
-                        </span>
-                        <span
-                          className="font-bold text-[13px]"
-                          style={{ color: "var(--yellow)", fontFamily: "var(--display)" }}
-                          title="quality score (avg of 9 dimensions)"
-                        >
-                          {post.score.quality_avg.toFixed(1)}
-                        </span>
-                      </span>
-                    </div>
-
-                    <p
-                      className="text-[14px] line-clamp-3"
-                      style={{ color: "#D8D8D2", lineHeight: 1.55 }}
+              {shown.map((post) => (
+                <Link
+                  key={post.id}
+                  href={`/feed/${post.id}`}
+                  className="block p-5 rounded-2xl transition-colors group"
+                  style={{ background: "var(--card)", border: "1px solid var(--border)" }}
+                >
+                  <div className="flex items-baseline justify-between gap-3 mb-1">
+                    <span
+                      className="text-[15.5px] font-semibold leading-snug"
+                      style={{ fontFamily: "var(--display)" }}
                     >
-                      {post.body}
-                    </p>
-
-                    {(post.proof.length > 0 || post.redactions.length > 0) && (
-                      <div className="mt-3 flex gap-2 flex-wrap">
-                        {post.proof.map((pf, i) => (
-                          <span key={i} className="chiprc">
-                            <span className="ic">✓</span> {pf}
-                          </span>
-                        ))}
-                        {post.redactions.length > 0 && (
-                          <span
-                            className="chiprc"
-                            title="sensitive details removed before drafting"
-                          >
-                            <span className="ic">⊘</span> redacted: {post.redactions.join(", ")}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </article>
-                );
-              })}
+                      {titleOf(post)}
+                    </span>
+                    <span
+                      className="font-bold text-[13px] shrink-0"
+                      style={{ color: "var(--yellow)", fontFamily: "var(--display)" }}
+                      title="quality score — open for the full breakdown"
+                    >
+                      {post.score.quality_avg.toFixed(1)}
+                    </span>
+                  </div>
+                  <div
+                    className="flex items-center justify-between gap-3 text-[11.5px] mb-3"
+                    style={{ color: "var(--dim)" }}
+                  >
+                    <span>
+                      {timeAgo(post.created_at)} · {post.status}
+                    </span>
+                    <span className="transition-colors group-hover:text-[var(--ink)]">
+                      breakdown →
+                    </span>
+                  </div>
+                  <p
+                    className="text-[14px] line-clamp-3"
+                    style={{ color: "#D8D8D2", lineHeight: 1.55 }}
+                  >
+                    {post.body}
+                  </p>
+                </Link>
+              ))}
             </div>
           )}
         </>

@@ -31,9 +31,28 @@ const PROMPTS = [
   },
 ] as const;
 
-// single-select tap groups (match the mockup's copy)
-const HUMORS = ["dry & deadpan", "playful", "sharp / spicy", "mostly straight"];
-const SHAPES = ["short & punchy", "a little story", "one big idea"];
+// A/B example pickers — read two real-feeling posts and pick the one that's you.
+// `value` is the label stored into the same voice field the old chips set.
+const HUMOR_AB = [
+  {
+    value: "dry & deadpan",
+    text: "shipped the thing. worked on the first try, which means something's broken i haven't found yet. i give it until tuesday.",
+  },
+  {
+    value: "warm & playful",
+    text: "we shipped it — and yeah, i did a little lap around the kitchen. worked first try, which never happens, so i'm taking the win and worrying about tuesday on tuesday.",
+  },
+] as const;
+const SHAPE_AB = [
+  {
+    value: "short & punchy",
+    text: "cut onboarding from nine steps to four. shipped it friday. signups up 22%. turns out the fastest way to grow was to ask for less. do less. ship it.",
+  },
+  {
+    value: "flowing & connected",
+    text: "we cut onboarding from nine steps down to four and shipped it friday, and by monday signups were up 22% — which taught me the fastest way to grow wasn't adding anything, it was having the nerve to ask for less.",
+  },
+] as const;
 
 function truncate(s: string, n = 90): string {
   const t = (s ?? "").trim();
@@ -218,31 +237,52 @@ export default function VoicePage() {
               })}
 
               <div className={styles.cardsec}>
-                <h3>two quick taps — your humor</h3>
-                <div className={styles.taps}>
-                  {HUMORS.map((h) => (
-                    <button
-                      key={h}
-                      type="button"
-                      className={`chip ${pickedHumor === h ? "on" : ""}`}
-                      onClick={() => pickHumor(h)}
-                    >
-                      {h}
-                    </button>
-                  ))}
+                <div className={styles.abgroup}>
+                  <h3>your humor</h3>
+                  <div className={styles.abq}>which of these reads more like you?</div>
+                  <div className={styles.abwrap}>
+                    {HUMOR_AB.map((opt, i) => {
+                      const on = pickedHumor === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          className={`${styles.ab} ${on ? styles.abon : ""}`}
+                          onClick={() => pickHumor(opt.value)}
+                        >
+                          <div className={styles.abtop}>
+                            <span className={styles.ablabel}>{i === 0 ? "a" : "b"}</span>
+                            <span className={styles.abpick}>{on ? "✓ that's me" : "this one"}</span>
+                          </div>
+                          <p className={styles.abtext}>{opt.text}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-                <h3>…and your shape</h3>
-                <div className={styles.taps}>
-                  {SHAPES.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      className={`chip ${pickedShape === s ? "on" : ""}`}
-                      onClick={() => pickShape(s)}
-                    >
-                      {s}
-                    </button>
-                  ))}
+
+                <div className={styles.abgroup}>
+                  <h3>your shape</h3>
+                  <div className={styles.abq}>and which rhythm feels like yours?</div>
+                  <div className={styles.abwrap}>
+                    {SHAPE_AB.map((opt, i) => {
+                      const on = pickedShape === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          className={`${styles.ab} ${on ? styles.abon : ""}`}
+                          onClick={() => pickShape(opt.value)}
+                        >
+                          <div className={styles.abtop}>
+                            <span className={styles.ablabel}>{i === 0 ? "a" : "b"}</span>
+                            <span className={styles.abpick}>{on ? "✓ that's me" : "this one"}</span>
+                          </div>
+                          <p className={styles.abtext}>{opt.text}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 

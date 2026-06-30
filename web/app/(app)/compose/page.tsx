@@ -3,9 +3,9 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { api, ApiError, type OptionResult, type PostRecord } from "@/lib/api";
-import { gateLabel, dimLabel } from "@/lib/score";
 import { getName } from "@/lib/onboarding-store";
 import { Waveform } from "@/components/Waveform";
+import { EvalPanel } from "@/components/EvalPanel";
 import styles from "./page.module.css";
 
 type Source = "say" | "paste";
@@ -75,7 +75,6 @@ function Compose() {
   const [editBody, setEditBody] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
   const [approving, setApproving] = useState(false);
-  const [showDims, setShowDims] = useState(false);
 
   const [name, setName] = useState("");
   const [tone, setTone] = useState<string[]>([]);
@@ -146,7 +145,6 @@ function Compose() {
         topic: work.trim(),
       });
       setPost(res.post);
-      setShowDims(false);
       setPhase("done");
       // Fold the choice into the voice profile and surface a quiet line of what it learned.
       try {
@@ -212,8 +210,6 @@ function Compose() {
   }
 
   const score = post?.score;
-  const qa = score ? score.quality_avg : 0;
-  const barPct = Math.max(0, Math.min(100, (qa / 10) * 100));
   const approved = post?.status === "approved";
   const posted = post?.status === "posted";
 
@@ -522,62 +518,8 @@ function Compose() {
               )}
             </div>
 
-            {/* eval */}
-            <aside className={styles.eval}>
-              <div className={styles.et}>eval</div>
-              <div className={styles.score}>
-                <span className={styles.scoren}>{qa.toFixed(1)}</span>
-                <span className={styles.scoreo}>/ 10</span>
-              </div>
-              <div className={styles.ebar}>
-                <i style={{ width: `${barPct}%` }} />
-              </div>
-
-              <div className={styles.gates}>
-                {score.gates.map((g) => (
-                  <div
-                    key={g.name}
-                    className={`${styles.gaterow}${g.passed ? "" : " " + styles.fail}`}
-                    title={g.reason}
-                  >
-                    <span className={styles.gk}>{g.passed ? "✓" : ""}</span>
-                    {gateLabel(g.name)}
-                  </div>
-                ))}
-              </div>
-
-              <button
-                className={styles.dimtoggle}
-                type="button"
-                onClick={() => setShowDims((v) => !v)}
-              >
-                {showDims ? "hide dimensions ▲" : "show all 9 dimensions ▾"}
-              </button>
-              {showDims && (
-                <div className={styles.dims}>
-                  {score.dimensions.map((d) => (
-                    <div key={d.name} className={styles.dim} title={d.reason}>
-                      <div className={styles.dimhead}>
-                        <span className={styles.dimlabel}>{dimLabel(d.name)}</span>
-                        <span className={styles.dimscore}>{d.score.toFixed(1)}/10</span>
-                      </div>
-                      <div className={styles.dimbar}>
-                        <i
-                          style={{
-                            width: `${Math.max(0, Math.min(100, (d.score / 10) * 100))}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className={styles.gatenote}>
-                {score.gates_passed}/{score.gates_total} gates passed. the score is your
-                meter — not a gate. edit freely; it re-scores.
-              </div>
-            </aside>
+            {/* eval — shared builder-facing panel (hides nothing) */}
+            <EvalPanel score={score} />
           </div>
         )}
       </div>

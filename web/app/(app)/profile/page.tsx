@@ -337,7 +337,7 @@ export default function ProfilePage() {
                 </div>
               </div>
             ) : docs.persona_md.trim() ? (
-              <div className="mt-2">{renderMarkdown(docs.persona_md)}</div>
+              <PersonaView md={docs.persona_md} />
             ) : (
               <p className="mt-3 text-[14px]" style={{ color: "var(--dim)" }}>
                 your voice hasn&apos;t been generated yet — re-tune to build it.
@@ -435,6 +435,68 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// Split the rewritten persona.md into its `##` sections so the read view is scannable
+// (a clean label · content list) instead of one undifferentiated wall of text.
+function parsePersona(md: string): {
+  intro: string[];
+  sections: { title: string; body: string[] }[];
+} {
+  const lines = md.replace(/\r\n/g, "\n").split("\n");
+  const intro: string[] = [];
+  const sections: { title: string; body: string[] }[] = [];
+  let cur: { title: string; body: string[] } | null = null;
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+    const h2 = /^##\s+(.*)$/.exec(line);
+    if (h2) {
+      cur = { title: h2[1].trim(), body: [] };
+      sections.push(cur);
+    } else if (cur) {
+      cur.body.push(line);
+    } else if (/^#\s+/.test(line)) {
+      // drop the top-level title — the serif signature line above already names the voice
+      continue;
+    } else {
+      intro.push(line);
+    }
+  }
+  return { intro, sections };
+}
+
+function PersonaView({ md }: { md: string }) {
+  const { intro, sections } = parsePersona(md);
+  // older persona format with no ## sections — fall back to the plain renderer
+  if (sections.length === 0) return <div className="mt-2">{renderMarkdown(md)}</div>;
+  const introText = intro.join("\n").trim();
+  return (
+    <div className="mt-2">
+      {introText && <div className="mb-1">{renderMarkdown(introText)}</div>}
+      {sections.map((s, i) => {
+        const banned = /bann|never|off.?limit|avoid|don'?t/i.test(s.title);
+        return (
+          <div
+            key={i}
+            className="grid grid-cols-[150px_1fr] gap-4 items-start py-3.5"
+            style={{ borderTop: "1px solid var(--border)" }}
+          >
+            <span
+              className="text-[11px] uppercase font-semibold pt-1"
+              style={{
+                color: banned ? "var(--bad)" : "var(--yellow)",
+                letterSpacing: "0.08em",
+                fontFamily: "var(--display)",
+              }}
+            >
+              {s.title}
+            </span>
+            <div className="min-w-0">{renderMarkdown(s.body.join("\n"))}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }
