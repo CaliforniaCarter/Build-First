@@ -46,11 +46,17 @@ def test_persona_insights_keeps_only_verbatim_quotes():
     insights_json = json.dumps(
         [
             # real: an exact span of the answer (lowercased here on purpose)
-            {"observation": "writes like he talks", "verbatim_quote": "HONESTLY nothing crazy",
-             "trait_label": "lowercase"},
+            {
+                "observation": "writes like he talks",
+                "verbatim_quote": "HONESTLY nothing crazy",
+                "trait_label": "lowercase",
+            },
             # invented: never appears in their words → must be dropped
-            {"observation": "made up", "verbatim_quote": "synergistic paradigm shift",
-             "trait_label": "x"},
+            {
+                "observation": "made up",
+                "verbatim_quote": "synergistic paradigm shift",
+                "trait_label": "x",
+            },
         ]
     )
     provider = FakeProvider({"persona_insights": insights_json})
@@ -69,8 +75,12 @@ def test_compose_post_returns_scored_post():
         {
             "compose_draft": "shipped the thing today. it broke. i fixed it.",
             "council_pass1": json.dumps(
-                {"critique": "good", "revised_draft": "shipped the thing today — it broke, i fixed it.",
-                 "stop": True, "reason": "passes"}
+                {
+                    "critique": "good",
+                    "revised_draft": "shipped the thing today — it broke, i fixed it.",
+                    "stop": True,
+                    "reason": "passes",
+                }
             ),
             "compose_score": _valid_score_json(),
         }

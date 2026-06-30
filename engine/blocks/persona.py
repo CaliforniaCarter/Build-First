@@ -129,9 +129,7 @@ def _exact_span(quote: str, sources: list[str]) -> str | None:
 def build_persona_insights(
     intake: Intake, provider: Provider, max_insights: int = 4
 ) -> list[Insight]:
-    raw = provider.complete(
-        "persona_insights", build_persona_insights_prompt(intake, max_insights)
-    )
+    raw = provider.complete("persona_insights", build_persona_insights_prompt(intake, max_insights))
     sources = voice_corpus(intake)
     out: list[Insight] = []
     for item in _parse_insight_array(raw):

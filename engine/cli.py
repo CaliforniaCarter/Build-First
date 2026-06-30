@@ -412,7 +412,9 @@ def cmd_publish(args):
         return
     if status == "posted":
         plural = "s" if shipped != 1 else ""
-        print(f"🎉 Shipped: {args.slug}. That's {shipped} post{plural} live — keep the streak going.")
+        print(
+            f"🎉 Shipped: {args.slug}. That's {shipped} post{plural} live — keep the streak going."
+        )
     else:
         print(f"{args.slug} → back to draft. ({shipped} still live.)")
 

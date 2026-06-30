@@ -30,9 +30,7 @@ class ComposeResult:
     council_log: list[dict] = field(default_factory=list)
 
 
-def compose_post(
-    intake: Intake, work: str, persona_md: str, provider: Provider
-) -> ComposeResult:
+def compose_post(intake: Intake, work: str, persona_md: str, provider: Provider) -> ComposeResult:
     """Turn `work` (what the person did) into one in-voice, scored post.
 
     `work` becomes the idea topic; any specifics already on `intake.idea`

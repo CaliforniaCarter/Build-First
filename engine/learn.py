@@ -96,9 +96,7 @@ def apply_edits(intake: Intake, edits: list[dict]) -> tuple[list[str], list[str]
     return applied, skipped
 
 
-def learn(
-    signals: list[dict], intake: Intake, provider: Provider
-) -> tuple[list[str], list[str]]:
+def learn(signals: list[dict], intake: Intake, provider: Provider) -> tuple[list[str], list[str]]:
     """Fold a batch of signals (picks + edits) into the profile in one call. Empty in, empty out."""
     if not signals:
         return [], []
