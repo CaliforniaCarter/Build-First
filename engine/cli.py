@@ -346,18 +346,30 @@ def cmd_posts(args):
     if not posts:
         print("No saved posts yet. Run `tb post` to make one.")
         return
+    shipped = sum(1 for p in posts if p.get("status") == "posted")
+    plural = "s" if len(posts) != 1 else ""
+    print(f"📚 {len(posts)} post{plural} · {shipped} shipped\n")
     for p in posts:
         when = p.get("updated") or p.get("created") or p.get("date", "")
-        print(f"{when}  [{p.get('status', 'draft')}]  {p['score']['quality']}/10  {p['slug']}")
+        mark = "✅" if p.get("status") == "posted" else "📝"
+        print(f"{mark} {when}  {p['score']['quality']}/10  {p['slug']}")
 
 
 def cmd_publish(args):
     """Mark a saved post as posted (or back to draft with --draft). Slug is from `tb posts`."""
     status = "draft" if args.draft else "posted"
-    if set_status(args.slug, status):
-        print(f"{args.slug} -> {status}")
-    else:
+    if not set_status(args.slug, status):
         print(f"no such post: {args.slug}", file=sys.stderr)
+        return
+    shipped = sum(1 for p in list_posts() if p.get("status") == "posted")
+    if args.json:
+        print(json.dumps({"slug": args.slug, "status": status, "shipped": shipped}))
+        return
+    if status == "posted":
+        plural = "s" if shipped != 1 else ""
+        print(f"🎉 Shipped: {args.slug}. That's {shipped} post{plural} live — keep the streak going.")
+    else:
+        print(f"{args.slug} → back to draft. ({shipped} still live.)")
 
 
 def cmd_learn(args):
