@@ -14,6 +14,7 @@ from .blocks import council
 from .blocks import draft as draft_block
 from .blocks import receipts as receipts_block
 from .blocks.intake import Intake
+from .blocks.persona import extract_voice
 from .config import LABS_PATH, LAYERS_DIR, RUNS_DIR
 from .onboarding import load_onboarding, render_audience
 from .providers.base import Provider
@@ -40,11 +41,10 @@ def context_for(inputs: list[str], intake: Intake) -> str:
     parts: list[str] = []
 
     if "online" in inputs:
+        # The raw handles are footprint, not draft material — a leave-one-out showed they add
+        # nothing to a draft (+0.0), so they stay in the intake (receipts + grounding use them)
+        # but don't enter the draft context. Only the posting-history framing carries signal.
         foot = [f"Name: {intake.name}"]
-        if o.linkedin:
-            foot.append(f"LinkedIn: {o.linkedin}")
-        if o.x:
-            foot.append(f"X: {o.x}")
         foot.append(
             "Start: cold start, no existing posts"
             if o.cold_start
@@ -60,7 +60,6 @@ def context_for(inputs: list[str], intake: Intake) -> str:
             s
             for s in (
                 f"Identity: {t.identity}" if t.identity else "",
-                f"Known for: {t.known_for}" if t.known_for else "",
                 f"Background: {t.background}" if t.background else "",
                 f"Beliefs: {t.beliefs}" if t.beliefs else "",
                 f"Lessons: {t.lessons}" if t.lessons else "",
@@ -152,7 +151,9 @@ def run_ablation(
 
 _FULL_INPUTS = ["online", "docs", "typed", "persona", "specifics"]
 _ABLATE_SECTIONS = ("idea", "typed", "docs", "online")
-_ABLATE_SKIP = {"idea.topic"}  # the topic is the seed of the post — never ablated
+# Skip the topic (the seed of the post) and the raw handles (footprint, not draft material — a
+# leave-one-out showed +0.0, so they no longer enter the draft context).
+_ABLATE_SKIP = {"idea.topic", "online.linkedin", "online.x"}
 
 
 def ablatable_fields(intake: Intake) -> list[str]:
@@ -209,6 +210,45 @@ def run_field_ablation(intake: Intake, persona_md: str, provider: Provider, run_
         without = _draft_score(
             trimmed, persona_md, layers, provider, "ablate_field_" + path.replace(".", "_")
         )
+        results.append(
+            {"field": path, "score_without": without, "contribution": round(baseline - without, 1)}
+        )
+    results.sort(key=lambda r: r["contribution"], reverse=True)
+    return baseline, results
+
+
+# --- persona-level ablation: prove what each VOICE input is worth ------------------------------
+# The sibling of the field ablation. The context fields above feed the DRAFT directly; the voice
+# corpus (writing samples, answers, the A/B pick) feeds the PERSONA instead — so to test it we
+# drop one voice input, RE-EXTRACT the persona from what's left, then redraft + rescore. Context
+# is held constant, so any change traces to that one voice input.
+
+
+def ablatable_voice_fields(intake: Intake) -> list[str]:
+    """Every populated voice-corpus field (feeds the persona, not the draft), as dotted paths.
+    Auto-discovered from the intake — add a voice input and it's tested here for free."""
+    out: list[str] = []
+    for field, val in intake.voice.model_dump().items():
+        if val in ("", [], {}, None):
+            continue
+        out.append(f"voice.{field}")
+    return out
+
+
+def run_persona_ablation(intake: Intake, provider: Provider, run_id: str):
+    """Leave-one-out over the voice corpus. Drop one voice input, re-extract the persona, redraft
+    + rescore, measure the loss. Returns (baseline_score, [{field, score_without, contribution}])
+    sorted by contribution (most valuable voice input first)."""
+    layers = load_layers()
+    base_persona = extract_voice(intake, provider, "ablate_persona_extract_baseline")
+    baseline = _draft_score(intake, base_persona, layers, provider, "ablate_persona_baseline")
+    results = []
+    for path in ablatable_voice_fields(intake):
+        trimmed = intake.model_copy(deep=True)
+        _clear_field(trimmed, path)
+        tag = path.replace(".", "_")
+        persona = extract_voice(trimmed, provider, "ablate_persona_extract_" + tag)
+        without = _draft_score(trimmed, persona, layers, provider, "ablate_persona_" + tag)
         results.append(
             {"field": path, "score_without": without, "contribution": round(baseline - without, 1)}
         )

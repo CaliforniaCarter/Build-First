@@ -41,8 +41,7 @@ class Docs(BaseModel):
 
 class Typed(BaseModel):
     identity: str = ""
-    known_for: str = ""
-    background: str = ""
+    background: str = ""  # what you've done / are known for (known_for merged in — eval: +0.2 alone)
     beliefs: str = ""
     lessons: str = ""
 

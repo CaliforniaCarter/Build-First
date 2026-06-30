@@ -86,7 +86,7 @@ class StubProvider(Provider):
     name = "stub"
 
     def complete(self, stage: str, prompt: str) -> str:
-        if stage == "voice":
+        if stage == "voice" or "_extract" in stage:  # _extract: the persona-ablation re-extracts
             return _PERSONA
         if stage == "learn":
             return "[]"  # offline: nothing learned

@@ -61,7 +61,6 @@ def source_corpus(intake: Intake) -> str:
         i.close,
         *i.proof,
         t.identity,
-        t.known_for,
         t.background,
         t.beliefs,
         t.lessons,

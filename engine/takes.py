@@ -16,7 +16,6 @@ from .providers.base import Provider
 def build_takes_prompt(intake: Intake, persona_md: str, n: int) -> str:
     t = intake.typed
     material = {
-        "known_for": t.known_for,
         "beliefs": t.beliefs,
         "lessons": t.lessons,
         "background": t.background,

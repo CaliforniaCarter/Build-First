@@ -13,7 +13,14 @@ import json
 import sys
 from pathlib import Path
 
-from .ablation import context_for, load_ladder, load_layers, run_ablation, run_field_ablation
+from .ablation import (
+    context_for,
+    load_ladder,
+    load_layers,
+    run_ablation,
+    run_field_ablation,
+    run_persona_ablation,
+)
 from .blocks.draft import build_draft_prompt
 from .blocks.gate import human_gate
 from .blocks.intake import load_intake
@@ -67,6 +74,19 @@ def cmd_ablate(args):
     intake = _intake(args)
     provider = _provider(args)
     persona_md = _onboard(intake, provider)
+    if args.persona:
+        baseline, results = run_persona_ablation(intake, provider, args.run_id)
+        if args.json:
+            print(json.dumps({"baseline": baseline, "voice_fields": results}, indent=2))
+            return
+        print(f"Baseline — full voice in: {baseline}/10\n")
+        print("Drop one voice input, RE-EXTRACT the persona, re-score — what does the post lose?")
+        for r in results:
+            print(
+                f"  {r['contribution']:>+5} ← {r['field']:22s} (without it: {r['score_without']}/10)"
+            )
+        print("\nA positive number = that voice input earns its place.")
+        return
     if args.fields:
         baseline, results = run_field_ablation(intake, persona_md, provider, args.run_id)
         if args.json:
@@ -703,6 +723,11 @@ def main(argv=None):
     )
     parsers["ablate"].add_argument(
         "--fields", action="store_true", help="leave-one-out per field (does each field help?)"
+    )
+    parsers["ablate"].add_argument(
+        "--persona",
+        action="store_true",
+        help="leave-one-out per voice input (re-extracts the persona each time)",
     )
 
     args = parser.parse_args(argv)

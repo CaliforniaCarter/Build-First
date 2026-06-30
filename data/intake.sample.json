@@ -28,8 +28,7 @@
   },
   "typed": {
     "identity": "Applied-AI engineer who ships eval-driven LLM features.",
-    "known_for": "Turning fuzzy 'make the AI better' asks into measurable gates.",
-    "background": "Six years as an air-traffic controller before switching to software at 29.",
+    "background": "Known for turning fuzzy 'make the AI better' asks into measurable gates. Six years as an air-traffic controller before switching to software at 29.",
     "beliefs": "Most AI 'quality' problems are eval problems wearing a costume. Vibes don't scale; rubrics do.",
     "lessons": "Shipped a chatbot once with no evals. It invented a refund policy and cost us a $40k weekend. Never again."
   },

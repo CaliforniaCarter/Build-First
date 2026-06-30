@@ -122,6 +122,14 @@ def load_voice() -> VoiceProfile | None:
     return VoiceProfile.model_validate_json(VOICE_PATH.read_text(encoding="utf-8"))
 
 
+def extract_voice(intake: Intake, provider: Provider, stage: str = "voice") -> str:
+    """Extract a voice profile and render it to prose WITHOUT reading or writing the stored
+    voice.json. Used by the persona ablation, which rebuilds the persona once per dropped voice
+    input to measure what each one is worth — so it must not touch the user's saved profile."""
+    vp = _parse_voice_json(provider.complete(stage, build_voice_prompt(intake)))
+    return render_voice(vp)
+
+
 def build_voice(intake: Intake, provider: Provider, force: bool = False) -> str:
     """Build profiles/voice.json from the intake and return its rendered prose.
 
