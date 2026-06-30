@@ -1,0 +1,30 @@
+/* animated background for the marketing landing (ported from mockups/marketing.html) */
+
+.glow {
+  position: fixed;
+  top: -200px;
+  right: -120px;
+  width: 680px;
+  height: 680px;
+  border-radius: 99px;
+  background: radial-gradient(circle, rgba(255, 229, 0, 0.09), transparent 62%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bgwave {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.08;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 30px;
+  pointer-events: none;
+}
+.bgwave i {
+  flex: 1;
+  background: linear-gradient(180deg, var(--yellow), transparent);
+  border-radius: 6px;
+}

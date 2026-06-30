@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>timbre — posts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000; --panel:#0A0A0C; --ink:#FAFAF7; --muted:#A2A29B; --dim:#7C7C76;
+    --yellow:#FFE500; --yellow-ink:#0B0B0C;
+    --card:#121214; --card2:#0C0C0E; --border:#242427; --border-hi:#3C3C42;
+    --display:"Space Grotesk",system-ui,sans-serif; --serif:"Instrument Serif",Georgia,serif; --body:"Inter",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg); color:var(--ink); font-family:var(--body); -webkit-font-smoothing:antialiased; line-height:1.5; height:100vh; display:grid; grid-template-columns:236px 1fr}
+  a{text-decoration:none;color:inherit}
+  .side{background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:22px 16px}
+  .side .logo{display:flex; align-items:center; gap:10px; padding:4px 8px 22px}
+  .side .word{font-family:var(--display); font-weight:700; font-size:19px; letter-spacing:-.02em}
+  .side .word .dot{color:var(--yellow)}
+  .nav{display:flex; flex-direction:column; gap:3px}
+  .nav a{display:flex; align-items:center; gap:11px; padding:10px 11px; border-radius:10px; color:var(--muted); font-size:14px; font-weight:500; transition:.14s}
+  .nav a:hover{background:#141417; color:var(--ink)}
+  .nav a.on{background:#16160c; color:var(--ink)} .nav a.on .i{color:var(--yellow)}
+  .nav a .i{width:18px; text-align:center}
+  .side .grow{flex:1}
+  .side .me{display:flex; align-items:center; gap:10px; padding:10px 8px; border-top:1px solid var(--border)}
+  .side .av{width:30px;height:30px;border-radius:99px;background:linear-gradient(135deg,#FFE500,#FFB200); color:#0B0B0C; display:grid;place-items:center; font-weight:700; font-family:var(--display); font-size:13px}
+  .side .me .nm{font-size:13px; font-weight:600} .side .me .role{font-size:11px; color:var(--dim)}
+
+  main{overflow:auto; padding:34px 44px 60px}
+  .top{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px}
+  .top h1{font-family:var(--serif); font-weight:400; font-size:38px; letter-spacing:.3px}
+  .new{background:var(--yellow); color:var(--yellow-ink); font-family:var(--display); font-weight:600; font-size:14px; padding:11px 18px; border-radius:11px; display:inline-flex; gap:8px; align-items:center; transition:.16s}
+  .new:hover{transform:translateY(-1px); box-shadow:0 10px 26px -10px rgba(255,229,0,.5)}
+  .tabs{display:flex; gap:8px; margin-bottom:20px}
+  .tab{font-size:13px; color:var(--muted); border:1px solid var(--border); background:transparent; padding:8px 15px; border-radius:99px; cursor:pointer; transition:.14s}
+  .tab:hover{color:var(--ink)} .tab.on{background:#16160c; color:var(--ink); border-color:#3a3a22}
+
+  .list{display:flex; flex-direction:column; gap:12px; max-width:860px}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; transition:.16s; cursor:pointer}
+  .card:hover{border-color:var(--border-hi)}
+  .ch{display:flex; align-items:center; gap:11px; margin-bottom:11px}
+  .ch .av{width:34px;height:34px;border-radius:99px;background:linear-gradient(135deg,#FFE500,#FFB200);color:#0B0B0C;display:grid;place-items:center;font-weight:700;font-family:var(--display);font-size:13px}
+  .ch .nm{font-size:13.5px;font-weight:600} .ch .mt{font-size:11.5px;color:var(--dim)}
+  .ch .right{margin-left:auto; display:flex; align-items:center; gap:11px}
+  .badge{font-size:11px; font-weight:600; padding:4px 11px; border-radius:99px; font-family:var(--display)}
+  .badge.draft{background:#1a1a1e; color:var(--muted); border:1px solid var(--border-hi)}
+  .badge.appr{background:#16160c; color:var(--yellow); border:1px solid #3a3a22}
+  .sc{font-family:var(--display); font-weight:700; font-size:13px; color:var(--yellow)}
+  .body{font-size:14px; color:#D8D8D2; line-height:1.55; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden}
+  .rc{margin-top:13px; display:flex; gap:7px; flex-wrap:wrap}
+  .chiprc{font-size:11px; color:#cfcfc9; background:var(--card2); border:1px solid var(--border-hi); border-radius:8px; padding:5px 9px; display:flex; align-items:center; gap:6px}
+  .chiprc .ic{color:var(--yellow)}
+</style>
+</head>
+<body>
+  <aside class="side">
+    <div class="logo"><span class="word">timbre<span class="dot">.</span></span></div>
+    <nav class="nav">
+      <a href="home.html"><span class="i">⌂</span> home</a>
+      <a href="compose.html"><span class="i">✍︎</span> write</a>
+      <a class="on" href="feed.html"><span class="i">▦</span> posts</a>
+      <a href="profile-view.html"><span class="i">◑</span> voice profile</a>
+    </nav>
+    <div class="grow"></div>
+    <div class="me"><span class="av">C</span><span><span class="nm">carter</span><br><span class="role">tuned · local-first</span></span></div>
+  </aside>
+
+  <main>
+    <div class="top"><h1>posts</h1><a class="new" href="compose.html">+ new post</a></div>
+    <div class="tabs"><button class="tab on">all · 3</button><button class="tab">drafts · 2</button><button class="tab">approved · 1</button></div>
+
+    <div class="list">
+      <div class="card">
+        <div class="ch"><span class="av">C</span><span><span class="nm">carter chasson</span><br><span class="mt">today · 2:14 pm</span></span>
+          <span class="right"><span class="badge draft">draft</span><span class="sc">8.6</span></span></div>
+        <div class="body">shipped timbre's onboarding today. no meetings, no deck — just built it and watched it work. the part i didn't expect: getting your voice from zero takes about 6 minutes — not six weeks of "brand guidelines." honestly the fastest i've moved in months.</div>
+        <div class="rc"><span class="chiprc"><span class="ic">▤</span> onboarding.diff</span><span class="chiprc"><span class="ic">▶</span> demo-6min.gif</span><span class="chiprc"><span class="ic">⌁</span> transcript</span></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="av">C</span><span><span class="nm">carter chasson</span><br><span class="mt">yesterday · 9:02 am</span></span>
+          <span class="right"><span class="badge appr">approved</span><span class="sc">9.1</span></span></div>
+        <div class="body">most content is slop because people skip the receipts. anyone can claim they shipped fast. show the diff, show the clip, show the real number — that's the part that's actually yours, and it's the part everyone leaves out.</div>
+        <div class="rc"><span class="chiprc"><span class="ic">▤</span> eval-rubric.md</span><span class="chiprc"><span class="ic">⌁</span> transcript</span></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="av">C</span><span><span class="nm">carter chasson</span><br><span class="mt">2 days ago · 6:40 pm</span></span>
+          <span class="right"><span class="badge draft">draft</span><span class="sc">7.8</span></span></div>
+        <div class="body">i used to think posting took a whole afternoon. turns out it takes one honest paragraph about what you actually did. the tool reads the work; you just confirm it sounds like you.</div>
+        <div class="rc"><span class="chiprc"><span class="ic">⌁</span> transcript</span></div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

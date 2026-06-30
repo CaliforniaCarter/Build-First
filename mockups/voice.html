@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>timbre — voice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000; --ink:#FAFAF7; --muted:#A2A29B; --dim:#7C7C76; --faint:#1C1C1F;
+    --yellow:#FFE500; --yellow-ink:#0B0B0C;
+    --card:#16161A; --card2:#101013; --border:#2C2C31; --border-hi:#43434B;
+    --max:1120px;
+    --display:"Space Grotesk",system-ui,sans-serif; --serif:"Instrument Serif",Georgia,serif; --body:"Inter",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg); color:var(--ink); font-family:var(--body); -webkit-font-smoothing:antialiased; line-height:1.45; min-height:100vh; display:flex; flex-direction:column;}
+  .wrap{width:100%; max-width:var(--max); margin:0 auto; padding:0 40px}
+
+  /* top progress line */
+  .tprog{position:fixed; top:0; left:0; right:0; height:3px; background:#1A1A1D; z-index:50}
+  .tprog > i{display:block; height:100%; width:0; background:linear-gradient(90deg,#FFC400,#FFE500); box-shadow:0 0 12px rgba(255,229,0,.5); transition:width 1s cubic-bezier(.2,.8,.2,1)}
+
+  header{padding:24px 0 0}
+  .topbar{display:flex; align-items:center; justify-content:space-between; gap:24px}
+  .brand{display:flex; align-items:center; gap:12px}
+  .word{font-family:var(--display); font-weight:700; font-size:20px; letter-spacing:-.02em}
+  .word .dot{color:var(--yellow)}
+  .wave{display:flex; align-items:flex-end; gap:2px; height:18px}
+  .wave i{width:3px; background:var(--yellow); border-radius:2px; height:5px}
+  .crumbs{display:flex; gap:11px; align-items:center; font-size:13px; color:var(--muted); font-weight:450}
+  .crumbs b{color:var(--ink); font-weight:600}
+  .crumbs .done{color:var(--ink)} .crumbs .done .c{color:var(--yellow)}
+  .crumbs span.sep{opacity:.4}
+
+  main{flex:1; padding:30px 0 60px}
+  h1{font-family:var(--serif); font-weight:400; font-size:clamp(34px,4vw,50px); line-height:1.02; letter-spacing:.3px; animation:rise .5s ease both}
+  .sub{margin-top:12px; font-size:16px; color:#C6C6C0; max-width:46ch; animation:rise .5s .05s ease both}
+  @keyframes rise{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+
+  .layout{margin-top:30px; display:grid; grid-template-columns:1fr 380px; gap:34px; align-items:start}
+
+  /* prompts */
+  .prompt{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:14px; animation:rise .5s ease both; transition:border-color .2s}
+  .prompt:nth-child(1){animation-delay:.08s}.prompt:nth-child(2){animation-delay:.14s}.prompt:nth-child(3){animation-delay:.2s}
+  .prompt.focus{border-color:var(--border-hi)}
+  .q{display:flex; align-items:center; gap:11px; margin-bottom:13px}
+  .qn{flex:none; width:26px;height:26px;border-radius:8px;background:var(--card2);border:1px solid var(--border-hi); display:grid;place-items:center; font-family:var(--display); font-weight:600; font-size:13px; color:var(--muted)}
+  .prompt.answered .qn{background:var(--yellow); border-color:var(--yellow); color:var(--yellow-ink)}
+  .qt{font-family:var(--display); font-weight:600; font-size:16px}
+  .prompt textarea{width:100%; background:var(--card2); border:1px solid var(--border-hi); color:var(--ink); font-family:var(--body); font-size:14.5px; padding:12px 13px; border-radius:11px; outline:none; transition:.16s; resize:none; min-height:52px}
+  .prompt textarea::placeholder{color:#74747A}
+  .prompt textarea:focus{border-color:var(--yellow); box-shadow:0 0 0 3px rgba(255,229,0,.12)}
+  .listen{display:flex; align-items:center; gap:9px; margin-top:9px; font-size:11.5px; color:var(--dim)}
+  .listen .lw{display:flex; gap:2px; align-items:flex-end; height:11px}
+  .listen .lw i{width:2.5px; background:#3a3a40; border-radius:2px; height:3px; transition:background .2s}
+  .prompt.focus .listen{color:var(--yellow)} .prompt.focus .listen .lw i{background:var(--yellow)}
+
+  /* tap cards */
+  .cardsec{margin-top:22px}
+  .cardsec h3{font-family:var(--display); font-weight:600; font-size:14px; color:#CFCFC9; margin-bottom:10px}
+  .taps{display:flex; gap:9px; flex-wrap:wrap; margin-bottom:18px}
+  .tap{background:var(--card); border:1px solid var(--border-hi); color:var(--ink); font-family:var(--body); font-size:13.5px; font-weight:500; padding:10px 15px; border-radius:11px; cursor:pointer; transition:.16s}
+  .tap:hover{border-color:#5a5a62; transform:translateY(-1px)}
+  .tap.on{background:var(--yellow); color:var(--yellow-ink); border-color:var(--yellow)}
+
+  .actions{display:flex; align-items:center; justify-content:space-between; margin-top:24px}
+  .back{background:transparent; border:none; color:var(--dim); font-size:14px; cursor:pointer} .back:hover{color:var(--ink)}
+  .cta{border:none; background:var(--yellow); color:var(--yellow-ink); font-family:var(--display); font-weight:600; font-size:15px; padding:13px 22px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; transition:.16s; text-decoration:none}
+  .cta:hover{transform:translateY(-1px); box-shadow:0 10px 28px -10px rgba(255,229,0,.5)} .cta:hover .arrow{transform:translateX(3px)} .arrow{transition:.16s}
+  .actr{display:flex; align-items:center; gap:14px}
+  .vmsg{display:none; font-size:12.5px; color:#FF9090; font-weight:500}
+  .vmsg.show{display:inline}
+  @keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
+  .cta.shake{animation:shake .4s}
+
+  /* live persona panel */
+  .pp{position:sticky; top:22px; background:linear-gradient(180deg,#17170f,#141416 30%); border:1px solid var(--border); border-radius:20px; padding:22px; overflow:hidden; animation:rise .5s .12s ease both}
+  .pp::before{content:""; position:absolute; inset:0; background:radial-gradient(420px 180px at 80% -10%, rgba(255,229,0,.10), transparent 60%); pointer-events:none}
+  .pp-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; position:relative}
+  .pp-title{font-family:var(--display); font-weight:600; font-size:15px}
+  .pp-sub{font-size:12px; color:var(--muted); margin-bottom:18px; position:relative}
+  .pp-file{display:flex; align-items:center; gap:8px; font-size:11px; color:var(--dim); margin-bottom:16px; font-family:var(--display)}
+  .pp-file .live-wave{display:flex; gap:2px; align-items:flex-end; height:12px}
+  .pp-file .live-wave i{width:2.5px; background:var(--yellow); border-radius:2px; height:3px}
+
+  .pslot{margin-bottom:15px; position:relative}
+  .pslot .plabel{font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin-bottom:6px; font-weight:600}
+  .skel{display:flex; flex-direction:column; gap:6px}
+  .skel span{height:9px; border-radius:5px; background:linear-gradient(90deg,#202024,#2b2b30,#202024); background-size:200% 100%; animation:shimmer 1.6s infinite}
+  .skel span:nth-child(1){width:78%} .skel span:nth-child(2){width:54%}
+  @keyframes shimmer{to{background-position:-200% 0}}
+  .pval{display:none; font-size:13.5px; color:var(--ink); line-height:1.5}
+  .pval .chips{display:flex; gap:6px; flex-wrap:wrap; margin-top:2px}
+  .pval .chip{font-size:12px; background:#1f1f12; border:1px solid #3a3a22; color:#f0e9b0; padding:4px 9px; border-radius:99px}
+  .pslot.filled .skel{display:none}
+  .pslot.filled .pval{display:block; animation:slidein .45s cubic-bezier(.2,.9,.3,1)}
+  @keyframes slidein{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+  .pslot.filled .plabel{color:var(--yellow)}
+
+  .pp-foot{margin-top:18px; padding-top:14px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:11.5px; color:var(--dim); position:relative}
+  .pp-foot b{color:var(--yellow); font-variant-numeric:tabular-nums}
+
+  @media (max-width:920px){ .layout{grid-template-columns:1fr} .pp{position:static; order:-1} }
+</style>
+</head>
+<body>
+<div class="tprog"><i id="tprog"></i></div>
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><span class="word">timbre<span class="dot">.</span></span><span class="wave" id="wave"></span></div>
+    <div class="crumbs"><span class="done"><span class="c">✓</span> the why</span><span class="sep">·</span><span class="done"><span class="c">✓</span> you</span><span class="sep">·</span><b>your voice</b></div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <h1>now — how you <span style="color:var(--yellow)">sound</span>.</h1>
+    <p class="sub">answer a few easy things. timbre listens to <em>how</em> you talk, not what you say — just dictate them, it's faster and more you.</p>
+
+    <div class="layout">
+      <!-- LEFT: capture -->
+      <section>
+        <div class="prompt" data-slot="sig">
+          <div class="q"><span class="qn">1</span><span class="qt">what'd you do last weekend?</span></div>
+          <textarea placeholder="dictate or type — just talk like you'd text a friend" data-voice></textarea>
+          <div class="listen"><span class="lw"></span><span>timbre's listening to your rhythm</span></div>
+        </div>
+        <div class="prompt" data-slot="style">
+          <div class="q"><span class="qn">2</span><span class="qt">your go-to lunch — and why?</span></div>
+          <textarea placeholder="dictate or type…" data-voice></textarea>
+          <div class="listen"><span class="lw"></span><span>reading your sentence shape</span></div>
+        </div>
+        <div class="prompt" data-slot="vocab">
+          <div class="q"><span class="qn">3</span><span class="qt">teach me something you're into — like i'm a friend.</span></div>
+          <textarea placeholder="dictate or type…" data-voice></textarea>
+          <div class="listen"><span class="lw"></span><span>catching your words &amp; tics</span></div>
+        </div>
+
+        <div class="cardsec">
+          <h3>two quick taps — your humor</h3>
+          <div class="taps" data-card="humor">
+            <button class="tap">dry &amp; deadpan</button>
+            <button class="tap">playful</button>
+            <button class="tap">sharp / spicy</button>
+            <button class="tap">mostly straight</button>
+          </div>
+          <h3>…and your shape</h3>
+          <div class="taps" data-card="format">
+            <button class="tap">short &amp; punchy</button>
+            <button class="tap">a little story</button>
+            <button class="tap">one big idea</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="back">← back</button>
+          <div class="actr"><span class="vmsg" id="vmsg">answer at least one — timbre needs something to hear.</span><a class="cta" href="reveal.html" id="seebtn">see my voice <span class="arrow">→</span></a></div>
+        </div>
+      </section>
+
+      <!-- RIGHT: live persona -->
+      <aside class="pp">
+        <div class="pp-head"><span class="pp-title">your voice, forming</span></div>
+        <div class="pp-sub">timbre writes this from how you answer. you'll confirm it next.</div>
+        <div class="pp-file"><span class="live-wave" id="ppwave"></span> persona.md</div>
+
+        <div class="pslot" id="slot-sig">
+          <div class="plabel">voice signature</div>
+          <div class="skel"><span></span><span></span></div>
+          <div class="pval">warm · lowercase · direct. talks like a person, not a brand.</div>
+        </div>
+        <div class="pslot" id="slot-style">
+          <div class="plabel">sentence style</div>
+          <div class="skel"><span></span><span></span></div>
+          <div class="pval">short and punchy. fragments for emphasis. rarely two clauses where one does.</div>
+        </div>
+        <div class="pslot" id="slot-vocab">
+          <div class="plabel">vocabulary &amp; tics</div>
+          <div class="skel"><span></span><span></span></div>
+          <div class="pval">plain and concrete, no corporate words.
+            <span class="chips"><span class="chip">"honestly"</span><span class="chip">"the thing is"</span><span class="chip">em-dashes</span></span>
+          </div>
+        </div>
+        <div class="pslot" id="slot-humor">
+          <div class="plabel">humor</div>
+          <div class="skel"><span></span></div>
+          <div class="pval" data-humor>—</div>
+        </div>
+        <div class="pslot" id="slot-format">
+          <div class="plabel">format</div>
+          <div class="skel"><span></span></div>
+          <div class="pval" data-format>—</div>
+        </div>
+
+        <div class="pp-foot"><span>voice formed</span><b id="ppct">0%</b></div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<script>
+  // top progress + header wave
+  setTimeout(()=>document.getElementById('tprog').style.width='72%',150);
+  const wave=document.getElementById('wave'); for(let i=0;i<20;i++)wave.appendChild(document.createElement('i'));
+  const wb=[...wave.children]; let tt=0;
+  setInterval(()=>{tt+=.35; wb.forEach((b,i)=>{b.style.height=(5+Math.abs(Math.sin(tt+i*.5))*12*(0.5+Math.random()*0.5)).toFixed(1)+'px';});},90);
+
+  // persona-panel waveform (always gently forming)
+  const pw=document.getElementById('ppwave'); for(let i=0;i<16;i++)pw.appendChild(document.createElement('i'));
+  const pwb=[...pw.children]; let pt=0;
+  setInterval(()=>{pt+=.3; pwb.forEach((b,i)=>{b.style.height=(3+Math.abs(Math.sin(pt+i*.55))*9).toFixed(1)+'px';});},80);
+
+  // listen-bars per prompt
+  document.querySelectorAll('.prompt').forEach(p=>{
+    const lw=p.querySelector('.lw'); for(let i=0;i<10;i++)lw.appendChild(document.createElement('i'));
+    const ta=p.querySelector('textarea');
+    let anim=null; const bars=[...lw.children];
+    ta.addEventListener('focus',()=>{p.classList.add('focus'); let lt=0; anim=setInterval(()=>{lt+=.4; bars.forEach((b,i)=>b.style.height=(3+Math.abs(Math.sin(lt+i*.6))*8).toFixed(1)+'px');},70);});
+    ta.addEventListener('blur',()=>{p.classList.remove('focus'); clearInterval(anim); bars.forEach(b=>b.style.height='3px');});
+  });
+
+  // ---- live persona build ----
+  const filled=new Set();
+  function fill(slot){
+    if(filled.has(slot))return; filled.add(slot);
+    document.getElementById('slot-'+slot).classList.add('filled');
+    const vm=document.getElementById('vmsg'); if(vm)vm.classList.remove('show');
+    recount();
+  }
+  const total=5;
+  function recount(){ document.getElementById('ppct').textContent=Math.round(filled.size/total*100)+'%'; }
+
+  document.querySelectorAll('.prompt').forEach(p=>{
+    const ta=p.querySelector('textarea'); const slot=p.dataset.slot;
+    ta.addEventListener('input',()=>{
+      if(ta.value.trim().length>4){ p.classList.add('answered'); fill(slot); }
+    });
+  });
+
+  // tap cards
+  document.querySelectorAll('[data-card]').forEach(group=>{
+    const kind=group.dataset.card;
+    group.querySelectorAll('.tap').forEach(t=>t.addEventListener('click',()=>{
+      group.querySelectorAll('.tap').forEach(x=>x.classList.remove('on')); t.classList.add('on');
+      const target=document.querySelector('[data-'+kind+']'); if(target)target.textContent=t.textContent.toLowerCase();
+      fill(kind);
+    }));
+  });
+
+  const seebtn=document.getElementById('seebtn'), vmsg=document.getElementById('vmsg');
+  seebtn.addEventListener('click',(e)=>{
+    if(filled.size===0){ e.preventDefault(); vmsg.classList.add('show'); seebtn.classList.remove('shake'); void seebtn.offsetWidth; seebtn.classList.add('shake'); }
+  });
+</script>
+</body>
+</html>

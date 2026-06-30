@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>timbre — voice profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000; --panel:#0A0A0C; --ink:#FAFAF7; --muted:#A2A29B; --dim:#7C7C76;
+    --yellow:#FFE500; --yellow-ink:#0B0B0C;
+    --card:#121214; --card2:#0C0C0E; --border:#242427; --border-hi:#3C3C42;
+    --display:"Space Grotesk",system-ui,sans-serif; --serif:"Instrument Serif",Georgia,serif; --body:"Inter",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg); color:var(--ink); font-family:var(--body); -webkit-font-smoothing:antialiased; line-height:1.5; height:100vh; display:grid; grid-template-columns:236px 1fr}
+  a{text-decoration:none;color:inherit}
+  .side{background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:22px 16px}
+  .side .logo{display:flex; align-items:center; gap:10px; padding:4px 8px 22px}
+  .side .word{font-family:var(--display); font-weight:700; font-size:19px; letter-spacing:-.02em}
+  .side .word .dot{color:var(--yellow)}
+  .nav{display:flex; flex-direction:column; gap:3px}
+  .nav a{display:flex; align-items:center; gap:11px; padding:10px 11px; border-radius:10px; color:var(--muted); font-size:14px; font-weight:500; transition:.14s}
+  .nav a:hover{background:#141417; color:var(--ink)}
+  .nav a.on{background:#16160c; color:var(--ink)} .nav a.on .i{color:var(--yellow)}
+  .nav a .i{width:18px; text-align:center}
+  .side .grow{flex:1}
+  .side .me{display:flex; align-items:center; gap:10px; padding:10px 8px; border-top:1px solid var(--border)}
+  .side .av{width:30px;height:30px;border-radius:99px;background:linear-gradient(135deg,#FFE500,#FFB200); color:#0B0B0C; display:grid;place-items:center; font-weight:700; font-family:var(--display); font-size:13px}
+  .side .me .nm{font-size:13px; font-weight:600} .side .me .role{font-size:11px; color:var(--dim)}
+
+  main{overflow:auto; padding:34px 44px 60px}
+  .top{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px}
+  .top h1{font-family:var(--serif); font-weight:400; font-size:38px; letter-spacing:.3px}
+  .retune{background:transparent; border:1px solid var(--border-hi); color:var(--ink); font-family:var(--display); font-weight:600; font-size:13.5px; padding:10px 16px; border-radius:11px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:.16s}
+  .retune:hover{border-color:var(--yellow); color:var(--yellow)}
+  .subline{color:var(--muted); font-size:14px; margin-bottom:24px; display:flex; align-items:center; gap:9px}
+  .subline .pip{width:7px;height:7px;border-radius:99px;background:var(--yellow);box-shadow:0 0 7px var(--yellow)}
+
+  .grid{max-width:860px; display:flex; flex-direction:column; gap:18px}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:18px; padding:24px}
+  .card.voice{background:linear-gradient(180deg,#16160e,#121214 30%); border-color:var(--border-hi)}
+  .cardt{font-family:var(--display); font-weight:600; font-size:14px; color:var(--muted); margin-bottom:4px; display:flex; align-items:center; gap:9px}
+  .file{font-size:11px; color:var(--dim); font-family:var(--display)}
+  .sig{font-family:var(--serif); font-weight:400; font-size:clamp(24px,3vw,32px); letter-spacing:.2px; line-height:1.1; margin:14px 0 22px}
+  .sig .hl{color:var(--yellow); font-style:italic}
+
+  .row{display:grid; grid-template-columns:160px 1fr auto; gap:16px; align-items:start; padding:13px 0; border-top:1px solid var(--border)}
+  .row .l{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); font-weight:600; font-family:var(--display); padding-top:2px}
+  .row .v{font-size:14px; color:var(--ink); line-height:1.5}
+  .row .v .chips{display:flex; gap:6px; flex-wrap:wrap}
+  .chip{font-size:12px; padding:5px 10px; border-radius:99px; border:1px solid #3a3a22; background:#1c1c10; color:#f0e9b0}
+  .chip.no{border-color:#3a2222; background:#1f1212; color:#e7b0b0}
+  .edit{opacity:0; font-size:12px; color:var(--muted); cursor:pointer; transition:.14s; white-space:nowrap}
+  .row:hover .edit{opacity:1} .edit:hover{color:var(--yellow)}
+
+  .note{margin-top:18px; font-size:12.5px; color:var(--dim); display:flex; align-items:center; gap:8px}
+</style>
+</head>
+<body>
+  <aside class="side">
+    <div class="logo"><span class="word">timbre<span class="dot">.</span></span></div>
+    <nav class="nav">
+      <a href="home.html"><span class="i">⌂</span> home</a>
+      <a href="compose.html"><span class="i">✍︎</span> write</a>
+      <a href="feed.html"><span class="i">▦</span> posts</a>
+      <a class="on" href="profile-view.html"><span class="i">◑</span> voice profile</a>
+    </nav>
+    <div class="grow"></div>
+    <div class="me"><span class="av">C</span><span><span class="nm">carter</span><br><span class="role">tuned · local-first</span></span></div>
+  </aside>
+
+  <main>
+    <div class="top"><h1>your voice profile</h1><button class="retune">⌁ re-tune</button></div>
+    <div class="subline"><span class="pip"></span> this is how timbre writes. change anything — it re-learns instantly. nothing leaves your machine.</div>
+
+    <div class="grid">
+      <div class="card voice">
+        <div class="cardt">your voice <span class="file">· persona.md</span></div>
+        <div class="sig">lowercase · understated · <span class="hl">dry.</span></div>
+        <div class="row"><span class="l">sentence style</span><span class="v">short and punchy. fragments for emphasis. says the thing and stops.</span><span class="edit">edit</span></div>
+        <div class="row"><span class="l">vocabulary</span><span class="v">plain and concrete. no corporate words, no hype.</span><span class="edit">edit</span></div>
+        <div class="row"><span class="l">favorite moves</span><span class="v"><span class="chips"><span class="chip">"honestly"</span><span class="chip">one-line openers</span><span class="chip">undercuts the win</span></span></span><span class="edit">edit</span></div>
+        <div class="row"><span class="l">never does</span><span class="v"><span class="chips"><span class="chip no">"unlock"</span><span class="chip no">"leverage"</span><span class="chip no">exclamation spam</span></span></span><span class="edit">edit</span></div>
+        <div class="row"><span class="l">humor</span><span class="v">dry and deadpan — never flags the joke.</span><span class="edit">edit</span></div>
+        <div class="row"><span class="l">format</span><span class="v">hook first, proof second, no throat-clearing.</span><span class="edit">edit</span></div>
+      </div>
+
+      <div class="card">
+        <div class="cardt">who you are <span class="file">· profile.md</span></div>
+        <div class="row" style="border-top:none"><span class="l">identity</span><span class="v">ai strategist at tenex — ex-athlete who got obsessed with building.</span><span class="edit">edit</span></div>
+        <div class="row"><span class="l">known for</span><span class="v">shipping fast and showing the work, not the highlight reel.</span><span class="edit">edit</span></div>
+        <div class="row"><span class="l">links</span><span class="v">linkedin.com/in/carter · 14 posts found</span><span class="edit">edit</span></div>
+        <div class="row"><span class="l">belief</span><span class="v">most content is slop because people skip the receipts.</span><span class="edit">edit</span></div>
+      </div>
+
+      <div class="note">🔒 persona.md &amp; profile.md live on your machine — plain files you own.</div>
+    </div>
+  </main>
+</body>
+</html>

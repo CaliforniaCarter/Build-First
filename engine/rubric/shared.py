@@ -76,10 +76,15 @@ def build_score_prompt(draft: str, persona_md: str, layers: str, prev_draft: str
         f"{prev}\n"
         "DRAFT:\n"
         f"{draft}\n\n"
-        "Return ONLY JSON with this shape:\n"
-        '{"gates":[{"name":..., "passed":true|false, "reason":...}, ... all six],\n'
-        ' "dimensions":[{"name":..., "score":0-10, "reason":...}, ... all eight],\n'
-        ' "delta_vs_prev":"one line on what changed vs the previous level (\\"baseline\\" for L0)"}'
+        "Return ONLY JSON with this shape — include EVERY gate and EVERY dimension, "
+        "using these exact names:\n"
+        f"  gates ({len(GATE_NAMES)}): {', '.join(GATE_NAMES)}\n"
+        f"  dimensions ({len(DIM_NAMES)}): {', '.join(DIM_NAMES)}\n"
+        '{"gates":[{"name":..., "passed":true|false, "reason":...}, ... all '
+        f"{len(GATE_NAMES)} gates],\n"
+        '  "dimensions":[{"name":..., "score":0-10, "reason":...}, ... all '
+        f"{len(DIM_NAMES)} dimensions],\n"
+        '  "delta_vs_prev":"one line on what changed vs the previous level (\\"baseline\\" for L0)"}'
     )
 
 

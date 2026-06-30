@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>timbre — profile (you)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000; --ink:#FAFAF7; --muted:#A2A29B; --dim:#7C7C76; --faint:#1C1C1F;
+    --yellow:#FFE500; --yellow-ink:#0B0B0C;
+    --card:#16161A; --card2:#101013; --border:#2C2C31; --border-hi:#43434B;
+    --max:1080px;
+    --display:"Space Grotesk",system-ui,sans-serif; --serif:"Instrument Serif",Georgia,serif; --body:"Inter",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg); color:var(--ink); font-family:var(--body); -webkit-font-smoothing:antialiased; line-height:1.45; min-height:100vh; display:flex; flex-direction:column;}
+  .wrap{width:100%; max-width:var(--max); margin:0 auto; padding:0 40px}
+
+  header{padding:22px 0; border-bottom:1px solid var(--border)}
+  .topbar{display:flex; align-items:center; justify-content:space-between; gap:24px}
+  .brand{display:flex; align-items:center; gap:12px}
+  .word{font-family:var(--display); font-weight:700; font-size:20px; letter-spacing:-.02em}
+  .word .dot{color:var(--yellow)}
+  .wave{display:flex; align-items:flex-end; gap:2px; height:18px}
+  .wave i{width:3px; background:var(--yellow); border-radius:2px; height:5px}
+  .crumbs{display:flex; gap:11px; align-items:center; font-size:13px; color:var(--muted); font-weight:450}
+  .crumbs b{color:var(--ink); font-weight:600}
+  .crumbs .done{color:var(--ink)} .crumbs .done .c{color:var(--yellow)}
+  .crumbs span.sep{opacity:.4}
+
+  main{flex:1; padding:42px 0 60px}
+  .layout{display:grid; grid-template-columns:1fr 312px; gap:40px; align-items:start}
+  h1{font-family:var(--serif); font-weight:400; font-size:clamp(34px,4vw,50px); line-height:1.02; letter-spacing:.3px; animation:rise .5s ease both}
+  .sub{margin-top:13px; font-size:16px; color:#C6C6C0; max-width:52ch; animation:rise .5s .05s ease both}
+  @keyframes rise{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+
+  /* progressive source list */
+  .sources{margin-top:28px; display:flex; flex-direction:column; gap:12px}
+  .src{background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; transition:border-color .2s, box-shadow .2s; animation:rise .5s ease both}
+  .src:nth-child(1){animation-delay:.08s} .src:nth-child(2){animation-delay:.14s} .src:nth-child(3){animation-delay:.2s}
+  .src.open{border-color:var(--border-hi)}
+  .src.addressed:not(.open){opacity:.92}
+  .src-head{width:100%; display:flex; align-items:center; gap:13px; padding:17px 18px; background:transparent; border:none; color:var(--ink); cursor:pointer; text-align:left; font-family:var(--body)}
+  .src-ic{flex:none; width:36px; height:36px; border-radius:10px; background:var(--card2); border:1px solid var(--border-hi); display:grid; place-items:center; font-size:17px; transition:.2s}
+  .src.open .src-ic, .src.done-src .src-ic{background:var(--yellow); border-color:var(--yellow)}
+  .src-tt{flex:1; display:flex; flex-direction:column; gap:2px}
+  .src-tt b{font-family:var(--display); font-weight:600; font-size:15px}
+  .src-tt span{font-size:12.5px; color:var(--muted)}
+  .src-status{font-size:12px; color:var(--dim)}
+  .src-status .pill{font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--yellow-ink); background:var(--yellow); padding:3px 8px; border-radius:99px}
+  .src-status .st-done{display:inline-flex; align-items:center; gap:6px; color:var(--ink); font-weight:500}
+  .src-status .st-done::before{content:"✓"; color:var(--yellow); font-weight:700}
+  .src-status .st-skip{color:var(--dim)}
+  .src-status .opt{color:var(--dim)}
+  .caret{flex:none; color:var(--dim); transition:transform .25s; font-size:11px}
+  .src.open .caret{transform:rotate(180deg)}
+
+  .src-body{max-height:0; opacity:0; overflow:hidden; transition:max-height .35s ease, opacity .3s ease}
+  .src.open .src-body{max-height:520px; opacity:1}
+  .src-inner{padding:4px 18px 18px}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:11px}
+  .row{margin-bottom:13px}
+  label{display:block; font-size:12.5px; color:#CFCFC9; margin-bottom:7px; font-weight:500}
+  input[type=text], textarea{width:100%; background:var(--card2); border:1px solid var(--border-hi); color:var(--ink); font-family:var(--body); font-size:14.5px; padding:12px 13px; border-radius:11px; outline:none; transition:.16s; resize:vertical}
+  input::placeholder, textarea::placeholder{color:#74747A}
+  input:focus, textarea:focus{border-color:var(--yellow); box-shadow:0 0 0 3px rgba(255,229,0,.12)}
+
+  /* dictation field */
+  .dict{position:relative}
+  .dict input, .dict textarea{padding-right:13px}
+  .mic{position:absolute; right:8px; top:8px; width:30px; height:30px; border-radius:9px; border:1px solid var(--border-hi); background:#1B1B20; color:var(--muted); display:grid; place-items:center; cursor:pointer; transition:.16s}
+  .dict textarea + .mic{top:8px}
+  .mic svg{width:15px;height:15px}
+  .mic:hover{color:var(--yellow-ink); background:var(--yellow); border-color:var(--yellow)}
+  .dict.listening input, .dict.listening textarea{border-color:var(--yellow); box-shadow:0 0 0 3px rgba(255,229,0,.16)}
+  .dict.listening .mic{background:var(--yellow); border-color:var(--yellow); color:var(--yellow-ink); animation:micpulse 1.1s infinite}
+  @keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,229,0,.55)}70%{box-shadow:0 0 0 7px rgba(255,229,0,0)}}
+  .dhint{display:flex; align-items:center; gap:7px; margin-top:7px; font-size:11.5px; color:var(--dim); transition:.2s}
+  .dhint .mi{opacity:.8}
+  .dhint.live{color:var(--yellow)}
+  .dhint .lw{display:none; gap:2px; align-items:flex-end; height:11px}
+  .dhint.live .lw{display:inline-flex}
+  .dhint.live .mi, .dhint.live .txt-static{display:none}
+  .lw i{width:2.5px; background:var(--yellow); border-radius:2px; height:3px}
+  .eg{margin-top:8px; font-size:11.5px; color:var(--dim); font-style:italic; line-height:1.45}
+
+  .drop{border:1.5px dashed var(--border-hi); border-radius:13px; padding:18px; text-align:center; color:var(--muted); font-size:13.5px; cursor:pointer; transition:.16s; margin-bottom:11px}
+  .drop:hover{border-color:var(--yellow); color:#C6C6C0}
+  .drop b{color:var(--ink); font-weight:600}
+
+  /* scan (post search) */
+  .scan{display:none; align-items:center; gap:9px; margin-top:12px; font-size:13px; color:var(--muted); background:var(--card2); border:1px solid var(--border); border-radius:11px; padding:11px 13px; animation:rise .3s ease}
+  .scan.show{display:flex}
+  .scan.done{color:var(--ink); border-color:#3a3a22; background:#15150c}
+  .spin{width:14px;height:14px;border-radius:99px;border:2px solid var(--border-hi); border-top-color:var(--yellow); animation:spin .7s linear infinite; flex:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .scan .ok{color:var(--yellow); font-weight:700}
+  .scan b{color:var(--ink); font-weight:600}
+
+  .src-actions{display:flex; align-items:center; justify-content:space-between; margin-top:16px}
+  .src-err{display:none; align-items:center; gap:8px; margin-top:12px; font-size:12.5px; color:#FF9090; font-weight:500}
+  .src-err::before{content:"⚠"; font-size:13px}
+  .src-err.show{display:flex; animation:efade .25s ease}
+  @keyframes efade{from{opacity:0; transform:translateY(-3px)} to{opacity:1; transform:none}}
+  @keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
+  .src.shake{animation:shake .4s}
+  .ghost{background:transparent; border:none; color:var(--dim); font-family:var(--body); font-size:13.5px; cursor:pointer; padding:6px 0}
+  .ghost:hover{color:var(--ink)}
+  .mini{border:none; background:var(--yellow); color:var(--yellow-ink); font-family:var(--display); font-weight:600; font-size:13.5px; padding:10px 16px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:.16s}
+  .mini:hover{transform:translateY(-1px); box-shadow:0 8px 22px -10px rgba(255,229,0,.5)} .mini:hover .arrow{transform:translateX(3px)} .arrow{transition:.16s}
+
+  .actions{display:flex; align-items:center; justify-content:space-between; margin-top:26px}
+  .back{background:transparent; border:none; color:var(--dim); font-size:14px; cursor:pointer} .back:hover{color:var(--ink)}
+  .cta{border:none; background:var(--yellow); color:var(--yellow-ink); font-family:var(--display); font-weight:600; font-size:15px; padding:13px 22px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; transition:.16s}
+  .cta:hover{transform:translateY(-1px); box-shadow:0 10px 28px -10px rgba(255,229,0,.5)} .cta:hover .arrow{transform:translateX(3px)}
+
+  /* progress card */
+  .pcard{position:sticky; top:22px; background:var(--card); border:1px solid var(--border); border-radius:18px; padding:22px; animation:rise .5s .12s ease both}
+  .pc-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px}
+  .pc-title{font-family:var(--display); font-weight:600; font-size:14px}
+  .pc-count{font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums}
+  .pc-count b{color:var(--yellow); font-weight:600}
+  .pc-bar{height:9px; border-radius:99px; background:#0E0E10; border:1px solid var(--border); overflow:hidden; margin-bottom:20px; position:relative}
+  .pc-bar > i{position:relative; display:block; height:100%; width:20%; border-radius:99px; background:linear-gradient(90deg,#FFC400,#FFE500 60%,#FFF18A); transition:width .6s cubic-bezier(.2,.85,.25,1); overflow:hidden}
+  .pc-bar > i::after{content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent, rgba(255,255,255,.55), transparent); transform:translateX(-120%); animation:sheen 2.6s infinite}
+  @keyframes sheen{to{transform:translateX(260%)}}
+  .checklist{list-style:none; display:flex; flex-direction:column; gap:2px}
+  .citem{display:flex; align-items:flex-start; gap:11px; padding:8px 8px; margin:0 -8px; border-radius:9px; font-size:13.5px; color:var(--muted); transition:color .25s, background .3s}
+  .citem .ck{flex:none; width:19px; height:19px; border-radius:99px; border:1.6px solid #4a4a52; display:grid; place-items:center; margin-top:1px; transition:.2s}
+  .citem .ck svg{width:10px; height:10px; opacity:0; transform:scale(.4); transition:.2s}
+  .citem.done{color:var(--ink)}
+  .citem.done .ck{background:var(--yellow); border-color:var(--yellow); animation:pop .34s cubic-bezier(.2,1.3,.4,1)}
+  .citem.done .ck svg{opacity:1; transform:scale(1)}
+  .citem.just{background:rgba(255,229,0,.10)}
+  .citem .lbl small{display:block; color:var(--dim); font-size:11.5px; margin-top:1px; font-weight:400}
+  @keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.14)}100%{transform:scale(1)}}
+  .pc-foot{margin-top:16px; padding-top:14px; border-top:1px solid var(--border); font-size:11.5px; color:var(--dim); display:flex; align-items:center; gap:7px}
+  .pc-foot .ring{width:6px;height:6px;border-radius:99px;background:var(--yellow)}
+
+  @media (max-width:880px){ .layout{grid-template-columns:1fr} .pcard{position:static; order:-1} .two{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><span class="word">timbre<span class="dot">.</span></span><span class="wave" id="wave"></span></div>
+    <div class="crumbs"><span class="done"><span class="c">✓</span> the why</span><span class="sep">·</span><b>you</b><span class="sep">·</span><span>your voice</span></div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap layout">
+    <section>
+      <h1>the basics, <span id="hname">carter</span>.</h1>
+      <p class="sub">the more timbre knows, the more it sounds like you. add what's easy — it'll nudge you for the rest. short on time? every field takes voice — just dictate it.</p>
+
+      <div class="sources" id="sources">
+
+        <!-- 1 · ONLINE -->
+        <div class="src open done-src" id="src-online">
+          <button class="src-head" data-toggle>
+            <span class="src-ic">🔗</span>
+            <span class="src-tt"><b>find me online</b><span>drop your links — timbre reads your profile &amp; posts</span></span>
+            <span class="src-status"><span class="pill">start here</span></span>
+            <span class="caret">▾</span>
+          </button>
+          <div class="src-body"><div class="src-inner">
+            <div class="two">
+              <div class="row"><label>LinkedIn</label><input type="text" placeholder="linkedin.com/in/you" data-k="find" data-social></div>
+              <div class="row"><label>X / Twitter</label><input type="text" placeholder="@you" data-k="find" data-social></div>
+            </div>
+            <div class="scan" id="scan"></div>
+            <div class="src-actions">
+              <button class="ghost" data-skip>no socials yet — skip</button>
+              <button class="mini" data-next>looks good <span class="arrow">→</span></button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- 2 · RESUME -->
+        <div class="src" id="src-resume">
+          <button class="src-head" data-toggle>
+            <span class="src-ic">📄</span>
+            <span class="src-tt"><b>add your resume</b><span>sharpens your background &amp; the only-you facts</span></span>
+            <span class="src-status"><span class="opt">optional</span></span>
+            <span class="caret">▾</span>
+          </button>
+          <div class="src-body"><div class="src-inner">
+            <div class="drop">⬆&nbsp;&nbsp;<b>drop a PDF</b> &nbsp;or click to upload</div>
+            <div class="dict">
+              <textarea rows="4" placeholder="…or paste it here — or dictate (faster)" data-k="find role known"></textarea>
+            </div>
+            <div class="src-err" id="resume-err">nothing loaded yet — paste, upload, or skip.</div>
+            <div class="src-actions">
+              <button class="ghost" data-skip>skip this</button>
+              <button class="mini" data-next>add resume <span class="arrow">→</span></button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- 3 · LINES -->
+        <div class="src" id="src-lines">
+          <button class="src-head" data-toggle>
+            <span class="src-ic">✍️</span>
+            <span class="src-tt"><b>a few quick lines</b><span>three prompts — talk or type, your call</span></span>
+            <span class="src-status"><span class="opt">optional</span></span>
+            <span class="caret">▾</span>
+          </button>
+          <div class="src-body"><div class="src-inner">
+            <div class="row dict" data-sample="i'm an ai strategist at tenex — ex-athlete who got obsessed with building, now i ship things and write about it.">
+              <label>your one-liner (role + lane)</label>
+              <input type="text" placeholder="type it or dictate (faster)" data-k="role">
+              <div class="eg">e.g. “ai strategist at tenex — ex-athlete who got obsessed with building”</div>
+            </div>
+            <div class="row dict" data-sample="shipping fast and showing the actual work, not just the highlight reel.">
+              <label>what you're known for</label>
+              <input type="text" placeholder="type it or dictate (faster)" data-k="known">
+              <div class="eg">e.g. “shipping fast and showing the actual work — not the highlight reel”</div>
+            </div>
+            <div class="row dict" data-sample="most content online is slop because people skip the receipts — the proof is what makes it land.">
+              <label>a belief or lesson you'd defend</label>
+              <input type="text" placeholder="type it or dictate (faster)" data-k="belief">
+              <div class="eg">e.g. “most content is slop because people skip the receipts”</div>
+            </div>
+            <div class="src-actions">
+              <button class="ghost" data-skip>skip this</button>
+              <button class="mini" data-next>save lines <span class="arrow">→</span></button>
+            </div>
+          </div></div>
+        </div>
+
+      </div>
+
+      <div class="actions">
+        <button class="back">← back</button>
+        <button class="cta">next: your voice <span class="arrow">→</span></button>
+      </div>
+    </section>
+
+    <!-- progress card -->
+    <aside class="pcard">
+      <div class="pc-head"><span class="pc-title">your profile</span><span class="pc-count"><b id="pcn">1</b> of 5</span></div>
+      <div class="pc-bar"><i id="pcbar"></i></div>
+      <ul class="checklist" id="checklist">
+        <li class="citem done" data-k="name"><span class="ck"><svg viewBox="0 0 12 12"><path d="M2 6.2l2.6 2.6L10 3" stroke="#0B0B0C" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="lbl">your name<small id="cl-name">carter</small></span></li>
+        <li class="citem" data-k="find"><span class="ck"><svg viewBox="0 0 12 12"><path d="M2 6.2l2.6 2.6L10 3" stroke="#0B0B0C" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="lbl">your links &amp; posts<small>linkedin / x</small></span></li>
+        <li class="citem" data-k="role"><span class="ck"><svg viewBox="0 0 12 12"><path d="M2 6.2l2.6 2.6L10 3" stroke="#0B0B0C" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="lbl">your role &amp; lane</span></li>
+        <li class="citem" data-k="known"><span class="ck"><svg viewBox="0 0 12 12"><path d="M2 6.2l2.6 2.6L10 3" stroke="#0B0B0C" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="lbl">what you're known for</span></li>
+        <li class="citem" data-k="belief"><span class="ck"><svg viewBox="0 0 12 12"><path d="M2 6.2l2.6 2.6L10 3" stroke="#0B0B0C" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="lbl">a belief you'd defend</span></li>
+      </ul>
+      <div class="pc-foot"><span class="ring"></span> everything saves as you go</div>
+    </aside>
+  </div>
+</main>
+
+<script>
+  // header waveform
+  const wave=document.getElementById('wave'); for(let i=0;i<20;i++)wave.appendChild(document.createElement('i'));
+  const wb=[...wave.children]; let tt=0;
+  setInterval(()=>{tt+=.35; wb.forEach((b,i)=>{b.style.height=(5+Math.abs(Math.sin(tt+i*.5))*12*(0.5+Math.random()*0.5)).toFixed(1)+'px';});},90);
+
+  // name from landing
+  try{const n=localStorage.getItem('timbre_name'); if(n){const v=n.toLowerCase(); document.getElementById('hname').textContent=v; document.getElementById('cl-name').textContent=v;}}catch(e){}
+
+  // ---- progress (truthful from fields) ----
+  const fields=[...document.querySelectorAll('input[data-k], textarea[data-k]')];
+  const items=[...document.querySelectorAll('#checklist .citem')];
+  const bar=document.getElementById('pcbar'), pcn=document.getElementById('pcn');
+  let lastSat=new Set(['name']);
+  function recompute(){
+    const sat=new Set(['name']);
+    fields.forEach(f=>{ if(f.value.trim()) f.dataset.k.split(' ').forEach(k=>sat.add(k)); });
+    items.forEach(li=>{
+      const on=sat.has(li.dataset.k);
+      if(on && !lastSat.has(li.dataset.k)){ li.classList.add('just'); setTimeout(()=>li.classList.remove('just'),700); }
+      li.classList.toggle('done', on);
+    });
+    bar.style.width=Math.round(sat.size/5*100)+'%';
+    pcn.textContent=sat.size;
+    lastSat=sat;
+  }
+  bar.style.width='20%';
+  document.addEventListener('input',e=>{ if(e.target.matches('[data-k]'))recompute(); });
+
+  // ---- accordion + progressive probing ----
+  const order=['src-online','src-resume','src-lines'];
+  const addressed=new Set();
+  function openSrc(id){ order.forEach(x=>document.getElementById(x).classList.toggle('open', x===id)); }
+  function setStatus(id,html){ document.querySelector('#'+id+' .src-status').innerHTML=html; }
+  function nextUnaddressed(after){
+    const idx=order.indexOf(after);
+    for(let i=idx+1;i<order.length;i++) if(!addressed.has(order[i])) return order[i];
+    for(const id of order) if(!addressed.has(id)) return id;
+    return null;
+  }
+  document.querySelectorAll('[data-toggle]').forEach(h=>h.addEventListener('click',()=>{
+    const el=h.closest('.src'); openSrc(el.classList.contains('open')?null:el.id);
+  }));
+  function shake(src){ src.classList.remove('shake'); void src.offsetWidth; src.classList.add('shake'); }
+  document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>{
+    const src=b.closest('.src');
+    // validation — resume needs something loaded
+    if(src.id==='src-resume'){
+      const ta=src.querySelector('textarea'); const err=src.querySelector('.src-err');
+      if(!ta.value.trim()){ if(err)err.classList.add('show'); shake(src); return; }
+    }
+    addressed.add(src.id); src.classList.add('done-src');
+    setStatus(src.id, src.id==='src-online' ? '<span class="st-done">connected</span>' : '<span class="st-done">added</span>');
+    const nx=nextUnaddressed(src.id); openSrc(nx); recompute();
+  }));
+  // clear the resume error once something's typed/pasted
+  const rta=document.querySelector('#src-resume textarea'); const rerr=document.getElementById('resume-err');
+  if(rta) rta.addEventListener('input',()=>{ if(rta.value.trim() && rerr) rerr.classList.remove('show'); });
+  document.querySelectorAll('[data-skip]').forEach(b=>b.addEventListener('click',(e)=>{
+    e.stopPropagation(); const src=b.closest('.src'); addressed.add(src.id);
+    setStatus(src.id, '<span class="st-skip">skipped</span>');
+    const nx=nextUnaddressed(src.id); openSrc(nx);
+  }));
+
+  // ---- post search (no toggle) ----
+  let scanned=false; const scan=document.getElementById('scan');
+  function maybeScan(){
+    if(scanned) return;
+    const any=[...document.querySelectorAll('[data-social]')].some(s=>s.value.trim().length>3);
+    if(!any) return; scanned=true;
+    scan.className='scan show'; scan.innerHTML='<span class="spin"></span> searching your recent posts…';
+    setTimeout(()=>{ scan.className='scan show done'; scan.innerHTML='<span class="ok">✓</span>&nbsp;found <b>14 posts</b> — timbre will learn your voice from these'; },1300);
+  }
+  document.querySelectorAll('[data-social]').forEach(s=>s.addEventListener('input',maybeScan));
+
+  // ---- dictation (the wispr moment) ----
+  function typeInto(el, text){
+    return new Promise(res=>{ el.value=''; let i=0;
+      const iv=setInterval(()=>{ el.value=text.slice(0,++i); el.dispatchEvent(new Event('input',{bubbles:true}));
+        if(i>=text.length){clearInterval(iv); res();} }, 24);
+    });
+  }
+  document.querySelectorAll('[data-mic]').forEach(mic=>{
+    // build live-wave bars in this dict's hint
+    const wrap=mic.closest('.dict'); const hint=wrap.querySelector('.dhint'); const lw=hint && hint.querySelector('.lw');
+    if(lw){ for(let i=0;i<14;i++) lw.appendChild(document.createElement('i')); }
+    mic.addEventListener('click', async ()=>{
+      const input=wrap.querySelector('input,textarea'); const sample=wrap.dataset.sample||'';
+      wrap.classList.add('listening'); if(hint){hint.classList.add('live');}
+      // animate live-wave
+      const bars=lw?[...lw.children]:[]; let lt=0;
+      const anim=setInterval(()=>{lt+=.4; bars.forEach((b,i)=>b.style.height=(3+Math.abs(Math.sin(lt+i*.6))*9).toFixed(1)+'px');},70);
+      await new Promise(r=>setTimeout(r,750));      // brief "listening"
+      await typeInto(input, sample);                 // transcribe in
+      clearInterval(anim);
+      wrap.classList.remove('listening'); if(hint){hint.classList.remove('live');}
+    });
+  });
+</script>
+</body>
+</html>

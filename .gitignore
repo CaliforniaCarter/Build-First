@@ -13,7 +13,13 @@ profiles/*.md
 !profiles/.gitkeep
 runs/
 data/intake.json
+data/posts.json
 data/transcripts/
+
+# Web app
+web/node_modules/
+web/.next/
+web/out/
 
 # OS
 .DS_Store

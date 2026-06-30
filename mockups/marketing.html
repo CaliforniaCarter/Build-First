@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>timbre — for tenex builders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000; --ink:#FAFAF7; --muted:#A2A29B; --dim:#7C7C76;
+    --yellow:#FFE500; --yellow-ink:#0B0B0C;
+    --card:#101012; --card2:#0A0A0C; --border:#222226; --border-hi:#3A3A40;
+    --max:1180px;
+    --display:"Space Grotesk",system-ui,sans-serif; --serif:"Instrument Serif",Georgia,serif; --body:"Inter",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg); color:var(--ink); font-family:var(--body); -webkit-font-smoothing:antialiased; line-height:1.5; min-height:100vh; overflow-x:hidden}
+  .wrap{width:100%; max-width:var(--max); margin:0 auto; padding:0 40px}
+  a{text-decoration:none; color:inherit}
+
+  .bgwave{position:fixed; inset:0; z-index:0; opacity:.08; display:flex; align-items:center; gap:4px; padding:0 30px; pointer-events:none}
+  .bgwave i{flex:1; background:linear-gradient(180deg,var(--yellow),transparent); border-radius:6px}
+  .glow{position:fixed; top:-200px; right:-120px; width:680px; height:680px; border-radius:99px; background:radial-gradient(circle, rgba(255,229,0,.09), transparent 62%); z-index:0; pointer-events:none}
+
+  nav{position:relative; z-index:5; padding:24px 0}
+  .navbar{display:flex; align-items:center; justify-content:space-between}
+  .brand{display:flex; align-items:center; gap:11px}
+  .word{font-family:var(--display); font-weight:700; font-size:22px; letter-spacing:-.02em}
+  .word .dot{color:var(--yellow)}
+  .fortenex{font-size:11px; color:var(--dim); border:1px solid var(--border-hi); border-radius:99px; padding:4px 10px; font-family:var(--display); font-weight:500; letter-spacing:.03em}
+  .navcta{display:flex; align-items:center; gap:18px}
+  .openapp{font-size:13.5px; color:var(--muted)} .openapp:hover{color:var(--ink)}
+  .btn{background:var(--yellow); color:var(--yellow-ink); font-family:var(--display); font-weight:600; font-size:14.5px; padding:10px 18px; border-radius:11px; display:inline-flex; align-items:center; gap:8px; transition:.16s}
+  .btn:hover{transform:translateY(-1px); box-shadow:0 12px 30px -10px rgba(255,229,0,.5)} .btn .ar{transition:.16s} .btn:hover .ar{transform:translateX(3px)}
+
+  .hero{position:relative; z-index:3; display:grid; grid-template-columns:1.08fr .92fr; gap:50px; align-items:center; padding:64px 0 56px}
+  .eyebrow{display:inline-flex; align-items:center; gap:9px; font-size:12px; letter-spacing:.13em; text-transform:uppercase; color:var(--yellow); font-weight:600; font-family:var(--display); margin-bottom:22px}
+  .eyebrow::before{content:""; width:24px; height:1px; background:var(--yellow)}
+  h1{font-family:var(--serif); font-weight:400; font-size:clamp(48px,6.2vw,82px); line-height:.98; letter-spacing:.4px}
+  h1 .it{font-style:italic; color:var(--yellow)}
+  .hsub{margin-top:22px; font-size:18px; color:#C6C6C0; max-width:42ch}
+  .hctas{margin-top:32px; display:flex; align-items:center; gap:20px}
+  .big{background:var(--yellow); color:var(--yellow-ink); font-family:var(--display); font-weight:600; font-size:16px; padding:15px 26px; border-radius:13px; display:inline-flex; align-items:center; gap:10px; transition:.16s}
+  .big:hover{transform:translateY(-1px); box-shadow:0 16px 38px -12px rgba(255,229,0,.6)} .big .ar{transition:.16s} .big:hover .ar{transform:translateX(3px)}
+  .quiet{font-size:14px; color:var(--dim)} .quiet:hover{color:var(--ink)}
+  .trust{margin-top:24px; font-size:13px; color:var(--dim); display:flex; align-items:center; gap:9px}
+  .trust .pip{width:6px;height:6px;border-radius:99px;background:var(--yellow)}
+
+  .pcard{position:relative; background:linear-gradient(180deg,#141410,#0E0E10 38%); border:1px solid var(--border-hi); border-radius:20px; padding:20px; box-shadow:0 50px 110px -40px rgba(255,229,0,.15), 0 30px 70px -40px rgba(0,0,0,.8); animation:float 6s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .pch{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px}
+  .pch .l{display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--muted); font-weight:500}
+  .pch .l .pip{width:7px;height:7px;border-radius:99px;background:var(--yellow); box-shadow:0 0 8px var(--yellow)}
+  .pch .ev{font-family:var(--display); font-weight:700; font-size:14px; color:var(--yellow)}
+  .post{background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:16px}
+  .post .ph{display:flex; align-items:center; gap:9px; margin-bottom:11px}
+  .post .ph .av{width:30px;height:30px;border-radius:99px;background:linear-gradient(135deg,#FFE500,#FFB200);color:#0B0B0C;display:grid;place-items:center;font-weight:700;font-family:var(--display);font-size:12px}
+  .post .ph .nm{font-size:12.5px;font-weight:600} .post .ph .mt{font-size:10.5px;color:var(--dim)}
+  .post .body{font-size:13px; color:#D8D8D2; line-height:1.55}
+  .post .rc{margin-top:12px; padding-top:11px; border-top:1px solid var(--border); display:flex; gap:7px; flex-wrap:wrap}
+  .chiprc{font-size:11px; color:#D8D8D2; background:#141416; border:1px solid var(--border-hi); border-radius:8px; padding:5px 9px; display:flex; align-items:center; gap:6px}
+  .chiprc .ic{color:var(--yellow)}
+
+  /* problem → goal mapping */
+  .map{position:relative; z-index:3; padding:30px 0 60px}
+  .map h2{font-family:var(--serif); font-weight:400; font-size:clamp(30px,3.6vw,44px); letter-spacing:.3px; margin-bottom:6px}
+  .map .mh{color:var(--muted); font-size:15px; margin-bottom:28px}
+  .rows{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  .pg{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:22px; transition:.16s}
+  .pg:hover{border-color:var(--border-hi)}
+  .pg .prob{font-family:var(--serif); font-style:italic; font-size:20px; color:#E6E6E0; line-height:1.25}
+  .pg .arrow{display:flex; align-items:center; gap:8px; margin:13px 0 11px; color:var(--dim); font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:600; font-family:var(--display)}
+  .pg .arrow .ln{flex:1; height:1px; background:var(--border-hi)}
+  .pg .goal{font-size:15px; color:var(--ink); line-height:1.5}
+  .pg .goal b{color:var(--yellow); font-weight:600}
+
+  .band{position:relative; z-index:3; border-top:1px solid var(--border); padding:34px 0; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap}
+  .band .bt{font-size:14px; color:var(--muted); max-width:60ch}
+  .band .bt b{color:var(--ink); font-weight:600}
+
+  @media (max-width:900px){ .hero{grid-template-columns:1fr; gap:36px} .rows{grid-template-columns:1fr} .hsub{max-width:none} }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="bgwave" id="bgwave"></div>
+
+<div class="wrap">
+  <nav>
+    <div class="navbar">
+      <div class="brand"><span class="word">timbre<span class="dot">.</span></span><span class="fortenex">for tenex</span></div>
+      <div class="navcta"><a class="openapp" href="home.html">open timbre →</a><a class="btn" href="landing-a-dark.html">get started <span class="ar">→</span></a></div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div>
+      <span class="eyebrow">built for the creator cup</span>
+      <h1>you do the work.<br><span class="it">timbre writes the post.</span></h1>
+      <p class="hsub">you already ship things worth posting. timbre turns what you actually did into your voice — receipts and all — so showing up takes minutes, not your whole afternoon.</p>
+      <div class="hctas">
+        <a class="big" href="landing-a-dark.html">find your voice <span class="ar">→</span></a>
+        <a class="quiet" href="#map">↓ is this you?</a>
+      </div>
+      <div class="trust"><span class="pip"></span> from zero · first post in under 10 minutes · stays on your machine</div>
+    </div>
+
+    <div class="pcard">
+      <div class="pch"><span class="l"><span class="pip"></span> your work, captured → a post</span><span class="ev">8.6 ✓</span></div>
+      <div class="post">
+        <div class="ph"><span class="av">C</span><span><span class="nm">carter chasson</span><br><span class="mt">draft · in your voice</span></span></div>
+        <div class="body">shipped timbre's onboarding today. no meetings, no deck — just built it and watched it work. honestly the fastest i've moved in months.</div>
+        <div class="rc">
+          <span class="chiprc"><span class="ic">▤</span> onboarding.diff</span>
+          <span class="chiprc"><span class="ic">▶</span> demo.gif</span>
+          <span class="chiprc"><span class="ic">⌁</span> transcript</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="map" id="map">
+    <h2>if any of this is you—</h2>
+    <div class="mh">timbre is built for the builders, not the content people. pick what stings.</div>
+    <div class="rows">
+      <div class="pg">
+        <div class="prob">"i ship great work. nobody sees it."</div>
+        <div class="arrow"><span>so timbre</span><span class="ln"></span></div>
+        <div class="goal">ships every post with the <b>proof</b> — the diff, the demo, the real number. the part that's actually yours.</div>
+      </div>
+      <div class="pg">
+        <div class="prob">"i'm not a 'content person.'"</div>
+        <div class="arrow"><span>so timbre</span><span class="ln"></span></div>
+        <div class="goal">kills the blank page. <b>say what you did</b> — it writes it in your voice, and you just approve.</div>
+      </div>
+      <div class="pg">
+        <div class="prob">"the cup's running and i'm behind."</div>
+        <div class="arrow"><span>so timbre</span><span class="ln"></span></div>
+        <div class="goal">gets you from a <b>cold start to your first in-voice post in under 10 minutes</b>. no corpus, no prep.</div>
+      </div>
+      <div class="pg">
+        <div class="prob">"posting eats my whole afternoon."</div>
+        <div class="arrow"><span>so timbre</span><span class="ln"></span></div>
+        <div class="goal">turns <b>one honest paragraph</b> into a draft you'd actually post. minutes, not hours.</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <div class="band">
+    <div class="bt">runs inside your own <b>claude code</b> &amp; <b>cowork</b> — no account, no login. your work never leaves your machine, and timbre <b>never posts for you</b>. drafts only.</div>
+    <a class="big" href="landing-a-dark.html">find your voice <span class="ar">→</span></a>
+  </div>
+</div>
+
+<script>
+  const bw=document.getElementById('bgwave');
+  for(let i=0;i<70;i++){ const b=document.createElement('i'); bw.appendChild(b); }
+  const bars=[...bw.children]; let t=0;
+  setInterval(()=>{t+=.18; bars.forEach((b,i)=>{ b.style.height=(20+Math.abs(Math.sin(t+i*.35))*60*(0.3+Math.random()*0.7)).toFixed(0)+'%'; });},110);
+</script>
+</body>
+</html>
