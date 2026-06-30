@@ -1,9 +1,10 @@
-"""Self-learning loop — turn your edits into a tighter profile, never a bloated one.
+"""Self-learning loop — turn your picks and edits into a tighter profile, never a bloated one.
 
-When you edit a draft, that edit reveals something about your voice or who you are. This
-reads the edit and updates the SOURCE (data/intake.json) so the next draft is closer. It
-updates in place (replace) and only adds genuinely new info — the profile never bloats.
-See docs/self_learning.md.
+Every pick (option A over B) and every edit reveals something about your voice or who you
+are. Those are logged token-free (engine/signals.py). This reads the pending batch and, in
+ONE call, updates the SOURCE (data/intake.json) so the next draft is closer. It updates in
+place (replace) and only adds genuinely new info — the profile never bloats. See
+docs/self_learning.md.
 """
 
 from __future__ import annotations
@@ -40,22 +41,21 @@ def _set(intake: Intake, dotted: str, value) -> None:
     setattr(getattr(intake, obj), attr, value)
 
 
-def build_learn_prompt(original: str, edited: str, intake: Intake) -> str:
+def build_learn_prompt(signals: list[dict], intake: Intake) -> str:
     fields = {f: _get(intake, f) for f in sorted(SET_FIELDS | ADD_FIELDS)}
     return (
-        "The user edited a post you drafted. Read ONLY for what the edit reveals about their "
-        "VOICE or WHO THEY ARE — not the post's content. Propose conservative updates to their "
-        "profile fields.\n\n"
+        "Below are the user's recent signals: picks (which of two drafts they chose, and maybe "
+        "why) and edits (how they changed a draft). Read ONLY for what they reveal about their "
+        "VOICE or WHO THEY ARE — not post content. Propose conservative profile updates.\n\n"
         "RULES (anti-bloat, strict):\n"
         "- Prefer op 'set' (replace a field's value in place). Keep values short.\n"
         "- Use op 'add' ONLY for genuinely new info not already covered, and only for list fields.\n"
-        "- If the edit is just a content tweak and reveals nothing about voice/identity, return [].\n\n"
+        "- If the signals reveal nothing about voice/identity, return [].\n\n"
         f"SET fields (replace the value): {sorted(SET_FIELDS)}\n"
         f"ADD fields (append only if new): {sorted(ADD_FIELDS)}\n\n"
         f"CURRENT FIELDS:\n{json.dumps(fields, indent=2)}\n\n"
-        f"DRAFT (what the engine wrote):\n{original}\n\n"
-        f"EDITED (what the user changed it to):\n{edited}\n\n"
-        'Return ONLY JSON: [{"field":"voice.emojis","op":"set","value":"none","why":"..."}]'
+        f"SIGNALS:\n{json.dumps(signals, indent=2)}\n\n"
+        'Return ONLY JSON: [{"field":"voice.signatures","op":"add","value":"...","why":"..."}]'
     )
 
 
@@ -95,7 +95,10 @@ def apply_edits(intake: Intake, edits: list[dict]) -> tuple[list[str], list[str]
 
 
 def learn(
-    original: str, edited: str, intake: Intake, provider: Provider
+    signals: list[dict], intake: Intake, provider: Provider
 ) -> tuple[list[str], list[str]]:
-    raw = provider.complete("learn", build_learn_prompt(original, edited, intake))
+    """Fold a batch of signals (picks + edits) into the profile in one call. Empty in, empty out."""
+    if not signals:
+        return [], []
+    raw = provider.complete("learn", build_learn_prompt(signals, intake))
     return apply_edits(intake, parse_edits(raw))

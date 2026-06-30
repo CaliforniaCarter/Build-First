@@ -27,6 +27,7 @@ from .providers import get_provider
 from .providers.base import NeedsCompletion
 from .report import RunReport, build_report, compute_places_to_refine, write_report
 from .revise import revise
+from .signals import mark_processed, pending_signals, record_signal
 from .store import latest_final, list_posts, recent_post_openings, save_post, set_status
 
 
@@ -210,17 +211,31 @@ def cmd_post(args):
 
 
 def cmd_pick(args):
-    """Pick one of the two options, polish it (Writer's Council), and save it to your library."""
+    """Pick one of the two options, polish it (Writer's Council), save it, and log the choice."""
     intake = _intake(args)
     provider = _provider(args)
     persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
-    opt = RUNS_DIR / args.run_id / "post" / f"option_{args.option}.md"
+    post_dir = RUNS_DIR / args.run_id / "post"
+    opt = post_dir / f"option_{args.option}.md"
     if not opt.exists():
         print(f"no such option: {opt} (run `tb post` first)", file=sys.stderr)
         return
-    result = polish(opt.read_text(encoding="utf-8"), intake, persona_md, provider)
-    out = human_gate(result.final_draft, RUNS_DIR / args.run_id / "post")
+    chosen = opt.read_text(encoding="utf-8").strip()
+    result = polish(chosen, intake, persona_md, provider)
+    out = human_gate(result.final_draft, post_dir)
     saved = save_post(result, intake, args.date)
+    # Log the A-vs-B choice as a token-free signal; `tb learn` folds it in later.
+    other = post_dir / f"option_{0 if str(args.option) == '1' else 1}.md"
+    rejected = other.read_text(encoding="utf-8").strip() if other.exists() else ""
+    first = lambda t: t.splitlines()[0] if t else ""  # noqa: E731 — opening line only
+    record_signal(
+        "pick",
+        {
+            "chosen_opening": first(chosen),
+            "rejected_opening": first(rejected),
+            "why": args.why or "",
+        },
+    )
     _emit_post(result, saved, out, args)
 
 
@@ -346,33 +361,53 @@ def cmd_publish(args):
 
 
 def cmd_learn(args):
-    """Self-learning loop: turn your edit into tighter profile fields, never bloat."""
+    """Self-learning loop: fold your recent picks + edits into a tighter profile, in place."""
     path = Path(args.intake) if args.intake else (DATA_DIR / "intake.json")
     intake = _intake(args)
-    if not Path(args.edited).exists():
-        print(f"no such file: {args.edited}", file=sys.stderr)
+    # An explicit --edited records an edit signal first, so it joins the pending batch.
+    if args.edited:
+        if not Path(args.edited).exists():
+            print(f"no such file: {args.edited}", file=sys.stderr)
+            return
+        if args.original and not Path(args.original).exists():
+            print(f"no such file: {args.original}", file=sys.stderr)
+            return
+        original = (
+            Path(args.original).read_text(encoding="utf-8") if args.original else latest_final()
+        )
+        if not original:
+            print("no draft to compare — pass --original or run `tb post` first", file=sys.stderr)
+            return
+        record_signal(
+            "edit",
+            {"original": original, "edited": Path(args.edited).read_text(encoding="utf-8")},
+        )
+
+    batch = pending_signals()
+    if not batch:
+        msg = "Nothing pending — pick a post or pass --edited <file>, then run `tb learn`."
+        print(json.dumps({"applied": [], "skipped": [], "folded": 0}) if args.json else msg)
         return
-    edited = Path(args.edited).read_text(encoding="utf-8")
-    if args.original and not Path(args.original).exists():
-        print(f"no such file: {args.original}", file=sys.stderr)
-        return
-    original = Path(args.original).read_text(encoding="utf-8") if args.original else latest_final()
-    if not original:
-        print("no original draft — pass --original <file> or run `tb post` first", file=sys.stderr)
-        return
-    applied, skipped = learn(original, edited, intake, _provider(args))
+    applied, skipped = learn(batch, intake, _provider(args))
     if applied:
         path.write_text(intake.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    mark_processed()
     if args.json:
-        print(json.dumps({"applied": applied, "skipped": skipped, "intake": str(path)}, indent=2))
+        print(
+            json.dumps(
+                {"applied": applied, "skipped": skipped, "folded": len(batch), "intake": str(path)},
+                indent=2,
+            )
+        )
         return
+    print(f"Folded {len(batch)} signal(s) — picks + edits — into your profile.")
     if applied:
         print("Learned (profile updated in place, no bloat):")
         for a in applied:
             print(f"  - {a}")
         print(f"\nWrote {path}. The next `tb post` will use it.")
     else:
-        print("Nothing to learn from this edit — no new voice/identity signal. Profile unchanged.")
+        print("No new voice/identity signal in this batch. Profile unchanged.")
     if skipped:
         print(f"(skipped: {'; '.join(skipped)})")
 
@@ -432,7 +467,9 @@ def main(argv=None):
         p = sub.add_parser(name, parents=[common])
         p.set_defaults(func=fn)
         parsers[name] = p
-    parsers["learn"].add_argument("--edited", required=True, help="path to your edited post")
+    parsers["learn"].add_argument(
+        "--edited", default=None, help="path to your edited post (also folds pending picks)"
+    )
     parsers["learn"].add_argument(
         "--original", default=None, help="the engine's draft (default: last saved post)"
     )
@@ -445,6 +482,9 @@ def main(argv=None):
     parsers["publish"].add_argument("slug", help="the post's folder name (see `tb posts`)")
     parsers["publish"].add_argument("--draft", action="store_true", help="move it back to draft")
     parsers["pick"].add_argument("--option", required=True, help="which option to keep (0 or 1)")
+    parsers["pick"].add_argument(
+        "--why", default=None, help="why you picked it (optional; feeds learning)"
+    )
 
     args = parser.parse_args(argv)
     try:

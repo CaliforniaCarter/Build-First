@@ -15,6 +15,7 @@ runs/
 posts/*
 !posts/.gitkeep
 data/intake.json
+data/signals.json
 data/transcripts/
 
 # OS
