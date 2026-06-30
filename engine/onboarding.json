@@ -1,5 +1,5 @@
 {
-  "welcome": "Hey, good to have you. I'll ask you a handful of quick questions — the whole point is to get how you actually sound when you write, so just answer like you'd text a friend. Type it or talk it out (dictation works great — Wispr Flow especially). Nothing here is permanent; you can change any of it later.",
+  "welcome": "Hey — I'm Timbre. I'm here to help you find your voice, so the posts you make actually sound like you, never like AI slop. This'll take less than 10 minutes — just a few quick questions, and everything's editable after. Let's get into it.",
 
   "defaults": {
     "audience": {
@@ -44,7 +44,7 @@
       "id": "background",
       "type": "deterministic",
       "order": 2,
-      "prompt": "Great, {name}. Tell me a bit about your background — paste a resume or just give me the short version. Got an X or LinkedIn? Drop the handle (no need to log in anywhere).",
+      "prompt": "Awesome, {name} — I'd love to get a little background on you. Drop your resume or give me the short bio, and paste your LinkedIn or X handle if you've got one (no need to log in anywhere).",
       "purpose": "context + your handles",
       "writes_to": "typed.background"
     },
@@ -52,7 +52,7 @@
       "id": "writing_samples",
       "type": "deterministic",
       "order": 2.5,
-      "prompt": "Got any writing you're proud of — a post, an essay, anything you've put out? Paste one or two. Honestly, your own words tell me more than anything else you could give me here. Totally optional, though — just say 'skip' if you'd rather not.",
+      "prompt": "Sweet, thank you. As I'm getting a feel for your voice — is there any writing you're really proud of? A post, an essay, anything you've put out. Drop it right here. If not, no worries — just say skip.",
       "purpose": "real writing samples, weighted above the easy answers (optional — skippable)",
       "writes_to": "voice.writing_samples"
     },
@@ -60,7 +60,7 @@
       "id": "weekend",
       "type": "deterministic",
       "order": 3,
-      "prompt": "Okay, the fun part — what'd you do last weekend?",
+      "prompt": "First one — what'd you do last weekend?",
       "purpose": "captures your natural rhythm",
       "writes_to": "voice.answers.weekend"
     },
@@ -68,7 +68,7 @@
       "id": "lunch",
       "type": "deterministic",
       "order": 4,
-      "prompt": "Your go-to lunch — and why?",
+      "prompt": "What's your go-to lunch, and why?",
       "purpose": "captures your sentence shape",
       "writes_to": "voice.answers.lunch"
     },
@@ -76,7 +76,7 @@
       "id": "teach",
       "type": "deterministic",
       "order": 5,
-      "prompt": "Teach me how you'd make pasta — step by step, like a friend's in the kitchen with you.",
+      "prompt": "Last one — teach me how you'd make a pasta dish, step by step.",
       "purpose": "captures your words & tics + how you explain something",
       "writes_to": "voice.answers.teach"
     },
@@ -84,7 +84,7 @@
       "id": "style_pick",
       "type": "adaptive_ab",
       "order": 6,
-      "prompt": "Last one. I'm going to write two short posts about your own work — two different feels — and you just tell me which sounds more like you. No labels, no right answer.",
+      "prompt": "Okay — I just read through your background, and I've got a quick this-or-that for you. I'm going to write two short examples, and you just tell me which one you resonate with more — A or B. No wrong answer.",
       "purpose": "a personalized this-or-that, written from THEIR own material — no leading style labels",
       "writes_to": "voice.style_pick",
       "generate": "Write TWO short posts (2-4 lines each) about ONE real thing from THEIR resume/answers. Same facts in both — only the FEEL differs. Pull every detail from their material; invent nothing, and NEVER show or name these reference feels to them (no 'dry vs warm'). Use these two as a guide for the kind of contrast — adapt to their facts, don't copy the wording: (A) understated & dry — 'shipped the new onboarding to the 800-user beta. worked first try, which usually means something's about to break. giving it till tuesday.' (B) warm & building — 'we got the new onboarding into 800 people's hands this week. watching it actually click for someone in real time — that's the part I'll remember.' Show yours as A and B, ask which is more them, and store the chosen one's text at writes_to."

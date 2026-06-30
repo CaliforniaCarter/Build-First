@@ -19,8 +19,9 @@ where each answer is stored). Ask those questions; never invent your own.
    print one question, wait for the answer, then the next. **Never batch them.** Above each
    question print a progress bar, e.g. `[▰▰▱▱▱▱▱] 2/7 · background`. Substitute `{name}` once you
    have it. **Before the three voice questions (weekend / lunch / teach), say a short
-   transition:** *"Now I'll ask you 3 quick questions — just type or talk them out, however
-   feels natural; it's the easiest way for me to hear how you actually sound."*
+   transition:** *"Great. Now I've got a couple quick questions for you — just type or dictate
+   them (Wispr Flow is great for this) in your normal tone. Quick and easy; I just want to get a
+   feel for how you naturally explain things."*
    - **`deterministic`** — ask the `prompt` verbatim.
    - **`adaptive_ab`** — the personalized this-or-that. Print the `prompt` to set it up, then
      follow the question's `generate` instruction: using their **resume + the answers so far**,
@@ -28,9 +29,10 @@ where each answer is stored). Ask those questions; never invent your own.
      **A** and **B**, and ask which sounds more like them. **Never label the difference** (no
      "dry vs warm") — let them feel it. Store the chosen example's **text** at `writes_to`.
 
-3. **Be human between questions.** One short, genuine reaction per answer — and at most one
-   grounded micro-observation mid-flow ("you keep it short and dry — noted"). Never invent
-   praise; never pad. The *full* voice reveal waits for the end.
+3. **Be human, but brief, between questions.** A simple, warm acknowledgement — *"thank you,"
+   "love it," "got it"* — then move on. **Don't over-praise or invent enthusiasm** (no "sounds
+   fun!", no padding). At most **one** grounded micro-observation in the *whole* flow. The full
+   voice reveal waits for the end.
 
 4. **Store answers in `data/intake.json`** as you go (start from `data/intake.example.json` for
    the shape). Put each answer at the question's `writes_to` path (e.g. `voice.answers.weekend`).
@@ -44,12 +46,13 @@ where each answer is stored). Ask those questions; never invent your own.
 5. **Extract the voice.** Run `uv run tb onboard --json`. This is the only AI step — it reads
    *how* they wrote and writes `profiles/voice.json`. It invents nothing.
 
-6. **The reveal — keep it SHORT (2–3 lines).** Read `profiles/voice.json` and tell them, in
-   plain language, how you'll match their energy and keep it authentically them. Don't dump the
-   whole profile. Then: *"You can view or tweak your exact voice anytime with `/timbre-voice`
-   (or by editing `profiles/voice.json`) — your edit is the confirmation."*
+6. **The reveal — keep it SHORT and warm.** Open with a genuine thanks (*"Thanks for walking me
+   through all that — here's your voice."*). Read `profiles/voice.json` and tell them, in 2–3
+   plain lines, how you'll keep it sounding like them. Don't dump the whole profile. Then:
+   *"It's always editable — tweak it anytime with `/timbre-voice` (or edit `profiles/voice.json`),
+   and your edit is the confirmation."*
 
-7. **Offer the first post:** "Want me to draft your first post?" → `/timbre-post`.
+7. **Offer the first post:** *"Want to make your first post? Just say the word."* → `/timbre-post`.
 
 ## Rules
 
