@@ -62,12 +62,6 @@ class Voice(BaseModel):
     notes: str = ""
 
 
-class Audience(BaseModel):
-    writing_for: str = ""
-    goal: str = ""
-    play_to: str = ""
-
-
 class OutputPrefs(BaseModel):
     channels: list[str] = ["LinkedIn"]
     length: str = ""
@@ -83,7 +77,6 @@ class Intake(BaseModel):
     docs: Docs = Docs()
     typed: Typed = Typed()
     voice: Voice = Voice()
-    audience: Audience = Audience()
     output: OutputPrefs = OutputPrefs()
 
 

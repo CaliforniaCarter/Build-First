@@ -95,7 +95,6 @@ See `data/intake.example.json` for the full blank shape. The fields the engine r
 - `voice` — `answers` (question→raw answer map; the model reads *how* you write),
   `tone_words` (list), `look`, `sentence_length`, `banned` (list), `signatures` (list),
   `emojis`, `notes`.
-- `audience` — `writing_for`, `goal`, `play_to`.
 - `output` — `channels` (list), `length`, `format`, `hard_nevers` (list), `off_limits`.
 
 A real `data/intake.json` is personal and gitignored; if absent the engine falls back to
