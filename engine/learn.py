@@ -48,6 +48,8 @@ def build_learn_prompt(signals: list[dict], intake: Intake) -> str:
         "why) and edits (how they changed a draft). Read ONLY for what they reveal about their "
         "VOICE or WHO THEY ARE — not post content. Propose conservative profile updates.\n\n"
         "RULES (anti-bloat, strict):\n"
+        "- Name the trait in general terms — never copy a specific phrase, number, or example "
+        "from the post (e.g. 'opens on a concrete moment', not 'Friday, 5 pm.').\n"
         "- Prefer op 'set' (replace a field's value in place). Keep values short.\n"
         "- Use op 'add' ONLY for genuinely new info not already covered, and only for list fields.\n"
         "- If the signals reveal nothing about voice/identity, return [].\n\n"
