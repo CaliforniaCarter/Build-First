@@ -4,7 +4,7 @@ produce a valid scored post (no provider mocking — the stub is the offline eng
 from engine.ablation import load_layers
 from engine.blocks.draft import build_draft_prompt
 from engine.blocks.intake import ContentIdea, Intake
-from engine.post import evaluate, make_post
+from engine.post import evaluate, make_options, make_post
 from engine.providers.stub import StubProvider
 from engine.revise import revise
 
@@ -39,3 +39,12 @@ def test_draft_prompt_varies_from_recent_posts():
     )
     assert "I've quit every second brain" in p  # the recent opening is fed in
     assert "vary" in p.lower()  # and it's told to vary the shape
+
+
+def test_make_options_produces_two_scored_variations(tmp_path, monkeypatch):
+    monkeypatch.setattr("engine.post.RUNS_DIR", tmp_path)
+    opts = make_options(_intake(), "persona", StubProvider(), "qa", n=2)
+    assert len(opts) == 2
+    assert all(r.final_draft and len(r.score.dimensions) == 9 for r in opts)
+    assert (tmp_path / "qa" / "post" / "option_0.md").exists()
+    assert (tmp_path / "qa" / "post" / "option_1.md").exists()

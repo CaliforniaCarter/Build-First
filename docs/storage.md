@@ -22,7 +22,7 @@ runs/<id>/                  disposable working files (prompts, drafts, completio
 
 ```json
 {
-  "slug": "2026-06-29-my-simple-notion-second-brain",
+  "slug": "my-simple-notion-second-brain",
   "topic": "...",
   "channels": ["LinkedIn", "X"],
   "status": "draft",

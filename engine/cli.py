@@ -22,7 +22,7 @@ from .blocks.probe import unfilled_gaps
 from .blocks.profile import write_profile_docs
 from .config import DATA_DIR, PROFILES_DIR, RUNS_DIR
 from .learn import learn
-from .post import ALL_INPUTS, PostResult, evaluate, make_post
+from .post import ALL_INPUTS, PostResult, evaluate, make_options, make_post, polish
 from .providers import get_provider
 from .providers.base import NeedsCompletion
 from .report import RunReport, build_report, compute_places_to_refine, write_report
@@ -166,13 +166,59 @@ def _emit_post(result, saved, out, args):
 
 
 def cmd_post(args):
-    """The product: draft ONE post from every input, polish, save, return structured output."""
+    """The product: draft TWO options in different shapes, score both, hand them to you to pick."""
     intake = _intake(args)
     provider = _provider(args)
     _, persona_md = _onboard(intake, provider)
-    result = make_post(
+    options = make_options(
         intake, persona_md, provider, args.run_id, recent_openings=recent_post_openings()
     )
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "run_id": args.run_id,
+                    "options": [
+                        {
+                            "option": i,
+                            "final": r.final_draft,
+                            "score": r.score.quality_avg,
+                            "evaluation": {
+                                "dimensions": [
+                                    {"name": d.name, "score": d.score, "reason": d.reason}
+                                    for d in r.score.dimensions
+                                ],
+                                "gates": [
+                                    {"name": g.name, "passed": g.passed, "reason": g.reason}
+                                    for g in r.score.gates
+                                ],
+                            },
+                            "receipts": r.proof,
+                        }
+                        for i, r in enumerate(options)
+                    ],
+                },
+                indent=2,
+            )
+        )
+        return
+    for i, r in enumerate(options):
+        print(f"=== OPTION {i} · {r.score.quality_avg}/10 ===")
+        print(r.final_draft)
+        print()
+    print(f"Pick one: tb pick --run-id {args.run_id} --option <0/1>  (polishes it and saves)")
+
+
+def cmd_pick(args):
+    """Pick one of the two options, polish it (Writer's Council), and save it to your library."""
+    intake = _intake(args)
+    provider = _provider(args)
+    persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
+    opt = RUNS_DIR / args.run_id / "post" / f"option_{args.option}.md"
+    if not opt.exists():
+        print(f"no such option: {opt} (run `tb post` first)", file=sys.stderr)
+        return
+    result = polish(opt.read_text(encoding="utf-8"), intake, persona_md, provider)
     out = human_gate(result.final_draft, RUNS_DIR / args.run_id / "post")
     saved = save_post(result, intake, args.date)
     _emit_post(result, saved, out, args)
@@ -368,6 +414,7 @@ def main(argv=None):
     parsers = {}
     for name, fn in (
         ("post", cmd_post),
+        ("pick", cmd_pick),
         ("revise", cmd_revise),
         ("gaps", cmd_gaps),
         ("persona", cmd_persona),
@@ -397,6 +444,7 @@ def main(argv=None):
     )
     parsers["publish"].add_argument("slug", help="the post's folder name (see `tb posts`)")
     parsers["publish"].add_argument("--draft", action="store_true", help="move it back to draft")
+    parsers["pick"].add_argument("--option", required=True, help="which option to keep (0 or 1)")
 
     args = parser.parse_args(argv)
     try:

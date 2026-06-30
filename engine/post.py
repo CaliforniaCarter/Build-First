@@ -89,3 +89,52 @@ def make_post(
         )
 
     return PostResult(first_draft, final_draft, score, proof, redactions, clog)
+
+
+def make_options(
+    intake: Intake,
+    persona_md: str,
+    provider: Provider,
+    run_id: str,
+    n: int = 2,
+    recent_openings: list[str] = (),
+) -> list[PostResult]:
+    """Draft n variations in deliberately different shapes and score each (no council yet).
+
+    The product hands you a few options to pick from; the chosen one gets polished (see polish).
+    """
+    layers = load_layers()
+    run_dir = RUNS_DIR / run_id / "post"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    ctx = context_for(ALL_INPUTS, intake)
+    results: list[PostResult] = []
+    avoid = list(recent_openings)
+    for i in range(n):
+        prompt = draft_block.build_draft_prompt(
+            intake.idea.topic,
+            ctx,
+            persona_md,
+            layers,
+            intake.output.hard_nevers,
+            intake.output.channels,
+            avoid,
+        )
+        text = draft_block.draft(f"draft_post_{i}", prompt, provider)
+        final, proof, redactions, score = evaluate(
+            text, intake, persona_md, layers, provider, f"score_post_{i}"
+        )
+        results.append(PostResult(text, final, score, proof, redactions, []))
+        if text.strip():
+            avoid = avoid + [text.splitlines()[0]]  # the next option must differ
+        (run_dir / f"option_{i}.md").write_text(final, encoding="utf-8")
+    return results
+
+
+def polish(text: str, intake: Intake, persona_md: str, provider: Provider) -> PostResult:
+    """Run the Writer's Council on the chosen option, attach receipts, re-score. For `tb pick`."""
+    layers = load_layers()
+    polished, clog = council.revise(text, persona_md, layers, provider)
+    final, proof, redactions, score = evaluate(
+        polished, intake, persona_md, layers, provider, "score_pick"
+    )
+    return PostResult(text, final, score, proof, redactions, clog)

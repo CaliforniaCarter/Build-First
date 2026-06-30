@@ -16,8 +16,8 @@ Every command accepts `--provider {terminal,anthropic,stub}`, `--intake <path>`,
 | 2. Onboard | — | `tb onboard` | writes `profiles/{profile,context,persona}.md` |
 | 3. "That's me?" | Show persona, let the user edit + save | `tb persona --json` | reads/writes `profiles/persona.md` |
 | 4. Gap probe | Ask each unfilled question, write answers into the idea | `tb gaps --json` | writes `data/intake.json` (`idea.<key>`) |
-| 5. Make post | — | `tb post --json` | writes `posts/<date>-<slug>/`, clipboard |
-| 6. Approve | Show final, let the user edit/approve | — | reads `posts/<date>-<slug>/final.md` |
+| 5. Make post | — | `tb post --json` | writes `posts/<slug>/`, clipboard |
+| 6. Approve | Show final, let the user edit/approve | — | reads `posts/<slug>/final.md` |
 | 7. Library | List past posts | `tb posts --json` | reads `posts/` |
 
 Editing `persona.md` (step 3) **is** the confirmation — the engine never over-trusts its
@@ -51,23 +51,26 @@ builder, not the end user.
 Keys: `number`, `scene`, `lesson`, `only_you`. To answer, write the text into
 `data/intake.json` at `idea.<key>`.
 
-`tb post --json` (and `tb revise --json`, same shape)
+`tb post --json` returns TWO options (different shapes) for the user to pick:
 ```json
 {
-  "final": "I've quit every second brain...",
-  "score": 9.2,
-  "evaluation": {
-    "dimensions": [{ "name": "story_strength", "score": 9, "reason": "..." }, "...all nine"],
-    "gates": [{ "name": "no_slop", "passed": true, "reason": "..." }, "...all six"]
-  },
-  "receipts": ["about 80 entries logged in two weeks", "..."],
-  "saved": "posts/2026-06-29-my-simple-notion-second-brain",
-  "draft": "runs/<id>/post/draft.md"
+  "run_id": "2026-06-29",
+  "options": [
+    { "option": 0, "final": "For years I treated the internet...", "score": 9.1,
+      "evaluation": { "dimensions": ["...all nine"], "gates": ["...all six"] }, "receipts": ["..."] },
+    { "option": 1, "final": "...same facts, a different shape...", "score": 8.9,
+      "evaluation": { "dimensions": ["..."], "gates": ["..."] }, "receipts": ["..."] }
+  ]
 }
 ```
-`score` is the overall 0–10 meter only. The full `evaluation` (per-dimension scores +
-reasons) is for the LLM and Timbre Labs — the UI turns weak dimensions into plain guidance and never
-shows the user the scale.
+The user picks one: `tb pick --run-id <id> --option <0|1>` polishes it (Writer's Council) and saves
+it. `tb pick --json` (and `tb revise --json`) return the single saved post:
+```json
+{ "final": "...", "score": 9.2, "evaluation": { "dimensions": ["..."], "gates": ["..."] },
+  "receipts": ["..."], "saved": "posts/my-simple-notion-second-brain", "draft": "runs/<id>/post/draft.md" }
+```
+`score` is the overall 0–10 meter only. The full `evaluation` is for the LLM and Timbre Labs — the
+UI turns weak dimensions into plain guidance and never shows the user the scale.
 
 `tb posts --json` — the saved library
 ```json
