@@ -1,7 +1,8 @@
-"""CLI — onboard, ablate, report, run, doctor.
+"""CLI — the product (`post`, `gaps`, `posts`) and the vetting lab (`ablate`, `report`).
 
-Default provider is `terminal` (no API key): each reasoning step writes a prompt and
-waits for an answer file. `run` does the whole thing: onboard -> ablation -> report.
+`post` makes one in-voice post you approve; `gaps` is the gap-driven probe; `posts`
+lists the saved library. `ablate`/`report` are the build-time lab. Default provider is
+`terminal` (Claude Code is the engine, no API key); `--json` emits UI-readable output.
 """
 
 from __future__ import annotations
@@ -23,6 +24,7 @@ from .post import make_post, open_gaps
 from .providers import get_provider
 from .providers.base import NeedsCompletion
 from .report import RunReport, build_report, compute_places_to_refine, write_report
+from .store import list_posts, save_post
 
 
 def _provider(args):
@@ -98,6 +100,7 @@ def cmd_post(args):
     persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
     result = make_post(intake, persona_md, provider, args.run_id)
     out = human_gate(result.final_draft, RUNS_DIR / args.run_id / "post")
+    saved = save_post(result, intake, args.date)
 
     print(result.final_draft)
     print(f"\n--- score: {result.score.headline()} ---")
@@ -108,7 +111,7 @@ def cmd_post(args):
             print(f"  - {g}")
     if result.proof:
         print(f"receipts: {', '.join(result.proof)}")
-    print(f"\nReady for your review (copied to clipboard): {out}")
+    print(f"\nSaved to {saved} · copied to clipboard · review draft: {out}")
 
 
 def cmd_gaps(args):
@@ -124,6 +127,22 @@ def cmd_gaps(args):
     print("To make this post strong, the engine needs (it won't invent these):")
     for g in gaps:
         print(f"  [{g['key']}] {g['question']}")
+
+
+def cmd_posts(args):
+    """List the saved-post library. The UI reads --json."""
+    posts = list_posts()
+    if args.json:
+        print(json.dumps(posts, indent=2))
+        return
+    if not posts:
+        print("No saved posts yet. Run `bf post` to make one.")
+        return
+    for p in posts:
+        s = p["score"]
+        print(
+            f"{p['date']}  {s['quality']}/10  gates {s['gates_passed']}/{s['gates_total']}  {p['topic'][:60]}"
+        )
 
 
 def cmd_doctor(args):
@@ -161,6 +180,7 @@ def main(argv=None):
     for name, fn in (
         ("post", cmd_post),
         ("gaps", cmd_gaps),
+        ("posts", cmd_posts),
         ("onboard", cmd_onboard),
         ("ablate", cmd_ablate),
         ("report", cmd_report),

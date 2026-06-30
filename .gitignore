@@ -12,6 +12,8 @@ __pycache__/
 profiles/*.md
 !profiles/.gitkeep
 runs/
+posts/*
+!posts/.gitkeep
 data/intake.json
 data/transcripts/
 
