@@ -102,6 +102,26 @@ def cmd_post(args):
     out = human_gate(result.final_draft, RUNS_DIR / args.run_id / "post")
     saved = save_post(result, intake, args.date)
 
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "final": result.final_draft,
+                    "score": {
+                        "quality": result.score.quality_avg,
+                        "gates_passed": result.score.gates_passed,
+                        "gates_total": result.score.gates_total,
+                    },
+                    "open_gates": [g.name for g in result.score.gates if not g.passed],
+                    "receipts": result.proof,
+                    "saved": str(saved),
+                    "draft": str(out),
+                },
+                indent=2,
+            )
+        )
+        return
+
     print(result.final_draft)
     print(f"\n--- score: {result.score.headline()} ---")
     gaps = open_gaps(result.score)
@@ -127,6 +147,20 @@ def cmd_gaps(args):
     print("To make this post strong, the engine needs (it won't invent these):")
     for g in gaps:
         print(f"  [{g['key']}] {g['question']}")
+
+
+def cmd_persona(args):
+    """Show the extracted voice profile (the 'that's me?' artifact). Edit the file to confirm."""
+    path = PROFILES_DIR / "persona.md"
+    if not path.exists():
+        msg = "no persona yet — run `bf onboard` first"
+        print(json.dumps({"error": msg}) if args.json else msg)
+        return
+    text = path.read_text(encoding="utf-8")
+    if args.json:
+        print(json.dumps({"path": str(path), "persona_md": text}, indent=2))
+    else:
+        print(text)
 
 
 def cmd_posts(args):
@@ -180,6 +214,7 @@ def main(argv=None):
     for name, fn in (
         ("post", cmd_post),
         ("gaps", cmd_gaps),
+        ("persona", cmd_persona),
         ("posts", cmd_posts),
         ("onboard", cmd_onboard),
         ("ablate", cmd_ablate),
