@@ -27,7 +27,7 @@ from .providers import get_provider
 from .providers.base import NeedsCompletion
 from .report import RunReport, build_report, compute_places_to_refine, write_report
 from .revise import revise
-from .store import latest_final, list_posts, recent_post_openings, save_post
+from .store import latest_final, list_posts, recent_post_openings, save_post, set_status
 
 
 def _provider(args):
@@ -286,10 +286,17 @@ def cmd_posts(args):
         print("No saved posts yet. Run `tb post` to make one.")
         return
     for p in posts:
-        s = p["score"]
-        print(
-            f"{p['date']}  {s['quality']}/10  gates {s['gates_passed']}/{s['gates_total']}  {p['topic'][:60]}"
-        )
+        when = p.get("updated") or p.get("created") or p.get("date", "")
+        print(f"{when}  [{p.get('status', 'draft')}]  {p['score']['quality']}/10  {p['slug']}")
+
+
+def cmd_publish(args):
+    """Mark a saved post as posted (or back to draft with --draft). Slug is from `tb posts`."""
+    status = "draft" if args.draft else "posted"
+    if set_status(args.slug, status):
+        print(f"{args.slug} -> {status}")
+    else:
+        print(f"no such post: {args.slug}", file=sys.stderr)
 
 
 def cmd_learn(args):
@@ -366,6 +373,7 @@ def main(argv=None):
         ("persona", cmd_persona),
         ("inspect", cmd_inspect),
         ("posts", cmd_posts),
+        ("publish", cmd_publish),
         ("learn", cmd_learn),
         ("onboard", cmd_onboard),
         ("ablate", cmd_ablate),
@@ -387,6 +395,8 @@ def main(argv=None):
     parsers["revise"].add_argument(
         "--post", default=None, help="the post to revise (default: last saved)"
     )
+    parsers["publish"].add_argument("slug", help="the post's folder name (see `tb posts`)")
+    parsers["publish"].add_argument("--draft", action="store_true", help="move it back to draft")
 
     args = parser.parse_args(argv)
     try:

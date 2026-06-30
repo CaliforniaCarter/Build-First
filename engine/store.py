@@ -21,15 +21,24 @@ def _slug(text: str, words: int = 5) -> str:
     return "-".join(clean.split()[:words]) or "post"
 
 
-def save_post(result: PostResult, intake: Intake, date: str, base: Path = POSTS_DIR) -> Path:
-    """Write the approved post + metadata to posts/<date>-<slug>/. Returns the folder."""
+def save_post(
+    result: PostResult, intake: Intake, date: str, status: str | None = None, base: Path = POSTS_DIR
+) -> Path:
+    """Write the post + metadata to posts/<date>-<slug>/ (one entry per post, updated in place).
+
+    Preserves `created` and the existing `status` across updates. Status is draft | posted.
+    """
     pdir = base / f"{date}-{_slug(intake.idea.topic)}"
     pdir.mkdir(parents=True, exist_ok=True)
+    meta_path = pdir / "post.json"
+    existing = json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else {}
+
     (pdir / "final.md").write_text(result.final_draft, encoding="utf-8")
     meta = {
-        "date": date,
+        "slug": pdir.name,
         "topic": intake.idea.topic,
         "channels": intake.output.channels,
+        "status": status or existing.get("status", "draft"),
         "score": {
             "quality": result.score.quality_avg,
             "gates_passed": result.score.gates_passed,
@@ -37,9 +46,22 @@ def save_post(result: PostResult, intake: Intake, date: str, base: Path = POSTS_
         },
         "open_gates": [g.name for g in result.score.gates if not g.passed],
         "receipts": result.proof,
+        "created": existing.get("created", date),
+        "updated": date,
     }
-    (pdir / "post.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
     return pdir
+
+
+def set_status(slug: str, status: str, base: Path = POSTS_DIR) -> bool:
+    """Flip a saved post's status (draft <-> posted). Returns False if the post isn't found."""
+    meta_path = base / slug / "post.json"
+    if not meta_path.exists():
+        return False
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    meta["status"] = status
+    meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    return True
 
 
 def list_posts(base: Path = POSTS_DIR) -> list[dict]:
@@ -50,7 +72,9 @@ def list_posts(base: Path = POSTS_DIR) -> list[dict]:
     for d in sorted(base.iterdir()):
         meta = d / "post.json"
         if meta.exists():
-            out.append(json.loads(meta.read_text(encoding="utf-8")))
+            data = json.loads(meta.read_text(encoding="utf-8"))
+            data.setdefault("slug", d.name)  # tolerate posts saved before slug existed
+            out.append(data)
     return out
 
 
