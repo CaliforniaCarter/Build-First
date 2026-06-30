@@ -82,6 +82,8 @@ class StubProvider(Provider):
             return _PERSONA
         if stage == "learn":
             return "[]"  # offline: nothing learned
+        if stage == "takes":
+            return '[{"take": "Stub take.", "based_on": "stub"}]'
         if stage == "revise":
             return _draft_text(stage)
         if stage.startswith("score_"):

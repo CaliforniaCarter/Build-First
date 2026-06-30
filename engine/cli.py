@@ -29,6 +29,7 @@ from .report import RunReport, build_report, compute_places_to_refine, write_rep
 from .revise import revise
 from .signals import mark_processed, pending_signals, record_signal
 from .store import latest_final, list_posts, recent_post_openings, save_post, set_status
+from .takes import form_takes
 
 
 def _provider(args):
@@ -317,6 +318,26 @@ def cmd_sample(args):
     print(json.dumps({"samples": n, "intake": str(path)}) if args.json else msg)
 
 
+def cmd_takes(args):
+    """Surface a few spiky takes you could post, grounded in your material (content playground)."""
+    intake = _intake(args)
+    provider = _provider(args)
+    pf = PROFILES_DIR / "persona.md"
+    persona_md = pf.read_text(encoding="utf-8") if pf.exists() else ""
+    takes = form_takes(intake, persona_md, provider)
+    if args.json:
+        print(json.dumps({"takes": takes}, indent=2))
+        return
+    if not takes:
+        print("No takes yet — add more about what you believe (onboarding or `tb sample`).")
+        return
+    print("Takes you could post (grounded in your material):")
+    for t in takes:
+        print(f"  • {t['take']}")
+        if t.get("based_on"):
+            print(f"      ↳ from: {t['based_on']}")
+
+
 def cmd_inspect(args):
     """Show exactly what Timbre knows about you + what it sends to the LLM. Nothing hidden."""
     intake = _intake(args)
@@ -490,6 +511,7 @@ def main(argv=None):
         ("gaps", cmd_gaps),
         ("persona", cmd_persona),
         ("sample", cmd_sample),
+        ("takes", cmd_takes),
         ("inspect", cmd_inspect),
         ("posts", cmd_posts),
         ("publish", cmd_publish),
