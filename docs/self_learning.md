@@ -19,8 +19,8 @@ edits refine existing fields; they never grow the file. If an edit reveals nothi
 voice or identity (just a content tweak), the loop does nothing.
 
 ## What it updates: the source, not the generated files
-`persona.md` and `profile.md` are regenerated from `data/intake.json` on every run, so the
-loop updates the **source** (`data/intake.json`) — that's what persists. Only the persistent
+`profiles/voice.json` and `profile.md` are generated from `data/intake.json`, so the loop
+updates the **source** (`data/intake.json`) — that's what persists. Only the persistent
 fields:
 - **Voice** — `look`, `sentence_length`, `emojis`, `notes` (replace); `tone_words`, `banned`,
   `signatures` (add-if-new).
@@ -38,8 +38,8 @@ When `tb learn` runs:
    new, return nothing if the batch reveals nothing about voice or identity.
 3. The engine applies them to `data/intake.json` and prints exactly what changed, so you can
    see it stayed tight.
-4. Run `tb onboard` to refresh persona/profile from the updated source (a hand-edited
-   `persona.md` otherwise stays put — `tb post` never clobbers it).
+4. Run `tb onboard` to refresh voice/profile from the updated source (a hand-edited
+   `voice.json` otherwise stays put — `tb post` never clobbers it).
 
 A real run: a pick ("open on the admission, not the how-to") taught `voice.notes` *"Opens on
 admissions or failures, not how-tos"* and added the tone word *"self-aware"*; an edit that

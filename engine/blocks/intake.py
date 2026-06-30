@@ -57,6 +57,8 @@ class Voice(BaseModel):
     banned: list[str] = []
     signatures: list[str] = []
     emojis: str = ""  # e.g. "none"
+    humor: str = ""  # the onboarding A/B pick, e.g. "dry & deadpan"
+    shape: str = ""  # the onboarding A/B pick, e.g. "short & punchy"
     notes: str = ""
 
 

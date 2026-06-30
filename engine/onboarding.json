@@ -1,0 +1,100 @@
+{
+  "welcome": "Hey, welcome to Timbre. I'm going to ask you a few quick questions so I can learn your voice. Type or use dictation (Wispr Flow works great). No stress — you can always edit and refine your voice later.",
+
+  "defaults": {
+    "audience": {
+      "writing_for": "AI-native builders & founders — the Tenex crowd",
+      "goal": "show I build real, useful things fast",
+      "play_to": "hands-on, ships working software, allergic to AI-slop"
+    }
+  },
+
+  "questions": [
+    {
+      "id": "name",
+      "type": "deterministic",
+      "order": 1,
+      "prompt": "First up — what's your name?",
+      "purpose": "identity + a real greeting",
+      "writes_to": "name"
+    },
+    {
+      "id": "background",
+      "type": "deterministic",
+      "order": 2,
+      "prompt": "Great, {name}. Now I'd love a bit about your background — paste a resume or just give me the short version. And if you've got an X or LinkedIn, drop the link so I can see how you write. If not, no worries.",
+      "purpose": "context + grab real writing samples (the strongest voice signal)",
+      "writes_to": "typed.background"
+    },
+    {
+      "id": "weekend",
+      "type": "deterministic",
+      "order": 3,
+      "prompt": "Okay, the fun part — what'd you do last weekend?",
+      "purpose": "captures your natural rhythm",
+      "writes_to": "voice.answers.weekend"
+    },
+    {
+      "id": "lunch",
+      "type": "deterministic",
+      "order": 4,
+      "prompt": "Your go-to lunch — and why?",
+      "purpose": "captures your sentence shape",
+      "writes_to": "voice.answers.lunch"
+    },
+    {
+      "id": "teach",
+      "type": "deterministic",
+      "order": 5,
+      "prompt": "Teach me something you're into — like I'm a friend.",
+      "purpose": "captures your words & tics",
+      "writes_to": "voice.answers.teach"
+    },
+    {
+      "id": "teach_followup",
+      "type": "adaptive",
+      "order": 5.5,
+      "enabled": false,
+      "prompt": null,
+      "based_on": "teach",
+      "purpose": "one smart follow-up to go a level deeper on what they just taught",
+      "writes_to": "voice.answers.teach_followup"
+    },
+    {
+      "id": "humor",
+      "type": "ab_pick",
+      "order": 6,
+      "prompt": "Two ways to say the same thing — pick the one that sounds more like you:",
+      "purpose": "humor axis",
+      "writes_to": "voice.humor",
+      "options": [
+        {
+          "value": "dry & deadpan",
+          "example": "shipped the thing. worked on the first try, which means something's broken i haven't found yet. i give it until tuesday."
+        },
+        {
+          "value": "warm & playful",
+          "example": "we shipped it — and yeah, i did a little lap around the kitchen. worked first try, which never happens, so i'm taking the win and worrying about tuesday on tuesday."
+        }
+      ]
+    },
+    {
+      "id": "shape",
+      "type": "ab_pick",
+      "order": 7,
+      "prompt": "Last one — which of these is more you?",
+      "purpose": "sentence shape axis",
+      "writes_to": "voice.shape",
+      "options": [
+        {
+          "value": "short & punchy",
+          "example": "cut onboarding from nine steps to four. shipped it friday. signups up 22%. turns out the fastest way to grow was to ask for less. do less. ship it."
+        },
+        {
+          "value": "flowing & connected",
+          "example": "we cut onboarding from nine steps down to four and shipped it friday, and by monday signups were up 22% — which taught me the fastest way to grow wasn't adding anything, it was having the nerve to ask for less."
+        }
+      ]
+    }
+  ]
+}

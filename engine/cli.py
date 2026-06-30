@@ -17,11 +17,12 @@ from .ablation import context_for, load_layers, run_ablation
 from .blocks.draft import build_draft_prompt
 from .blocks.gate import human_gate
 from .blocks.intake import load_intake
-from .blocks.persona import build_persona
+from .blocks.persona import VOICE_PATH, build_voice, load_voice, render_voice
 from .blocks.probe import unfilled_gaps
 from .blocks.profile import write_profile_docs
 from .config import DATA_DIR, PROFILES_DIR, RUNS_DIR
 from .learn import learn
+from .onboarding import apply_audience_default, load_onboarding, onboarding_summary
 from .post import ALL_INPUTS, PostResult, evaluate, make_options, make_post, polish
 from .providers import get_provider
 from .providers.base import NeedsCompletion
@@ -40,16 +41,30 @@ def _intake(args):
     return load_intake(Path(args.intake) if args.intake else None)
 
 
+def _apply_audience_default(intake):
+    """Fill an empty audience from the hardcoded default in onboarding.json (Tenex).
+
+    Best-effort: a missing or malformed config never breaks drafting — `tb doctor`
+    is where that gets flagged loudly.
+    """
+    try:
+        cfg = load_onboarding()
+    except (FileNotFoundError, ValueError):
+        return
+    apply_audience_default(cfg, intake.audience)
+
+
 def _onboard(intake, provider, force_persona=False):
+    _apply_audience_default(intake)
     paths = write_profile_docs(intake)
-    persona_md = build_persona(intake, provider, force=force_persona)
+    persona_md = build_voice(intake, provider, force=force_persona)
     return paths, persona_md
 
 
 def cmd_onboard(args):
     intake = _intake(args)
     paths, _ = _onboard(intake, _provider(args), force_persona=True)
-    print(f"wrote {paths['profile']} and {paths['context']} and {PROFILES_DIR / 'persona.md'}")
+    print(f"wrote {paths['profile']} and {paths['context']} and {VOICE_PATH}")
 
 
 def cmd_ablate(args):
@@ -215,7 +230,8 @@ def cmd_pick(args):
     """Pick one of the two options, polish it (Writer's Council), save it, and log the choice."""
     intake = _intake(args)
     provider = _provider(args)
-    persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
+    vp = load_voice()
+    persona_md = render_voice(vp) if vp else ""
     post_dir = RUNS_DIR / args.run_id / "post"
     opt = post_dir / f"option_{args.option}.md"
     if not opt.exists():
@@ -281,17 +297,21 @@ def cmd_gaps(args):
 
 
 def cmd_persona(args):
-    """Show the extracted voice profile (the 'that's me?' artifact). Edit the file to confirm."""
-    path = PROFILES_DIR / "persona.md"
-    if not path.exists():
-        msg = "no persona yet — run `tb onboard` first"
+    """Show the editable voice profile (the 'that's me?' artifact). Edit profiles/voice.json to confirm."""
+    vp = load_voice()
+    if vp is None:
+        msg = "no voice profile yet — run `tb onboard` first"
         print(json.dumps({"error": msg}) if args.json else msg)
         return
-    text = path.read_text(encoding="utf-8")
     if args.json:
-        print(json.dumps({"path": str(path), "persona_md": text}, indent=2))
+        print(
+            json.dumps(
+                {"path": str(VOICE_PATH), "voice": vp.model_dump(), "rendered": render_voice(vp)},
+                indent=2,
+            )
+        )
     else:
-        print(text)
+        print(render_voice(vp))
 
 
 def cmd_sample(args):
@@ -322,8 +342,8 @@ def cmd_takes(args):
     """Surface a few spiky takes you could post, grounded in your material (content playground)."""
     intake = _intake(args)
     provider = _provider(args)
-    pf = PROFILES_DIR / "persona.md"
-    persona_md = pf.read_text(encoding="utf-8") if pf.exists() else ""
+    vp = load_voice()
+    persona_md = render_voice(vp) if vp else ""
     takes = form_takes(intake, persona_md, provider)
     if args.json:
         print(json.dumps({"takes": takes}, indent=2))
@@ -348,7 +368,8 @@ def cmd_inspect(args):
 
     profile_md = _read("profile.md")
     context_md = _read("context.md")
-    persona_md = _read("persona.md")
+    vp = load_voice()
+    persona_md = render_voice(vp) if vp else "(run `tb onboard` first)"
     layers = load_layers()
     ctx = context_for(ALL_INPUTS, intake)
     prompt = build_draft_prompt(
@@ -376,7 +397,7 @@ def cmd_inspect(args):
     print(profile_md)
     print("\n=== TODAY'S CONTEXT (context.md) ===")
     print(context_md)
-    print("\n=== YOUR VOICE (persona.md) ===")
+    print("\n=== YOUR VOICE (voice.json, rendered) ===")
     print(persona_md)
     print("\n=== THE EXACT PROMPT SENT TO THE LLM ===")
     print(prompt)
@@ -475,6 +496,11 @@ def cmd_doctor(args):
     intake = _intake(args)
     print(f"intake ok: {intake.name}, topic={intake.idea.topic[:60]!r}")
     print(f"channels={intake.output.channels} hard_nevers={intake.output.hard_nevers}")
+    try:
+        print(onboarding_summary(load_onboarding()))
+    except (FileNotFoundError, ValueError) as e:
+        print(f"onboarding config ERROR: {e}")
+    print(f"voice profile: {'present' if load_voice() else 'not built yet (run `tb onboard`)'}")
 
 
 def _load_env() -> None:

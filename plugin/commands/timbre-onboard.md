@@ -4,16 +4,50 @@ argument-hint: "[your LinkedIn/X handle or a post you're proud of]"
 allowed-tools: Bash Read Write Edit
 ---
 
-Onboard the user into Timbre. Context they gave: **$ARGUMENTS**
+Onboard the user into Timbre — a warm, one-question-at-a-time conversation that learns their
+voice. Context they gave: **$ARGUMENTS**
 
-Follow the `timbre` skill's onboarding step:
-1. Have a short conversation — who they are, who they write for, and their real writing. If
-   they gave a handle, offer to paste in a few of their existing posts (their own writing is
-   the strongest voice sample); put that text into `voice.writing_samples` in
-   `data/intake.json`. See `data/intake.example.json` for the shape.
-2. Run `uv run tb onboard --json`.
-3. Run `uv run tb persona --json` and show the extracted voice. Ask "does this sound like
-   you?" and let them edit `profiles/persona.md` — that edit is the confirmation.
-4. Offer to draft their first post with `/timbre-post`.
+**The flow is data, not improv.** Read `engine/onboarding.json` first — it holds the welcome
+line, the hardcoded audience default, and the exact questions (with their order, type, and
+where each answer is stored). Ask those questions; never invent your own.
 
-Don't make them fill a form. Never invent details about them.
+## How to run it
+
+1. **Read `engine/onboarding.json`.** Print its `welcome` line, as written.
+
+2. **Ask the `questions` one at a time, in `order`** (skip any with `enabled: false`). Above
+   each question print a progress bar, e.g. `[▰▰▱▱▱▱▱] 2/7 · background`. Wait for the answer
+   before the next one. Substitute `{name}` in a prompt with their name once you have it.
+   - **`deterministic`** — ask the `prompt` verbatim.
+   - **`ab_pick`** — show the TWO `options[].example` posts as **A** and **B** (the real little
+     examples, not the labels), ask which sounds more like them, and store the chosen option's
+     `value`.
+   - **`adaptive`** — write a short follow-up question yourself, based on their answer to the
+     `based_on` question. (Only if `enabled`.)
+
+3. **Be human between questions.** One short, genuine reaction per answer — and at most one
+   grounded micro-observation mid-flow ("you keep it short and dry — noted"). Never invent
+   praise; never pad. The *full* voice reveal waits for the end.
+
+4. **Store answers in `data/intake.json`** as you go (start from `data/intake.example.json` for
+   the shape). Put each answer at the question's `writes_to` path (e.g. `voice.answers.weekend`).
+   Also copy `defaults.audience` from the config into the intake's `audience`. For the
+   background question: pull any X/LinkedIn URL into `online.linkedin` / `online.x`, and if they
+   share real posts, append them to `voice.writing_samples` (their own writing is the strongest
+   voice signal) — or run `uv run tb sample --text "…"` per post.
+
+5. **Extract the voice.** Run `uv run tb onboard --json`. This is the only AI step — it reads
+   *how* they wrote and writes `profiles/voice.json`. It invents nothing.
+
+6. **The reveal — keep it SHORT (2–3 lines).** Read `profiles/voice.json` and tell them, in
+   plain language, how you'll match their energy and keep it authentically them. Don't dump the
+   whole profile. Then: *"You can view or tweak your exact voice anytime with `/timbre-voice`
+   (or by editing `profiles/voice.json`) — your edit is the confirmation."*
+
+7. **Offer the first post:** "Want me to draft your first post?" → `/timbre-post`.
+
+## Rules
+
+- Don't make them fill a form — it's a conversation.
+- Never invent details about them. A blank stays blank.
+- The questions come from `engine/onboarding.json`. To change them, edit that file — not this.

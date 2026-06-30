@@ -16,12 +16,20 @@ import json
 from ..rubric.schemas import DIM_NAMES, GATE_NAMES
 from .base import Provider
 
-_PERSONA = (
-    "# persona.md (stub)\n\n"
-    "- Voice signature: plain, direct, concrete\n"
-    "- Vocabulary: everyday words, no jargon\n"
-    "- BANNED: delve, leverage, game-changer, thrilled to announce\n"
-    "- NEVER-DO: no hype, no emojis, never fake a number\n"
+_PERSONA = json.dumps(
+    {
+        "signature": "plain, direct, concrete (stub)",
+        "vocabulary": "everyday words, no jargon",
+        "sentence_style": "short, varied; fragments allowed",
+        "favorite_phrases": [],
+        "banned": ["delve", "leverage", "game-changer", "thrilled to announce"],
+        "punctuation": "lowercase-friendly, no emojis",
+        "humor": "dry",
+        "structure": "open on a fact / develop / land a takeaway",
+        "never_do": ["no hype", "no emojis", "never fake a number"],
+        "signatures": [],
+        "notes": "stub: deterministic offline voice (LIGHT PREFERENCE)",
+    }
 )
 
 

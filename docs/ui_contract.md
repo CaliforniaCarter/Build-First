@@ -13,14 +13,14 @@ Every command accepts `--provider {terminal,anthropic,stub}`, `--intake <path>`,
 | Step | UI does | Engine command | Reads / writes |
 | --- | --- | --- | --- |
 | 1. Capture | Collect profile + voice + the idea, write `data/intake.json` | — | writes `data/intake.json` |
-| 2. Onboard | — | `tb onboard` | writes `profiles/{profile,context,persona}.md` |
-| 3. "That's me?" | Show persona, let the user edit + save | `tb persona --json` | reads/writes `profiles/persona.md` |
+| 2. Onboard | — | `tb onboard` | writes `profiles/{profile,context}.md` + `voice.json` |
+| 3. "That's me?" | Show the voice, let the user edit + save | `tb persona --json` | reads/writes `profiles/voice.json` |
 | 4. Gap probe | Ask each unfilled question, write answers into the idea | `tb gaps --json` | writes `data/intake.json` (`idea.<key>`) |
 | 5. Make post | show the 2 options, user picks one | `tb post --json`, then `tb pick --option <n>` | writes `posts/<slug>/`, clipboard |
 | 6. Approve / publish | show final, edit, mark posted | `tb publish <slug>` | reads/writes `posts/<slug>/` |
 | 7. Library | List past posts | `tb posts --json` | reads `posts/` |
 
-Editing `persona.md` (step 3) **is** the confirmation — the engine never over-trusts its
+Editing `voice.json` (step 3) **is** the confirmation — the engine never over-trusts its
 own extraction. Step 4 never invents an answer; a blank stays blank on purpose.
 
 ## The conversation is the LLM's job, not the engine's
@@ -39,9 +39,11 @@ builder, not the end user.
 
 ## JSON shapes
 
-`tb persona --json`
+`tb persona --json` — the editable voice profile (JSON) + a prose render
 ```json
-{ "path": "profiles/persona.md", "persona_md": "# persona.md\n..." }
+{ "path": "profiles/voice.json",
+  "voice": { "signature": "...", "banned": ["..."], "humor": "...", "...": "..." },
+  "rendered": "# voice\n- Voice signature: ...\n..." }
 ```
 
 `tb gaps --json` — only the unfilled gaps are missing from the idea

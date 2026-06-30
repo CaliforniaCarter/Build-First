@@ -10,6 +10,7 @@ __pycache__/
 
 # Personal, local-first data — never leaves the machine, never committed
 profiles/*.md
+profiles/*.json
 !profiles/.gitkeep
 runs/
 posts/*

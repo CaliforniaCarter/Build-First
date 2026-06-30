@@ -19,8 +19,8 @@ That's Timbre.
 Start with nothing. Onboarding isn't a form — it's a short conversation, and the strongest
 input is *your own writing* (paste a post or an essay you're proud of). Run `tb onboard`.
 
-Show `profiles/persona.md`. **"This is the voice it pulled from my writing. I didn't tune it —
-I just corrected the one thing it got wrong. That edit is the confirmation."**
+Show `profiles/voice.json`. **"This is the voice it pulled from my writing — plain, editable
+JSON. I didn't tune it, I just corrected the one thing it got wrong. That edit is the confirmation."**
 
 ## 1:45 — Two options (90s)
 `tb post`. It returns **two** drafts, in *different shapes* — not the same post twice.

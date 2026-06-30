@@ -10,7 +10,7 @@ data/intake.json            your raw inputs (private, gitignored)
 profiles/
   profile.md                who you are
   context.md                today's work
-  persona.md                your voice (hand-confirmable; never silently overwritten)
+  voice.json                your voice (editable JSON; hand-confirmable, never silently overwritten)
 posts/
   <date>-<slug>/            one folder per post, updated in place
     final.md                the post text

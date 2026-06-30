@@ -21,14 +21,14 @@ then speak in plain language.
 
 ## The flow
 
-**1. Onboard (only if `data/intake.json` or `profiles/persona.md` is missing).**
-Don't make them fill a form. Have a short conversation: who they are, who they're writing for,
-a couple of posts/essays they're proud of (their real writing is the best voice sample), and
-what they want to post about. Write it into `data/intake.json` (see `data/intake.example.json`
-for the shape — `voice.writing_samples` is where pasted real writing goes), then run
-`uv run tb onboard --json`. Show them the extracted voice (`tb persona --json`) and ask
-"does this sound like you?" — let them edit `profiles/persona.md`. That edit IS the
-confirmation.
+**1. Onboard (only if `data/intake.json` or `profiles/voice.json` is missing).**
+Don't make them fill a form — run the `/timbre-onboard` flow. Read `engine/onboarding.json` and
+ask its questions one at a time, in order, with a light progress bar and a human reaction
+between answers (full details in `commands/timbre-onboard.md`). Store answers in
+`data/intake.json` at each question's `writes_to` path, and copy `defaults.audience` into the
+intake. Then run `uv run tb onboard --json` — the only AI step; it writes `profiles/voice.json`.
+Show a SHORT reveal of how you'll match their voice, and point them to `/timbre-voice` (or
+editing `profiles/voice.json`) — that edit IS the confirmation.
 
 **2. Sharpen (optional).** Run `uv run tb gaps --json`. If it lists gaps (a real number, a
 scene, the lesson, the only-you angle), ask the user those one or two questions in plain words

@@ -37,7 +37,7 @@ DIM_DESCRIPTIONS = {
     "specificity_surprise": "specific and a little surprising, not predictable",
     "emotional_resonance": "an honest, human feeling lands",
     "ownability": "only this person could have written it",
-    "voice_match": "matches persona.md (diction, cadence, tics, never-do list)",
+    "voice_match": "matches the voice profile (diction, cadence, tics, never-do list)",
     "format_adherence": "hook in first line, one idea, short lines, real close, no bait",
     "audience_fit": "fits the audience's values without losing the voice",
     "stakes_turn": "a real cost, risk, admission, or contrarian turn — not just pleasant and safe",

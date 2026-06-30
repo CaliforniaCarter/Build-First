@@ -7,8 +7,8 @@ allowed-tools: Bash Read Write Edit
 Draft a post with Timbre about: **$ARGUMENTS**
 
 Follow the `timbre` skill flow:
-1. If `data/intake.json`/`profiles/persona.md` are missing, onboard first (have the short
-   conversation, don't dump a form).
+1. If `data/intake.json`/`profiles/voice.json` are missing, onboard first (run the
+   `/timbre-onboard` conversation, don't dump a form).
 2. Write the topic into `data/intake.json` at `idea.topic` if it isn't already there, and run
    `uv run tb gaps --json` — ask the user any gap questions in plain words; never invent answers.
 3. Run `uv run tb post --provider anthropic --json` and present **both** options in full.
