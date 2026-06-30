@@ -19,12 +19,13 @@ from .blocks.intake import load_intake
 from .blocks.persona import build_persona
 from .blocks.probe import unfilled_gaps
 from .blocks.profile import write_profile_docs
-from .config import PROFILES_DIR, RUNS_DIR
+from .config import DATA_DIR, PROFILES_DIR, RUNS_DIR
+from .learn import learn
 from .post import make_post, open_gaps
 from .providers import get_provider
 from .providers.base import NeedsCompletion
 from .report import RunReport, build_report, compute_places_to_refine, write_report
-from .store import list_posts, save_post
+from .store import latest_final, list_posts, save_post
 
 
 def _provider(args):
@@ -48,6 +49,7 @@ def cmd_onboard(args):
 
 
 def cmd_ablate(args):
+    """Admin / lab: add context one tier at a time and watch the score move."""
     intake = _intake(args)
     provider = _provider(args)
     persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
@@ -57,6 +59,7 @@ def cmd_ablate(args):
 
 
 def cmd_report(args):
+    """Admin / lab: full ablation report — each level's post, score, and diff."""
     intake = _intake(args)
     provider = _provider(args)
     persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
@@ -179,6 +182,32 @@ def cmd_posts(args):
         )
 
 
+def cmd_learn(args):
+    """Self-learning loop: turn your edit into tighter profile fields, never bloat."""
+    path = Path(args.intake) if args.intake else (DATA_DIR / "intake.json")
+    intake = _intake(args)
+    edited = Path(args.edited).read_text(encoding="utf-8")
+    original = Path(args.original).read_text(encoding="utf-8") if args.original else latest_final()
+    if not original:
+        print("no original draft — pass --original <file> or run `bf post` first", file=sys.stderr)
+        return
+    applied, skipped = learn(original, edited, intake, _provider(args))
+    if applied:
+        path.write_text(intake.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    if args.json:
+        print(json.dumps({"applied": applied, "skipped": skipped, "intake": str(path)}, indent=2))
+        return
+    if applied:
+        print("Learned (profile updated in place, no bloat):")
+        for a in applied:
+            print(f"  - {a}")
+        print(f"\nWrote {path}. The next `bf post` will use it.")
+    else:
+        print("Nothing to learn from this edit — no new voice/identity signal. Profile unchanged.")
+    if skipped:
+        print(f"(skipped: {'; '.join(skipped)})")
+
+
 def cmd_doctor(args):
     intake = _intake(args)
     print(f"intake ok: {intake.name}, topic={intake.idea.topic[:60]!r}")
@@ -211,18 +240,26 @@ def main(argv=None):
 
     parser = argparse.ArgumentParser(prog="bf", description="Brand Voice Content Engine")
     sub = parser.add_subparsers(dest="cmd", required=True)
+    parsers = {}
     for name, fn in (
         ("post", cmd_post),
         ("gaps", cmd_gaps),
         ("persona", cmd_persona),
         ("posts", cmd_posts),
+        ("learn", cmd_learn),
         ("onboard", cmd_onboard),
         ("ablate", cmd_ablate),
         ("report", cmd_report),
         ("run", cmd_run),
         ("doctor", cmd_doctor),
     ):
-        sub.add_parser(name, parents=[common]).set_defaults(func=fn)
+        p = sub.add_parser(name, parents=[common])
+        p.set_defaults(func=fn)
+        parsers[name] = p
+    parsers["learn"].add_argument("--edited", required=True, help="path to your edited post")
+    parsers["learn"].add_argument(
+        "--original", default=None, help="the engine's draft (default: last saved post)"
+    )
 
     args = parser.parse_args(argv)
     try:

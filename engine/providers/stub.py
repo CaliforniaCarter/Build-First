@@ -80,6 +80,8 @@ class StubProvider(Provider):
     def complete(self, stage: str, prompt: str) -> str:
         if stage == "persona":
             return _PERSONA
+        if stage == "learn":
+            return "[]"  # offline: nothing learned
         if stage.startswith("score_"):
             return _score_json(stage)
         if stage.startswith("council_pass"):

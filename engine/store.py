@@ -52,3 +52,11 @@ def list_posts(base: Path = POSTS_DIR) -> list[dict]:
         if meta.exists():
             out.append(json.loads(meta.read_text(encoding="utf-8")))
     return out
+
+
+def latest_final(base: Path = POSTS_DIR) -> str | None:
+    """The most recent saved post's final text (for the learning loop's default original)."""
+    if not base.exists():
+        return None
+    dirs = sorted(d for d in base.iterdir() if (d / "final.md").exists())
+    return (dirs[-1] / "final.md").read_text(encoding="utf-8") if dirs else None
