@@ -65,5 +65,5 @@ Two ways to fill `writing_samples`:
 - **Cowork browser flow:** in Cowork (or Claude Code with a browser tool), open the user's
   *already-logged-in* LinkedIn/X profile, read their last several posts, and call
   `tb sample --text "…"` for each. This needs the human's own session — Timbre never logs in or
-  stores credentials, and never auto-posts. The API's `/online/scan` is the same idea behind an
-  endpoint; until a browser is wired it returns `pending` honestly rather than faking a count.
+  stores credentials, and never auto-posts. Until a browser is wired, this stays a manual paste
+  rather than faking a count.

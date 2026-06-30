@@ -1,6 +1,6 @@
 """Anthropic provider — the real-API path (model-agnostic via BF_MODEL).
 
-A first-class provider used by both the web API (api/) for live generation and the CLI
+A first-class provider used by the CLI and the Claude Code plugin
 (`--provider anthropic`) for draft/council/score/learn. Enable with `uv pip install -e '.[api]'`
 and `ANTHROPIC_API_KEY` (BF_MODEL picks the model; defaults to a current Claude). Kept thin —
 prompts are terse so there is little repeated bulk to cache; long stages get more max_tokens so

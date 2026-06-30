@@ -35,16 +35,16 @@ uv run tb learn                   # fold your pick into your voice profile
 
 `intake → voice profile → draft (×2 shapes) → Writer's Council (revise to a bar) → receipts →
 eval (6 gates + 9 dimensions) → you pick → it learns`. The engine returns structured data; the
-interface (Claude Code, the web UI, or your own) presents it and owns the conversation.
+interface (Claude Code or your own) presents it and owns the conversation.
 
-## Run it three ways
+## Run it two ways
 
-Standalone CLI + your own key · a **Claude Code plugin** (`plugin/`) · or the **web UI**. See
+Standalone CLI + your own key · or a **Claude Code plugin** (`plugin/`). See
 [`docs/deploy.md`](docs/deploy.md).
 
 ## Docs
 
-- [`docs/deploy.md`](docs/deploy.md) — the three deploy routes.
+- [`docs/deploy.md`](docs/deploy.md) — the deploy routes.
 - [`docs/ui_contract.md`](docs/ui_contract.md) — how a UI drives the engine (commands ↔ JSON).
 - [`docs/self_learning.md`](docs/self_learning.md) — the picks + edits learning loop.
 - [`docs/storage.md`](docs/storage.md) — the local file layout.

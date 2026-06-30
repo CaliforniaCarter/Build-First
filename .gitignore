@@ -15,14 +15,8 @@ runs/
 posts/*
 !posts/.gitkeep
 data/intake.json
-data/posts.json
 data/signals.json
 data/transcripts/
-
-# Web app
-web/node_modules/
-web/.next/
-web/out/
 
 # OS
 .DS_Store

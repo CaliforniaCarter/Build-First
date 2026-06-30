@@ -53,8 +53,8 @@ clipboard. Then `tb learn`.
 That's the loop: every choice makes the next draft more me.
 
 ## 5:30 — It runs anywhere (45s)
-Three ways, same engine: a standalone CLI with your own key, a **Claude Code plugin** where the
-chat *is* the interface, or a web dashboard. Model-agnostic. Local-first — your data never
+Two ways, same engine: a standalone CLI with your own key, or a **Claude Code plugin** where the
+chat *is* the interface. Model-agnostic. Local-first — your data never
 leaves your machine. No "log in with Anthropic" — that's against their terms, so it's
 bring-your-own-key by design.
 

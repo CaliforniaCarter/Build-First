@@ -9,14 +9,12 @@ dependencies = [
     "python-dotenv>=1.0",
 ]
 
-# The 'api' extra powers the web path: the Anthropic SDK (live generation) plus the
-# FastAPI backend in api/ that serves the Next.js app. The CLI still runs with no key
-# (TerminalProvider). Install with:  uv pip install -e ".[api]"
+# The 'api' extra adds the Anthropic SDK so you can run against your own API key
+# (`--provider anthropic`). The CLI and the Claude Code plugin run with no key by
+# default (TerminalProvider). Install with:  uv pip install -e ".[api]"
 [project.optional-dependencies]
 api = [
     "anthropic>=0.40",
-    "fastapi>=0.110",
-    "uvicorn[standard]>=0.29",
 ]
 
 [dependency-groups]
