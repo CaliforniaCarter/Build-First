@@ -12,6 +12,11 @@ uv run tb pick --option 0 --why "punchier opening"   # polish + save the one you
 uv run tb learn                   # fold your pick into your voice profile
 ```
 
+> **Local-first by design.** Your posts, your voice profile, and everything Timbre learns about
+> you stay as plain files on your machine (`data/`, `profiles/`, `posts/`) — they're gitignored
+> and never uploaded. The only thing that ever leaves is the redacted text a single model call
+> needs, and Timbre never posts anywhere for you. Your work, your machine, your call.
+
 ## What makes it different
 
 - **Your voice, not a template.** Onboarding extracts a voice profile from your real writing;
