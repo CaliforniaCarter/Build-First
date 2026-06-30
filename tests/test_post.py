@@ -2,6 +2,7 @@
 produce a valid scored post (no provider mocking — the stub is the offline engine)."""
 
 from engine.ablation import load_layers
+from engine.blocks.draft import build_draft_prompt
 from engine.blocks.intake import ContentIdea, Intake
 from engine.post import evaluate, make_post
 from engine.providers.stub import StubProvider
@@ -30,3 +31,11 @@ def test_evaluate_and_revise_paths():
     )
     assert final
     assert len(score.dimensions) == 9
+
+
+def test_draft_prompt_varies_from_recent_posts():
+    p = build_draft_prompt(
+        "topic", "ctx", "voice", "layers", [], ["LinkedIn"], ["I've quit every second brain"]
+    )
+    assert "I've quit every second brain" in p  # the recent opening is fed in
+    assert "vary" in p.lower()  # and it's told to vary the shape

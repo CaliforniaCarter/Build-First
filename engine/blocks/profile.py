@@ -1,7 +1,9 @@
 """Profile + context — deterministic. Pure restatement of the intake, nothing invented.
 
 profile.md = stable identity (who you are). context.md = today's specific work.
-These are templated straight from the intake so they can never hallucinate.
+These are templated straight from the intake so they can never hallucinate. The draft draws the
+same facts from the intake; these are the human-readable mirror you (and the UI) review via
+`tb inspect`.
 """
 
 from __future__ import annotations

@@ -27,7 +27,7 @@ from .providers import get_provider
 from .providers.base import NeedsCompletion
 from .report import RunReport, build_report, compute_places_to_refine, write_report
 from .revise import revise
-from .store import latest_final, list_posts, save_post
+from .store import latest_final, list_posts, recent_post_openings, save_post
 
 
 def _provider(args):
@@ -170,7 +170,9 @@ def cmd_post(args):
     intake = _intake(args)
     provider = _provider(args)
     _, persona_md = _onboard(intake, provider)
-    result = make_post(intake, persona_md, provider, args.run_id)
+    result = make_post(
+        intake, persona_md, provider, args.run_id, recent_openings=recent_post_openings()
+    )
     out = human_gate(result.final_draft, RUNS_DIR / args.run_id / "post")
     saved = save_post(result, intake, args.date)
     _emit_post(result, saved, out, args)
@@ -231,14 +233,16 @@ def cmd_persona(args):
 
 
 def cmd_inspect(args):
-    """Show exactly what the LLM sees: your voice profile + the assembled prompt. Nothing hidden."""
+    """Show exactly what Timbre knows about you + what it sends to the LLM. Nothing hidden."""
     intake = _intake(args)
-    persona_path = PROFILES_DIR / "persona.md"
-    persona_md = (
-        persona_path.read_text(encoding="utf-8")
-        if persona_path.exists()
-        else "(run `tb onboard` first)"
-    )
+
+    def _read(name):
+        p = PROFILES_DIR / name
+        return p.read_text(encoding="utf-8") if p.exists() else "(run `tb onboard` first)"
+
+    profile_md = _read("profile.md")
+    context_md = _read("context.md")
+    persona_md = _read("persona.md")
     layers = load_layers()
     ctx = context_for(ALL_INPUTS, intake)
     prompt = build_draft_prompt(
@@ -253,19 +257,21 @@ def cmd_inspect(args):
         print(
             json.dumps(
                 {
+                    "profile_md": profile_md,
+                    "context_md": context_md,
                     "persona_md": persona_md,
-                    "context_block": ctx,
-                    "layers": layers,
-                    "draft_prompt": prompt,
+                    "draft_prompt": prompt,  # the exact text sent to the LLM
                 },
                 indent=2,
             )
         )
         return
-    print("=== PERSONA (your voice — what the LLM is told to match) ===")
+    print("=== WHO YOU ARE (profile.md) ===")
+    print(profile_md)
+    print("\n=== TODAY'S CONTEXT (context.md) ===")
+    print(context_md)
+    print("\n=== YOUR VOICE (persona.md) ===")
     print(persona_md)
-    print("\n=== CONTEXT (assembled from your intake) ===")
-    print(ctx)
     print("\n=== THE EXACT PROMPT SENT TO THE LLM ===")
     print(prompt)
 

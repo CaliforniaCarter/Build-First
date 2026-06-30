@@ -60,3 +60,16 @@ def latest_final(base: Path = POSTS_DIR) -> str | None:
         return None
     dirs = sorted(d for d in base.iterdir() if (d / "final.md").exists())
     return (dirs[-1] / "final.md").read_text(encoding="utf-8") if dirs else None
+
+
+def recent_post_openings(n: int = 2, base: Path = POSTS_DIR) -> list[str]:
+    """First line of the most recent saved posts, so a new draft can vary its shape from them."""
+    if not base.exists():
+        return []
+    dirs = sorted(d for d in base.iterdir() if (d / "final.md").exists())
+    out: list[str] = []
+    for d in dirs[-n:]:
+        text = (d / "final.md").read_text(encoding="utf-8").strip()
+        if text:
+            out.append(text.splitlines()[0])
+    return out

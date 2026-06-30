@@ -52,7 +52,13 @@ def evaluate(
     return final_draft, proof, redactions, score
 
 
-def make_post(intake: Intake, persona_md: str, provider: Provider, run_id: str) -> PostResult:
+def make_post(
+    intake: Intake,
+    persona_md: str,
+    provider: Provider,
+    run_id: str,
+    recent_openings: list[str] = (),
+) -> PostResult:
     layers = load_layers()
     run_dir = RUNS_DIR / run_id / "post"
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -65,6 +71,7 @@ def make_post(intake: Intake, persona_md: str, provider: Provider, run_id: str) 
         layers,
         intake.output.hard_nevers,
         intake.output.channels,
+        recent_openings,
     )
     first_draft = draft_block.draft("draft_post", prompt, provider)
 

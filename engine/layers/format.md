@@ -13,14 +13,24 @@ Real hooks:
 - "I'm in a text group with 30 AI-pilled enterprise executives."
 - Bad: "Excited to share some thoughts on AI agents!"
 
-## Explain it well
-- Name the pain in concrete steps, then the mechanism in plain words. Don't be vague about what it does or why it helps.
-- Show the moment, don't summarize it.
+## Pick the shape that fits — and VARY it across posts
+Do NOT default to the same template every time. The biggest tell of an AI content engine is that
+every post is "hook, then a how-it-works list, then a question." Choose the structure THIS post
+actually wants:
+- Story / arc: a real moment, a turn, what you learned.
+- How-it-works / teardown: only when the thing genuinely has steps.
+- One sharp insight: a single claim, defended in a few lines.
+- Contrarian take: the thing everyone believes, then why you don't.
+- Before / after: what you used to do, what changed, the result.
+- A short list of takeaways: used sparingly, not every post.
+If a recent post used a shape (see RECENT POSTS in the prompt, if present), pick a different one.
 
-## Build for the second read
-- Saves and shares outweigh likes (~5x). Make it saveable: a clear how-it-works, scannable use cases, a small framework or teardown.
-- One idea. Short lines. White space. Close with a real question or the proof. No engagement bait, no hashtags.
-- Length isn't penalized, but restraint wins; over-formatting (bold everything, an emoji per line) reads as AI.
+## Make it land
+- Name the pain and the mechanism in plain words. Show the moment, don't summarize it.
+- Saves and shares outweigh likes (~5x). Make it worth a second read.
+- One idea. Short lines. White space. Vary the close too — sometimes a question, sometimes the
+  proof, sometimes a flat last line that just lands. No engagement bait, no hashtags.
+- Restraint wins; over-formatting (bold everything, an emoji per line) reads as AI.
 
 Real body:
 - Good: "The bug wasn't in the code. It was my prompt. One word, 'thorough,' quadrupled the slop."
