@@ -43,13 +43,15 @@ folder; `created` stays, `updated` moves, and `status` is preserved.
 - **Mark posted / back to draft:** `tb publish <slug>` (`--draft` to revert), or set `status` in `post.json`.
 - **Save the user's edited text:** write it to `final.md`, then trigger learning (below).
 
-## Edits → profile, token-efficiently (design — building next)
+## Picks + edits → profile, token-efficiently
 
-When you edit a post, the profile learns from it, without burning tokens on every keystroke:
-- Edits are stored as plain text (no AI), capped to the last few.
-- The profile-update AI call runs **on demand over that small batch of diffs** (not per edit) and
-  updates the profile **in place** (anti-bloat, via `engine/learn.py`). Most edits cost zero
-  tokens; learning fires occasionally on a tiny input.
+Your picks (option A vs B, and why) and your edits both teach the profile, without burning
+tokens on every interaction:
+- Signals are stored as plain text in `data/signals.json` (no AI), capped to the last few.
+- `tb learn` runs the profile-update AI call **on demand over that small batch** (not per
+  signal) and updates the profile **in place** (anti-bloat, via `engine/learn.py`). Most
+  interactions cost zero tokens; learning fires occasionally on a tiny input. See
+  `docs/self_learning.md`.
 
 ## Warm start (handles → existing posts)
 
