@@ -82,8 +82,3 @@ def make_post(intake: Intake, persona_md: str, provider: Provider, run_id: str) 
         )
 
     return PostResult(first_draft, final_draft, score, proof, redactions, clog)
-
-
-def open_gaps(score: Score) -> list[str]:
-    """Failing hard gates — what the post still needs before it's ready (e.g. a real number)."""
-    return [f"{g.name}: {g.reason}" for g in score.gates if not g.passed]

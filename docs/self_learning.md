@@ -28,7 +28,8 @@ fields:
    genuinely new, return nothing if the edit is just content.
 3. The engine applies them to `data/intake.json` and prints exactly what changed, so you can
    see it stayed tight.
-4. The next `tb post` regenerates persona/profile from the richer source.
+4. Run `tb onboard` to refresh persona/profile from the updated source (a hand-edited
+   `persona.md` otherwise stays put — `tb post` never clobbers it).
 
 ## Guards against clutter
 - A whitelist of learnable fields — the loop can't touch anything else.

@@ -16,7 +16,7 @@ GATE_NAMES = [
     "central_claim_human",  # the core claim is the human's, not the model's
 ]
 
-# The eight 0-10 quality dimensions, each scored with a one-line reason.
+# The nine 0-10 quality dimensions, each scored with a one-line reason.
 DIM_NAMES = [
     "story_strength",
     "opinion_edge",
@@ -68,12 +68,6 @@ class Score(BaseModel):
     @property
     def quality_avg(self) -> float:
         return round(mean(d.score for d in self.dimensions), 1)
-
-    @property
-    def passes_threshold(self) -> bool:
-        from ..config import COUNCIL_TARGET
-
-        return self.gates_passed == self.gates_total and self.quality_avg >= COUNCIL_TARGET
 
     def headline(self) -> str:
         return f"{self.quality_avg}/10  ·  gates {self.gates_passed}/{self.gates_total}"

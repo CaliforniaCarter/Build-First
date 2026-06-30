@@ -6,7 +6,7 @@ missing from the idea and returns one fixed question per gap. The engine never
 invents the answer — you provide it, or you leave it blank on purpose.
 
 Thin by design: fixed questions, not an adaptive interview. The UI asks them and
-writes the answers back into the idea (see apply_answers).
+writes the answers back into the idea (intake.idea.<key>).
 """
 
 from __future__ import annotations
@@ -41,11 +41,3 @@ def find_gaps(intake: Intake) -> list[dict]:
 def unfilled_gaps(intake: Intake) -> list[dict]:
     """Just the gaps still missing — the questions to actually ask, one at a time."""
     return [g for g in find_gaps(intake) if not g["filled"]]
-
-
-def apply_answers(intake: Intake, answers: dict[str, str]) -> Intake:
-    """Write provided gap answers into the idea (skips blanks). Returns the updated intake."""
-    for key, val in answers.items():
-        if key in GAP_QUESTIONS and val and val.strip():
-            setattr(intake.idea, key, val.strip())
-    return intake

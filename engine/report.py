@@ -5,6 +5,7 @@ and a places-to-refine list. Output is Markdown (also what gets posted to Notion
 from __future__ import annotations
 
 import difflib
+from pathlib import Path
 
 from .config import RUNS_DIR
 from .rubric.schemas import LevelResult, RunReport, Score
@@ -25,7 +26,7 @@ def compute_places_to_refine(results: list[LevelResult]) -> list[str]:
     for gate in final.gates:
         if not gate.passed:
             places.append(f"Hard gate still failing — {gate.name}: {gate.reason}")
-    weak = sorted((d for d in final.dimensions), key=lambda d: d.score)[:2]
+    weak = sorted(final.dimensions, key=lambda d: d.score)[:2]
     for d in weak:
         if d.score < 8:
             places.append(f"Lowest dimension — {d.name} ({d.score}/10): {d.reason}")
@@ -89,14 +90,14 @@ def build_report(report: RunReport) -> str:
         "",
         "Same idea held constant; one input tier added per level (online → +docs → +typed → "
         "+persona → +specifics → +eval pass). Each draft scored against the shared rubric "
-        "(six hard gates + eight 0–10 dimensions). The +eval pass is the Writer's Council "
+        "(six hard gates + nine 0–10 dimensions). The +eval pass is the Writer's Council "
         "revising to a 9/10 target with a Reflexion stop rule. No facts or numbers were "
         "invented; gaps are flagged above, not filled.",
     ]
     return "\n".join(out).rstrip() + "\n"
 
 
-def write_report(report: RunReport) -> object:
+def write_report(report: RunReport) -> Path:
     path = RUNS_DIR / report.run_id / "report.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(build_report(report), encoding="utf-8")

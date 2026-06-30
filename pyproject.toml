@@ -1,13 +1,12 @@
 [project]
-name = "build-first"
+name = "timbre"
 version = "0.1.0"
-description = "Brand Voice Content Engine — turns what you actually build into on-brand, in-voice LinkedIn posts, from a cold start."
+description = "Timbre — captures your authentic voice and drafts on-brand posts you approve, from a cold start."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "pydantic>=2.7",
     "python-dotenv>=1.0",
-    "rich>=13.7",
 ]
 
 # The Anthropic SDK is OPTIONAL and DORMANT. The overnight build runs with no API
@@ -15,6 +14,9 @@ dependencies = [
 # only when you want the automated re-eval path:  uv pip install -e ".[api]"
 [project.optional-dependencies]
 api = ["anthropic>=0.40"]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6"]
 
 [project.scripts]
 tb = "engine.cli:main"

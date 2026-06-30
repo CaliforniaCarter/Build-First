@@ -1,18 +1,7 @@
-"""Slop detection and PII redaction behave."""
+"""PII redaction and score parsing behave."""
 
 from engine.blocks.receipts import redact
-from engine.rubric.shared import find_slop, parse_score
-
-
-def test_find_slop_detects_banned():
-    hits = find_slop(
-        "We're thrilled to announce a game-changer that will leverage and supercharge it"
-    )
-    assert "leverage" in hits and "game-changer" in hits
-
-
-def test_find_slop_clean_text():
-    assert find_slop("i shipped a thing today. it broke. i fixed it.") == []
+from engine.rubric.shared import parse_score
 
 
 def test_redact_email_and_phone():

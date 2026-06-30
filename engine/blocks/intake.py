@@ -1,7 +1,8 @@
 """Intake — load and validate the user's inputs (the onboarding answers).
 
-The real file (`data/intake.json`) is personal and gitignored. `intake.example.json`
-shows the shape. Nothing here is invented: every field is something the user gave.
+The real file (`data/intake.json`) is personal and gitignored. `intake.example.json` shows the
+blank shape; `intake.sample.json` is a filled synthetic example used as the cold-start fallback.
+Nothing here is invented: every field is something the user gave.
 """
 
 from __future__ import annotations

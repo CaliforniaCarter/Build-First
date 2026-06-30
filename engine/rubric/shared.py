@@ -44,12 +44,6 @@ DIM_DESCRIPTIONS = {
 }
 
 
-def find_slop(text: str) -> list[str]:
-    """Return slop phrases present in the text (case-insensitive)."""
-    low = text.lower()
-    return [p for p in SLOP_PHRASES if p in low]
-
-
 def rubric_text() -> str:
     gates = "\n".join(f"  - {n}: {GATE_DESCRIPTIONS[n]}" for n in GATE_NAMES)
     dims = "\n".join(f"  - {n}: {DIM_DESCRIPTIONS[n]}" for n in DIM_NAMES)
@@ -78,7 +72,7 @@ def build_score_prompt(draft: str, persona_md: str, layers: str, prev_draft: str
         f"{draft}\n\n"
         "Return ONLY JSON with this shape:\n"
         '{"gates":[{"name":..., "passed":true|false, "reason":...}, ... all six],\n'
-        ' "dimensions":[{"name":..., "score":0-10, "reason":...}, ... all eight],\n'
+        ' "dimensions":[{"name":..., "score":0-10, "reason":...}, ... all nine],\n'
         ' "delta_vs_prev":"one line on what changed vs the previous level (\\"baseline\\" for L0)"}'
     )
 

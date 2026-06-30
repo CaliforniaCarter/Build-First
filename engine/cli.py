@@ -38,15 +38,15 @@ def _intake(args):
     return load_intake(Path(args.intake) if args.intake else None)
 
 
-def _onboard(intake, provider):
+def _onboard(intake, provider, force_persona=False):
     paths = write_profile_docs(intake)
-    persona_md = build_persona(intake, provider)
+    persona_md = build_persona(intake, provider, force=force_persona)
     return paths, persona_md
 
 
 def cmd_onboard(args):
     intake = _intake(args)
-    paths, _ = _onboard(intake, _provider(args))
+    paths, _ = _onboard(intake, _provider(args), force_persona=True)
     print(f"wrote {paths['profile']} and {paths['context']} and {PROFILES_DIR / 'persona.md'}")
 
 
@@ -54,7 +54,7 @@ def cmd_ablate(args):
     """Admin / lab: add context one tier at a time and watch the score move."""
     intake = _intake(args)
     provider = _provider(args)
-    persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
+    _, persona_md = _onboard(intake, provider)
     results = run_ablation(intake, persona_md, provider, args.run_id)
     for r in results:
         print(f"{r.level} {r.label:12s} {r.score.headline()}")
@@ -64,7 +64,7 @@ def cmd_report(args):
     """Admin / lab: full ablation report — each level's post, score, and diff."""
     intake = _intake(args)
     provider = _provider(args)
-    persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
+    _, persona_md = _onboard(intake, provider)
     results = run_ablation(intake, persona_md, provider, args.run_id)
     report = RunReport(
         run_id=args.run_id,
@@ -82,8 +82,7 @@ def cmd_admin(args):
     """Admin: the full eval scale + how your change moved it. Not user-facing."""
     intake = _intake(args)
     provider = _provider(args)
-    _onboard(intake, provider)
-    persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
+    _, persona_md = _onboard(intake, provider)
     s = make_post(intake, persona_md, provider, args.run_id).score
     posts = list_posts()
     baseline = posts[-1]["score"]["quality"] if posts else None
@@ -121,8 +120,7 @@ def cmd_admin(args):
 def cmd_run(args):
     intake = _intake(args)
     provider = _provider(args)
-    _onboard(intake, provider)
-    persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
+    _, persona_md = _onboard(intake, provider)
     results = run_ablation(intake, persona_md, provider, args.run_id)
     report = RunReport(
         run_id=args.run_id,
@@ -164,15 +162,14 @@ def _emit_post(result, saved, out, args):
         )
         return
     print(result.final_draft)
-    print(f"\nScore: {result.score.quality_avg}/10 · saved to {saved} · copied to clipboard")
+    print(f"\nScore: {result.score.quality_avg}/10 · saved to {saved}")
 
 
 def cmd_post(args):
     """The product: draft ONE post from every input, polish, save, return structured output."""
     intake = _intake(args)
     provider = _provider(args)
-    _onboard(intake, provider)
-    persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
+    _, persona_md = _onboard(intake, provider)
     result = make_post(intake, persona_md, provider, args.run_id)
     out = human_gate(result.final_draft, RUNS_DIR / args.run_id / "post")
     saved = save_post(result, intake, args.date)
@@ -183,8 +180,11 @@ def cmd_revise(args):
     """Revise the current post by your command, re-score, and save. The LLM does the rewrite."""
     intake = _intake(args)
     provider = _provider(args)
-    persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
+    _, persona_md = _onboard(intake, provider)
     layers = load_layers()
+    if args.post and not Path(args.post).exists():
+        print(f"no such file: {args.post}", file=sys.stderr)
+        return
     current = Path(args.post).read_text(encoding="utf-8") if args.post else latest_final()
     if not current:
         print("no post to revise — run `tb post` first or pass --post <file>", file=sys.stderr)
@@ -290,7 +290,13 @@ def cmd_learn(args):
     """Self-learning loop: turn your edit into tighter profile fields, never bloat."""
     path = Path(args.intake) if args.intake else (DATA_DIR / "intake.json")
     intake = _intake(args)
+    if not Path(args.edited).exists():
+        print(f"no such file: {args.edited}", file=sys.stderr)
+        return
     edited = Path(args.edited).read_text(encoding="utf-8")
+    if args.original and not Path(args.original).exists():
+        print(f"no such file: {args.original}", file=sys.stderr)
+        return
     original = Path(args.original).read_text(encoding="utf-8") if args.original else latest_final()
     if not original:
         print("no original draft — pass --original <file> or run `tb post` first", file=sys.stderr)
@@ -342,7 +348,9 @@ def main(argv=None):
         "--json", action="store_true", help="emit machine-readable JSON (for the UI)"
     )
 
-    parser = argparse.ArgumentParser(prog="tb", description="Brand Voice Content Engine")
+    parser = argparse.ArgumentParser(
+        prog="tb", description="Timbre — capture your voice, draft posts you approve."
+    )
     sub = parser.add_subparsers(dest="cmd", required=True)
     parsers = {}
     for name, fn in (
@@ -380,6 +388,10 @@ def main(argv=None):
     except NeedsCompletion as nc:
         print(nc, file=sys.stderr)
         return 2
+    except ValueError as e:
+        # malformed model output (bad JSON / failed validation) — fail cleanly, not a traceback
+        print(f"couldn't parse the model's output: {e}", file=sys.stderr)
+        return 1
     return 0
 
 

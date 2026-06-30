@@ -51,17 +51,23 @@ end user.
 Keys: `number`, `scene`, `lesson`, `only_you`. To answer, write the text into
 `data/intake.json` at `idea.<key>`.
 
-`tb post --json`
+`tb post --json` (and `tb revise --json`, same shape)
 ```json
 {
   "final": "I've quit every second brain...",
-  "score": { "quality": 8.2, "gates_passed": 6, "gates_total": 6 },
-  "open_gates": [],
+  "score": 9.2,
+  "evaluation": {
+    "dimensions": [{ "name": "story_strength", "score": 9, "reason": "..." }, "...all nine"],
+    "gates": [{ "name": "no_slop", "passed": true, "reason": "..." }, "...all six"]
+  },
   "receipts": ["about 80 entries logged in two weeks", "..."],
   "saved": "posts/2026-06-29-my-simple-notion-second-brain",
   "draft": "runs/<id>/post/draft.md"
 }
 ```
+`score` is the overall 0–10 meter only. The full `evaluation` (per-dimension scores +
+reasons) is for the LLM/admin — the UI turns weak dimensions into plain guidance and never
+shows the user the scale.
 
 `tb posts --json` — the saved library
 ```json
