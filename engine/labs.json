@@ -1,0 +1,10 @@
+{
+  "ladder": [
+    { "level": "L0", "label": "Online", "adds": "handles + public footprint only", "inputs": ["online"] },
+    { "level": "L1", "label": "+Docs", "adds": "résumé / credentials", "inputs": ["online", "docs"] },
+    { "level": "L2", "label": "+Typed", "adds": "identity, background, beliefs", "inputs": ["online", "docs", "typed"] },
+    { "level": "L3", "label": "+Persona", "adds": "the voice profile", "inputs": ["online", "docs", "typed", "persona"] },
+    { "level": "L4", "label": "+Specifics", "adds": "the concrete scene, real proof, mechanism", "inputs": ["online", "docs", "typed", "persona", "specifics"] },
+    { "level": "L5", "label": "+Eval pass", "adds": "Writer's Council to threshold", "inputs": ["online", "docs", "typed", "persona", "specifics", "eval"] }
+  ]
+}

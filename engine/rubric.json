@@ -1,0 +1,21 @@
+{
+  "gates": [
+    { "name": "only_you", "description": "an observation only this person could make (not a generic take)" },
+    { "name": "real_number_or_specific", "description": "a real number, or a concrete checkable detail" },
+    { "name": "concrete_scene", "description": "a real moment, shown not summarized" },
+    { "name": "non_obvious_lesson", "description": "a takeaway most people would miss" },
+    { "name": "no_slop", "description": "none of the banned slop phrases appear" },
+    { "name": "central_claim_human", "description": "the core claim is the human's, not the model's" }
+  ],
+  "dimensions": [
+    { "name": "story_strength", "description": "is there a real story with a beginning and a turn" },
+    { "name": "opinion_edge", "description": "a clear point of view someone could disagree with" },
+    { "name": "specificity_surprise", "description": "specific and a little surprising, not predictable" },
+    { "name": "emotional_resonance", "description": "an honest, human feeling lands" },
+    { "name": "ownability", "description": "only this person could have written it" },
+    { "name": "voice_match", "description": "matches the voice profile (diction, cadence, tics, never-do list)" },
+    { "name": "format_adherence", "description": "hook in first line, one idea, short lines, real close, no bait" },
+    { "name": "audience_fit", "description": "fits the audience's values without losing the voice" },
+    { "name": "stakes_turn", "description": "a real cost, risk, admission, or contrarian turn — not just pleasant and safe" }
+  ]
+}

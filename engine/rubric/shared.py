@@ -11,28 +11,7 @@ import json
 import re
 
 from ..blocks.proof import load_proof_config
-from .schemas import DIM_NAMES, GATE_NAMES, Score
-
-GATE_DESCRIPTIONS = {
-    "only_you": "an observation only this person could make (not a generic take)",
-    "real_number_or_specific": "a real number, or a concrete checkable detail",
-    "concrete_scene": "a real moment, shown not summarized",
-    "non_obvious_lesson": "a takeaway most people would miss",
-    "no_slop": "none of the banned slop phrases appear",
-    "central_claim_human": "the core claim is the human's, not the model's",
-}
-
-DIM_DESCRIPTIONS = {
-    "story_strength": "is there a real story with a beginning and a turn",
-    "opinion_edge": "a clear point of view someone could disagree with",
-    "specificity_surprise": "specific and a little surprising, not predictable",
-    "emotional_resonance": "an honest, human feeling lands",
-    "ownability": "only this person could have written it",
-    "voice_match": "matches the voice profile (diction, cadence, tics, never-do list)",
-    "format_adherence": "hook in first line, one idea, short lines, real close, no bait",
-    "audience_fit": "fits the audience's values without losing the voice",
-    "stakes_turn": "a real cost, risk, admission, or contrarian turn — not just pleasant and safe",
-}
+from .schemas import DIM_DESCRIPTIONS, DIM_NAMES, GATE_DESCRIPTIONS, GATE_NAMES, Score
 
 
 def rubric_text() -> str:

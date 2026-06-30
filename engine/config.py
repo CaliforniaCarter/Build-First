@@ -21,6 +21,11 @@ ONBOARDING_PATH = ENGINE / "onboarding.json"
 # Editable JSON; feeds both the deterministic proof check and the LLM rubric prompt.
 PROOF_PATH = ENGINE / "proof.json"
 
+# Timbre Labs config — the eval rubric (gates + dimensions) and the ablation ladder.
+# Editable JSON: retune a gate, reword a dimension, add/reorder a context tier — no code.
+RUBRIC_PATH = ENGINE / "rubric.json"
+LABS_PATH = ENGINE / "labs.json"
+
 # Council target and stop behaviour (Reflexion: stop when revisions stop helping).
 COUNCIL_TARGET = 9.0
 COUNCIL_MAX_PASSES = 3

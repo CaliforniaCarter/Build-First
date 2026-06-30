@@ -1,7 +1,7 @@
 """The ablation's integrity invariants: levels are cumulative, and the rich
 specifics must NOT leak before L4 (or the ladder would show no progression)."""
 
-from engine.ablation import LEVELS, context_for
+from engine.ablation import context_for, load_ladder
 from engine.blocks.intake import ContentIdea, Intake
 from engine.report import build_report, compute_places_to_refine
 from engine.rubric.schemas import DIM_NAMES, GATE_NAMES, LevelResult, RunReport, Score
@@ -17,17 +17,18 @@ def _intake() -> Intake:
 
 
 def test_levels_are_cumulative():
+    ladder = load_ladder()
     seen: set[str] = set()
-    for _level, _label, _adds, inputs in LEVELS:
+    for _level, _label, _adds, inputs in ladder:
         assert seen.issubset(set(inputs)), "each level must keep all prior inputs"
         seen = set(inputs)
-    assert LEVELS[0][3] == ["online"]
-    assert "eval" in LEVELS[-1][3]
+    assert ladder[0][3] == ["online"]
+    assert "eval" in ladder[-1][3]
 
 
 def test_specifics_hidden_until_l4():
     intake = _intake()
-    for _level, _label, _adds, inputs in LEVELS:
+    for _level, _label, _adds, inputs in load_ladder():
         ctx = context_for(inputs, intake)
         assert "TOPIC-LINE" in ctx, "topic is known at every level"
         if "specifics" in inputs:

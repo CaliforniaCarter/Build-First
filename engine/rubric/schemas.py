@@ -1,33 +1,34 @@
-"""Pydantic schemas — every machine output is validated against these or rejected."""
+"""Pydantic schemas — every machine output is validated against these or rejected.
+
+The rubric (hard gates + quality dimensions) is editable JSON: engine/rubric.json. It's loaded
+here once, so the Score validation, the LLM score prompt (rubric/shared.py), and the stub all
+key off the same source — retune a gate or reword a dimension by editing the JSON, no code.
+"""
 
 from __future__ import annotations
 
+import json
 from statistics import mean
 
 from pydantic import BaseModel, Field, model_validator
 
-# The six hard gates (must-contain / must-be-true). Pass/fail.
-GATE_NAMES = [
-    "only_you",  # an observation only this person could make
-    "real_number_or_specific",  # a real number or a concrete, checkable detail
-    "concrete_scene",  # a real moment, shown not summarized
-    "non_obvious_lesson",  # a takeaway most people would miss
-    "no_slop",  # none of the banned slop phrases
-    "central_claim_human",  # the core claim is the human's, not the model's
-]
+from ..config import RUBRIC_PATH
 
-# The nine 0-10 quality dimensions, each scored with a one-line reason.
-DIM_NAMES = [
-    "story_strength",
-    "opinion_edge",
-    "specificity_surprise",
-    "emotional_resonance",
-    "ownability",
-    "voice_match",
-    "format_adherence",
-    "audience_fit",
-    "stakes_turn",
-]
+
+def _load_rubric() -> tuple[list[dict], list[dict]]:
+    try:
+        data = json.loads(RUBRIC_PATH.read_text(encoding="utf-8"))
+        return list(data["gates"]), list(data["dimensions"])
+    except (OSError, ValueError, KeyError) as e:
+        raise RuntimeError(f"invalid rubric config at {RUBRIC_PATH}: {e}") from e
+
+
+_GATES, _DIMS = _load_rubric()
+# The hard gates (must-contain / must-be-true, pass/fail) and the 0-10 quality dimensions.
+GATE_NAMES = [g["name"] for g in _GATES]
+DIM_NAMES = [d["name"] for d in _DIMS]
+GATE_DESCRIPTIONS = {g["name"]: g.get("description", "") for g in _GATES}
+DIM_DESCRIPTIONS = {d["name"]: d.get("description", "") for d in _DIMS}
 
 
 class Gate(BaseModel):

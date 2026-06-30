@@ -13,7 +13,7 @@ import json
 import sys
 from pathlib import Path
 
-from .ablation import context_for, load_layers, run_ablation
+from .ablation import context_for, load_ladder, load_layers, run_ablation
 from .blocks.draft import build_draft_prompt
 from .blocks.gate import human_gate
 from .blocks.intake import load_intake
@@ -29,6 +29,7 @@ from .providers import get_provider
 from .providers.base import NeedsCompletion
 from .report import RunReport, build_report, compute_places_to_refine, write_report
 from .revise import revise
+from .rubric.schemas import DIM_NAMES, GATE_NAMES
 from .signals import mark_processed, pending_signals, record_signal
 from .store import (
     latest_final,
@@ -593,6 +594,11 @@ def cmd_doctor(args):
         )
     except ValueError as e:
         print(f"proof config ERROR: {e}")
+    print(f"rubric ok: {len(GATE_NAMES)} gates, {len(DIM_NAMES)} dimensions (engine/rubric.json)")
+    try:
+        print(f"labs ladder ok: {len(load_ladder())} tiers (engine/labs.json)")
+    except (FileNotFoundError, ValueError, KeyError) as e:
+        print(f"labs ladder ERROR: {e}")
     print(f"voice profile: {'present' if load_voice() else 'not built yet (run `tb onboard`)'}")
 
 

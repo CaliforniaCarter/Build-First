@@ -14,30 +14,17 @@ from .blocks import council
 from .blocks import draft as draft_block
 from .blocks import receipts as receipts_block
 from .blocks.intake import Intake
-from .config import LAYERS_DIR, RUNS_DIR
+from .config import LABS_PATH, LAYERS_DIR, RUNS_DIR
 from .onboarding import load_onboarding, render_audience
 from .providers.base import Provider
 from .rubric.schemas import LevelResult
 from .rubric.shared import build_score_prompt, parse_score
 
-LEVELS = [
-    ("L0", "Online", "handles + public footprint only", ["online"]),
-    ("L1", "+Docs", "résumé / credentials", ["online", "docs"]),
-    ("L2", "+Typed", "identity, background, beliefs", ["online", "docs", "typed"]),
-    ("L3", "+Persona", "the voice profile", ["online", "docs", "typed", "persona"]),
-    (
-        "L4",
-        "+Specifics",
-        "the concrete scene, real proof, mechanism",
-        ["online", "docs", "typed", "persona", "specifics"],
-    ),
-    (
-        "L5",
-        "+Eval pass",
-        "Writer's Council to threshold",
-        ["online", "docs", "typed", "persona", "specifics", "eval"],
-    ),
-]
+
+def load_ladder() -> list[tuple[str, str, str, list[str]]]:
+    """The ablation ladder, from editable JSON (engine/labs.json) — add/reorder a tier, no code."""
+    data = json.loads(LABS_PATH.read_text(encoding="utf-8"))
+    return [(t["level"], t["label"], t["adds"], list(t["inputs"])) for t in data["ladder"]]
 
 
 def load_layers() -> str:
@@ -113,7 +100,7 @@ def run_ablation(
     results: list[LevelResult] = []
     prev_draft: str | None = None
 
-    for level, label, adds, inputs in LEVELS:
+    for level, label, adds, inputs in load_ladder():
         ldir = run_dir / level
         ldir.mkdir(parents=True, exist_ok=True)
         persona = persona_md if "persona" in inputs else None
