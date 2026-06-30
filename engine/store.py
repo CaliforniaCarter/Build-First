@@ -24,11 +24,12 @@ def _slug(text: str, words: int = 5) -> str:
 def save_post(
     result: PostResult, intake: Intake, date: str, status: str | None = None, base: Path = POSTS_DIR
 ) -> Path:
-    """Write the post + metadata to posts/<date>-<slug>/ (one entry per post, updated in place).
+    """Write the post + metadata to posts/<slug>/ (one entry per post, updated in place).
 
-    Preserves `created` and the existing `status` across updates. Status is draft | posted.
+    The folder is keyed by the topic slug only, so re-running or editing the same post updates
+    the same entry. Preserves `created` and `status` across updates. Status is draft | posted.
     """
-    pdir = base / f"{date}-{_slug(intake.idea.topic)}"
+    pdir = base / _slug(intake.idea.topic)
     pdir.mkdir(parents=True, exist_ok=True)
     meta_path = pdir / "post.json"
     existing = json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else {}

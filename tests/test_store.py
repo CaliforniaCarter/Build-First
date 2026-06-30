@@ -24,7 +24,7 @@ def test_save_and_list_roundtrip(tmp_path):
 
     pdir = save_post(result, intake, "2026-06-29", base=tmp_path)
     assert (pdir / "final.md").read_text(encoding="utf-8") == "final post"
-    assert pdir.name == "2026-06-29-my-second-brain"
+    assert pdir.name == "my-second-brain"
 
     posts = list_posts(base=tmp_path)
     assert len(posts) == 1
