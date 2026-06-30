@@ -49,6 +49,9 @@ class Typed(BaseModel):
 
 class Voice(BaseModel):
     answers: dict[str, str] = {}  # question -> raw, unpolished answer
+    writing_samples: list[
+        str
+    ] = []  # real work you're proud of (essays, chats, posts): voice corpus
     tone_words: list[str] = []
     look: str = ""
     sentence_length: str = ""

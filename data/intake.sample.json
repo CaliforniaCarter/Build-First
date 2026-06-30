@@ -39,6 +39,9 @@
       "Whose posts make you cringe?": "The 'thrilled to announce' crowd. Ten adjectives, zero numbers. Just tell me what broke and what you learned from it.",
       "Teach me something you know well": "Right of way at an uncontrolled intersection isn't first-come. Whoever's on the right wins the tie. Most drivers guess, and most guess wrong."
     },
+    "writing_samples": [
+      "We shipped the eval harness today. Twenty lines. It already caught a confidently-wrong answer that three of us missed in review. The lesson isn't 'AI is risky.' The lesson is reviewers grade fluency, not truth. Build the thing that grades truth."
+    ],
     "tone_words": ["direct", "dry", "concrete", "a little blunt"],
     "look": "short paragraphs, no emojis, the occasional one-line punch",
     "sentence_length": "short and varied; fragments allowed for emphasis",

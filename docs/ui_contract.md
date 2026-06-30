@@ -34,8 +34,8 @@ canned feedback. When the LLM (Claude Code / Cowork, or your UI's model) drives 
   what to change, or I'll ask a couple of sharpening questions drawn from the weak spots);
 - if they want help, asks those questions, writes the answers back, and re-runs.
 
-`tb admin` is the one place the full eval scale is shown — it's for you, the builder, not the
-end user.
+`tb labs` (Timbre Labs) is the one place the full eval scale is shown — it's for you, the
+builder, not the end user.
 
 ## JSON shapes
 
@@ -66,7 +66,7 @@ Keys: `number`, `scene`, `lesson`, `only_you`. To answer, write the text into
 }
 ```
 `score` is the overall 0–10 meter only. The full `evaluation` (per-dimension scores +
-reasons) is for the LLM/admin — the UI turns weak dimensions into plain guidance and never
+reasons) is for the LLM and Timbre Labs — the UI turns weak dimensions into plain guidance and never
 shows the user the scale.
 
 `tb posts --json` — the saved library

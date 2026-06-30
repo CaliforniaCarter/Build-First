@@ -1,9 +1,16 @@
 """build_persona preserves a hand-edited persona.md unless forced — the 'that's me?' confirm
 must survive the next post."""
 
-from engine.blocks.intake import ContentIdea, Intake
-from engine.blocks.persona import build_persona
+from engine.blocks.intake import ContentIdea, Intake, Voice
+from engine.blocks.persona import build_persona, build_persona_prompt
 from engine.providers.stub import StubProvider
+
+
+def test_persona_prompt_weights_writing_samples():
+    intake = Intake(
+        name="T", idea=ContentIdea(topic="t"), voice=Voice(writing_samples=["SAMPLE-ESSAY-XYZ"])
+    )
+    assert "SAMPLE-ESSAY-XYZ" in build_persona_prompt(intake)
 
 
 def test_persona_preserves_hand_edit_unless_forced(tmp_path, monkeypatch):

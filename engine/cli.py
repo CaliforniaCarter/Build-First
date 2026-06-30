@@ -1,8 +1,8 @@
-"""CLI — the product (`post`, `gaps`, `posts`) and the vetting lab (`ablate`, `report`).
+"""CLI — the product (`post`, `gaps`, `posts`) and Timbre Labs (`ablate`, `report`, `labs`).
 
-`post` makes one in-voice post you approve; `gaps` is the gap-driven probe; `posts`
-lists the saved library. `ablate`/`report` are the build-time lab. Default provider is
-`terminal` (Claude Code is the engine, no API key); `--json` emits UI-readable output.
+`post` makes one in-voice post you approve; `gaps` is the gap-driven probe; `posts` lists the
+saved library. Timbre Labs (`ablate`/`report`/`labs`) is the builder's eval-testing bench.
+Default provider is `terminal` (Claude is the engine, no API key); `--json` emits UI output.
 """
 
 from __future__ import annotations
@@ -51,7 +51,7 @@ def cmd_onboard(args):
 
 
 def cmd_ablate(args):
-    """Admin / lab: add context one tier at a time and watch the score move."""
+    """Timbre Labs: add context one tier at a time and watch the score move."""
     intake = _intake(args)
     provider = _provider(args)
     _, persona_md = _onboard(intake, provider)
@@ -61,7 +61,7 @@ def cmd_ablate(args):
 
 
 def cmd_report(args):
-    """Admin / lab: full ablation report — each level's post, score, and diff."""
+    """Timbre Labs: full ablation report — each level's post, score, and diff."""
     intake = _intake(args)
     provider = _provider(args)
     _, persona_md = _onboard(intake, provider)
@@ -78,8 +78,8 @@ def cmd_report(args):
     print(f"report -> {path}")
 
 
-def cmd_admin(args):
-    """Admin: the full eval scale + how your change moved it. Not user-facing."""
+def cmd_labs(args):
+    """Timbre Labs: the full eval scale + how your change moved it. Not user-facing."""
     intake = _intake(args)
     provider = _provider(args)
     _, persona_md = _onboard(intake, provider)
@@ -106,7 +106,7 @@ def cmd_admin(args):
             )
         )
         return
-    print(f"EVAL (admin) — quality {s.quality_avg}/10, gates {s.gates_passed}/{s.gates_total}")
+    print(f"Timbre Labs — quality {s.quality_avg}/10, gates {s.gates_passed}/{s.gates_total}")
     if baseline is not None:
         print(f"vs last saved: {baseline} -> {s.quality_avg} ({s.quality_avg - baseline:+.1f})")
     print("\nDimensions:")
@@ -364,7 +364,7 @@ def main(argv=None):
         ("onboard", cmd_onboard),
         ("ablate", cmd_ablate),
         ("report", cmd_report),
-        ("admin", cmd_admin),
+        ("labs", cmd_labs),
         ("run", cmd_run),
         ("doctor", cmd_doctor),
     ):

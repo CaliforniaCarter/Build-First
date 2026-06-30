@@ -14,10 +14,12 @@ from .intake import Intake
 def build_persona_prompt(intake: Intake) -> str:
     v = intake.voice
     answers = "\n\n".join(f"Q: {q}\nA: {a}" for q, a in v.answers.items()) or "(none)"
+    samples = "\n\n---\n\n".join(v.writing_samples) or "(none)"
     return (
-        "Extract this person's writing VOICE from how they answered below. Read HOW they "
+        "Extract this person's writing VOICE from the material below. Read HOW they "
         "write, not what they say. Do NOT invent traits that aren't in evidence. Tag each "
         "trait with a confidence label: HARD RULE / STRONG TENDENCY / LIGHT PREFERENCE.\n\n"
+        f"REAL WRITING SAMPLES (their actual work — the strongest signal; weight this most):\n{samples}\n\n"
         f"RAW ANSWERS (unpolished, may be voice-to-text):\n{answers}\n\n"
         f"Tone words they picked: {', '.join(v.tone_words) or '—'}\n"
         f"Look: {v.look or '—'}\n"
