@@ -53,11 +53,13 @@ or 2) teaches the voice with no AI call. Show the final and offer three outs: **
 **edit it yourself**, or **let me help** (tell me what to change, or I'll ask a sharpening
 question). If they edit, save their version to the post's `final.md`.
 
-**5. Don't fold the voice per-pick.** Picks and edits accumulate as free signals. The fold into
-the voice profile is **batched to the end of the session** and only on the user's yes — and the
-fold is deliberately conservative (replace-in-place, add only if genuinely new, do nothing if
-the batch reveals nothing about voice), so the profile never bloats or drifts. Do **not** run
-`tb learn` after each pick; that's the end-of-session learning loop's job.
+**5. Learn at session end, on consent.** Picks and edits accumulate as free signals. Do **not**
+run `tb learn` after each pick. Instead, when the user **wraps up** (says they're done, "bye",
+or after a good run of picks), run `uv run tb learn --check`; if anything's pending, ask *"fold
+today's N picks into your voice?"* and fold **only on yes** (`uv run tb learn` → updates
+`profiles/voice.json`). The fold is deliberately conservative (replace-in-place, add only if
+genuinely new, nothing if the batch reveals nothing) and never touches the voice signature or
+identity — so the voice never bloats or drifts. This is the `/timbre-learn` flow.
 
 ## Library + posting
 

@@ -1,13 +1,13 @@
 """Learning signals are logged token-free, then folded in one batch — picks and edits alike."""
 
 from engine import signals
-from engine.blocks.intake import ContentIdea, Intake, Voice
+from engine.blocks.persona import VoiceProfile
 from engine.learn import build_learn_prompt, learn
 from engine.providers.stub import StubProvider
 
 
-def _intake() -> Intake:
-    return Intake(name="Tester", idea=ContentIdea(topic="t"), voice=Voice(emojis="sparingly"))
+def _voice() -> VoiceProfile:
+    return VoiceProfile(signature="dry", punctuation="emojis sparingly")
 
 
 def test_record_pending_and_mark_processed(tmp_path):
@@ -32,11 +32,11 @@ def test_cap_keeps_only_recent(tmp_path):
 
 def test_batch_prompt_includes_picks_and_edits():
     prompt = build_learn_prompt(
-        [{"kind": "pick", "chosen_opening": "A", "why": "punchier"}], _intake()
+        [{"kind": "pick", "chosen_opening": "A", "why": "punchier"}], _voice()
     )
     assert "punchier" in prompt and "SIGNALS" in prompt
 
 
 def test_empty_batch_is_a_noop():
-    applied, skipped = learn([], _intake(), StubProvider())
+    applied, skipped = learn([], _voice(), StubProvider())
     assert applied == [] and skipped == []

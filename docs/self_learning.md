@@ -18,32 +18,29 @@ and only **adds** a line when it's genuinely new information not already covered
 edits refine existing fields; they never grow the file. If an edit reveals nothing about
 voice or identity (just a content tweak), the loop does nothing.
 
-## What it updates: the source, not the generated files
-`profiles/voice.json` and `profile.md` are generated from `data/intake.json`, so the loop
-updates the **source** (`data/intake.json`) — that's what persists. Only the persistent
-fields:
-- **Voice** — `look`, `sentence_length`, `emojis`, `notes` (replace); `tone_words`, `banned`,
-  `signatures` (add-if-new).
-- **Profile** — `typed.identity`, `known_for`, `background`, `beliefs`, `lessons` (replace).
-- Per-post fields (the idea) are never touched — they aren't "you."
+## What it updates: voice.json, in place
+The loop folds signals straight into **`profiles/voice.json`** — the profile your drafts obey
+and you edit by hand — so a learned change reaches the next draft immediately, with no
+re-onboarding. Only these fields are learnable:
+- **Replace in place:** `vocabulary`, `sentence_style`, `punctuation`, `humor`, `structure`, `notes`.
+- **Add only if new (de-duplicated):** `favorite_phrases`, `banned`, `signatures`, `never_do`.
+- The voice **signature** and your **identity** are never auto-rewritten; per-post content is never touched.
 
 ## How it runs
 - `tb pick --option <0|1> [--why "..."]` — saves the post and logs the choice (no AI).
-- `tb learn` — folds the pending batch (picks + edits) into `data/intake.json`. Add an edit to
+- `tb learn --check` — report pending signals without folding (powers the consent prompt).
+- `tb learn` — fold the pending batch (picks + edits) into `profiles/voice.json`. Add an edit to
   the batch with `tb learn --edited <your-edited-post>` (original defaults to the last saved post).
 
 When `tb learn` runs:
-1. The engine shows the model the batch of signals and your current voice/profile fields.
+1. The engine shows the model the batch of signals and your current voice fields.
 2. The model proposes conservative updates: prefer **set** (replace), **add** only if genuinely
-   new, return nothing if the batch reveals nothing about voice or identity.
-3. The engine applies them to `data/intake.json` and prints exactly what changed, so you can
-   see it stayed tight.
-4. Run `tb onboard` to refresh voice/profile from the updated source (a hand-edited
-   `voice.json` otherwise stays put — `tb post` never clobbers it).
+   new, return nothing if the batch reveals nothing about voice.
+3. The engine applies them to `profiles/voice.json` in place and prints exactly what changed, so
+   you can see it stayed tight. The next `tb post` uses it — no re-onboarding needed.
 
-A real run: a pick ("open on the admission, not the how-to") taught `voice.notes` *"Opens on
-admissions or failures, not how-tos"* and added the tone word *"self-aware"*; an edit that
-cut an emoji added it to `voice.banned`.
+A real run: a pick ("open on the admission, not the how-to") set `structure` to *"opens on an
+admission, not a how-to"*; an edit that cut an emoji added it to `banned`.
 
 ## Guards against clutter
 - A whitelist of learnable fields — the loop can't touch anything else.

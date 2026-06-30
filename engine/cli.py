@@ -500,9 +500,12 @@ def cmd_publish(args):
 
 
 def cmd_learn(args):
-    """Self-learning loop: fold your recent picks + edits into a tighter profile, in place."""
-    path = Path(args.intake) if args.intake else (DATA_DIR / "intake.json")
-    intake = _intake(args)
+    """End-of-session learning: fold your recent picks + edits into voice.json, in place and
+    conservatively. Picks are always logged for free (`tb pick`); this is the only AI call, batched."""
+    if args.check:  # report pending count without folding — for the end-of-session consent prompt
+        n = len(pending_signals())
+        print(json.dumps({"pending": n}) if args.json else f"{n} pending signal(s) to fold")
+        return
     # An explicit --edited records an edit signal first, so it joins the pending batch.
     if args.edited:
         if not Path(args.edited).exists():
@@ -522,31 +525,41 @@ def cmd_learn(args):
             {"original": original, "edited": Path(args.edited).read_text(encoding="utf-8")},
         )
 
+    vp = load_voice()
+    if vp is None:
+        msg = "no voice profile yet — run `tb onboard` first"
+        print(json.dumps({"error": msg}) if args.json else msg)
+        return
     batch = pending_signals()
     if not batch:
         msg = "Nothing pending — pick a post or pass --edited <file>, then run `tb learn`."
         print(json.dumps({"applied": [], "skipped": [], "folded": 0}) if args.json else msg)
         return
-    applied, skipped = learn(batch, intake, _provider(args))
+    applied, skipped = learn(batch, vp, _provider(args))
     if applied:
-        path.write_text(intake.model_dump_json(indent=2) + "\n", encoding="utf-8")
+        VOICE_PATH.write_text(vp.model_dump_json(indent=2) + "\n", encoding="utf-8")
     mark_processed()
     if args.json:
         print(
             json.dumps(
-                {"applied": applied, "skipped": skipped, "folded": len(batch), "intake": str(path)},
+                {
+                    "applied": applied,
+                    "skipped": skipped,
+                    "folded": len(batch),
+                    "voice": str(VOICE_PATH),
+                },
                 indent=2,
             )
         )
         return
-    print(f"Folded {len(batch)} signal(s) — picks + edits — into your profile.")
+    print(f"Folded {len(batch)} signal(s) — picks + edits — into your voice.")
     if applied:
-        print("Learned (profile updated in place, no bloat):")
+        print("Learned (voice.json updated in place, no bloat):")
         for a in applied:
             print(f"  - {a}")
-        print(f"\nWrote {path}. The next `tb post` will use it.")
+        print(f"\nWrote {VOICE_PATH}. The next `tb post` will use it.")
     else:
-        print("No new voice/identity signal in this batch. Profile unchanged.")
+        print("No new voice signal in this batch. Voice unchanged.")
     if skipped:
         print(f"(skipped: {'; '.join(skipped)})")
 
@@ -627,6 +640,11 @@ def main(argv=None):
     )
     parsers["learn"].add_argument(
         "--original", default=None, help="the engine's draft (default: last saved post)"
+    )
+    parsers["learn"].add_argument(
+        "--check",
+        action="store_true",
+        help="report pending signals without folding (consent prompt)",
     )
     parsers["revise"].add_argument(
         "--command", required=True, help="what to change, in plain words"
