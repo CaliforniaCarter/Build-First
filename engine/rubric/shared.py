@@ -1,8 +1,8 @@
 """The shared rubric: the same grading sheet the eval and the council both use.
 
-Framing borrowed from Tenex's 5-stage eval framework: must-contain (the hard
-gates) + must-not-contain (the slop list) + an LLM-as-judge rubric calibrated to
-one human (Carter corrects the scores each morning, which tunes the weights).
+A 5-stage eval: must-contain (the hard gates) + must-not-contain (the slop list) +
+an LLM-as-judge rubric calibrated to one person — you correct the scores, which tunes
+the weights over time.
 """
 
 from __future__ import annotations

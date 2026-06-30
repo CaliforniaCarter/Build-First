@@ -61,8 +61,8 @@ above the easy-question answers.
 
 Two ways to fill `writing_samples`:
 - **Paste path (works now):** `tb sample --text "<a post you wrote>"` (or `--file <path>`),
-  de-duplicated, then `tb onboard` refolds the voice. The UI does the same write on paste.
-- **Cowork browser flow:** in Cowork (or Claude Code with a browser tool), open the user's
+  de-duplicated, then `tb onboard` refolds the voice. The plugin does the same write on paste.
+- **Browser flow:** in Claude Code with a browser tool, open the user's
   *already-logged-in* LinkedIn/X profile, read their last several posts, and call
   `tb sample --text "…"` for each. This needs the human's own session — Timbre never logs in or
   stores credentials, and never auto-posts. Until a browser is wired, this stays a manual paste

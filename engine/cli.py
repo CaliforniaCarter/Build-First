@@ -20,7 +20,6 @@ from .blocks.intake import load_intake
 from .blocks.persona import VOICE_PATH, build_voice, load_voice, render_voice
 from .blocks.proof import check_text, load_proof_config
 from .blocks.probe import unfilled_gaps
-from .blocks.profile import write_profile_docs
 from .config import DATA_DIR, POSTS_DIR, PROFILES_DIR, RUNS_DIR
 from .learn import learn
 from .onboarding import load_onboarding, onboarding_summary
@@ -53,22 +52,20 @@ def _intake(args):
 
 
 def _onboard(intake, provider, force_persona=False):
-    paths = write_profile_docs(intake)
-    persona_md = build_voice(intake, provider, force=force_persona)
-    return paths, persona_md
+    return build_voice(intake, provider, force=force_persona)
 
 
 def cmd_onboard(args):
     intake = _intake(args)
-    paths, _ = _onboard(intake, _provider(args), force_persona=True)
-    print(f"wrote {paths['profile']} and {paths['context']} and {VOICE_PATH}")
+    _onboard(intake, _provider(args), force_persona=True)
+    print(f"wrote your voice profile to {VOICE_PATH}")
 
 
 def cmd_ablate(args):
     """Timbre Labs: add context one tier at a time and watch the score move."""
     intake = _intake(args)
     provider = _provider(args)
-    _, persona_md = _onboard(intake, provider)
+    persona_md = _onboard(intake, provider)
     results = run_ablation(intake, persona_md, provider, args.run_id)
     for r in results:
         print(f"{r.level} {r.label:12s} {r.score.headline()}")
@@ -78,7 +75,7 @@ def cmd_report(args):
     """Timbre Labs: full ablation report — each level's post, score, and diff."""
     intake = _intake(args)
     provider = _provider(args)
-    _, persona_md = _onboard(intake, provider)
+    persona_md = _onboard(intake, provider)
     results = run_ablation(intake, persona_md, provider, args.run_id)
     report = RunReport(
         run_id=args.run_id,
@@ -96,7 +93,7 @@ def cmd_labs(args):
     """Timbre Labs: the full eval scale + how your change moved it. Not user-facing."""
     intake = _intake(args)
     provider = _provider(args)
-    _, persona_md = _onboard(intake, provider)
+    persona_md = _onboard(intake, provider)
     s = make_post(intake, persona_md, provider, args.run_id).score
     posts = list_posts()
     baseline = posts[-1]["score"]["quality"] if posts else None
@@ -134,7 +131,7 @@ def cmd_labs(args):
 def cmd_run(args):
     intake = _intake(args)
     provider = _provider(args)
-    _, persona_md = _onboard(intake, provider)
+    persona_md = _onboard(intake, provider)
     results = run_ablation(intake, persona_md, provider, args.run_id)
     report = RunReport(
         run_id=args.run_id,
@@ -210,7 +207,7 @@ def cmd_post(args):
     """The product: draft TWO options in different shapes, score both, hand them to you to pick."""
     intake = _intake(args)
     provider = _provider(args)
-    _, persona_md = _onboard(intake, provider)
+    persona_md = _onboard(intake, provider)
     options = make_options(
         intake, persona_md, provider, args.run_id, recent_openings=recent_post_openings()
     )
@@ -288,7 +285,7 @@ def cmd_revise(args):
     """Revise the current post by your command, re-score, and save. The LLM does the rewrite."""
     intake = _intake(args)
     provider = _provider(args)
-    _, persona_md = _onboard(intake, provider)
+    persona_md = _onboard(intake, provider)
     layers = load_layers()
     if args.post and not Path(args.post).exists():
         print(f"no such file: {args.post}", file=sys.stderr)
@@ -428,15 +425,8 @@ def cmd_takes(args):
 
 
 def cmd_inspect(args):
-    """Show exactly what Timbre knows about you + what it sends to the LLM. Nothing hidden."""
+    """Show exactly what Timbre knows + what it sends to the LLM. Nothing hidden."""
     intake = _intake(args)
-
-    def _read(name):
-        p = PROFILES_DIR / name
-        return p.read_text(encoding="utf-8") if p.exists() else "(run `tb onboard` first)"
-
-    profile_md = _read("profile.md")
-    context_md = _read("context.md")
     vp = load_voice()
     persona_md = render_voice(vp) if vp else "(run `tb onboard` first)"
     layers = load_layers()
@@ -453,19 +443,16 @@ def cmd_inspect(args):
         print(
             json.dumps(
                 {
-                    "profile_md": profile_md,
-                    "context_md": context_md,
-                    "persona_md": persona_md,
+                    "context": ctx,  # what Timbre knows, built from data/intake.json
+                    "voice": persona_md,
                     "draft_prompt": prompt,  # the exact text sent to the LLM
                 },
                 indent=2,
             )
         )
         return
-    print("=== WHO YOU ARE (profile.md) ===")
-    print(profile_md)
-    print("\n=== TODAY'S CONTEXT (context.md) ===")
-    print(context_md)
+    print("=== WHAT TIMBRE KNOWS (from data/intake.json) ===")
+    print(ctx)
     print("\n=== YOUR VOICE (voice.json, rendered) ===")
     print(persona_md)
     print("\n=== THE EXACT PROMPT SENT TO THE LLM ===")

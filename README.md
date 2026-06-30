@@ -39,16 +39,14 @@ interface (Claude Code or your own) presents it and owns the conversation.
 
 ## Run it two ways
 
-Standalone CLI + your own key · or a **Claude Code plugin** (`plugin/`). See
-[`docs/deploy.md`](docs/deploy.md).
+Standalone CLI with your own key, or a **Claude Code plugin** (`plugin/`) where the chat is the
+interface — no API key needed.
 
 ## Docs
 
-- [`docs/deploy.md`](docs/deploy.md) — the deploy routes.
-- [`docs/ui_contract.md`](docs/ui_contract.md) — how a UI drives the engine (commands ↔ JSON).
+- [`docs/ui_contract.md`](docs/ui_contract.md) — how the plugin drives the engine (commands ↔ JSON).
 - [`docs/self_learning.md`](docs/self_learning.md) — the picks + edits learning loop.
 - [`docs/storage.md`](docs/storage.md) — the local file layout.
-- [`docs/talk_track.md`](docs/talk_track.md) — the demo narrative.
 
 `tb labs` is the builder's bench — an ablation harness that shows what each input is worth.
 Drafts only. You decide what ships.

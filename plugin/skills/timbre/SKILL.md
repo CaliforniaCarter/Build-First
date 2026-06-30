@@ -25,8 +25,8 @@ then speak in plain language.
 Don't make them fill a form — run the `/timbre-onboard` flow. Read `engine/onboarding.json` and
 ask its questions one at a time, in order, with a light progress bar and a human reaction
 between answers (full details in `commands/timbre-onboard.md`). Store answers in
-`data/intake.json` at each question's `writes_to` path (the audience is hardcoded for Tenex in
-the config and feeds drafts automatically). Then run `uv run tb onboard --json` — the only AI
+`data/intake.json` at each question's `writes_to` path (the audience is set in the config and
+feeds drafts automatically). Then run `uv run tb onboard --json` — the only AI
 step; it writes `profiles/voice.json`.
 Show a SHORT reveal of how you'll match their voice, and point them to `/timbre-voice` (or
 editing `profiles/voice.json`) — that edit IS the confirmation.

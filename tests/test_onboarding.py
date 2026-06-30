@@ -27,7 +27,7 @@ def test_ab_pick_questions_carry_two_real_examples():
 def test_audience_renders_to_the_draft_layer():
     cfg = load_onboarding()
     prose = render_audience(cfg.defaults.audience)
-    # the editable JSON audience drives drafts as prose (replaces audience_tenex.md)
+    # the editable JSON audience drives drafts as prose (rendered to the draft layer)
     assert "Audience layer" in prose
     assert cfg.defaults.audience.writing_for.split()[0] in prose  # the 'who' makes it in
     assert "anatomy" in prose.lower()  # the playbook moves make it in

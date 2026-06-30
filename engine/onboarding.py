@@ -36,7 +36,7 @@ class Question(BaseModel):
 
 
 class AudienceDefault(BaseModel):
-    """The hardcoded audience (Tenex for V1). Editable JSON; rendered to the draft layer."""
+    """The hardcoded audience — who you're writing for. Editable JSON; rendered to the draft layer."""
 
     writing_for: str = ""
     goal: str = ""

@@ -26,7 +26,7 @@ own extraction. Step 4 never invents an answer; a blank stays blank on purpose.
 ## The conversation is the LLM's job, not the engine's
 
 The engine returns structured data (the post + the eval). It does **not** print menus or
-canned feedback. When the LLM (Claude Code / Cowork, or your UI's model) drives the engine, it:
+canned feedback. When the LLM (Claude Code, or your UI's model) drives the engine, it:
 - presents the post in its own voice;
 - reads the structured eval (`evaluation.dimensions` + their reasons) and, if something is
   weak, says so in plain language — never the dimension names or the 0–10 scale;

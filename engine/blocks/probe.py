@@ -5,7 +5,7 @@ only-you take (the same four the rubric's hard gates check). This finds which ar
 missing from the idea and returns one fixed question per gap. The engine never
 invents the answer — you provide it, or you leave it blank on purpose.
 
-Thin by design: fixed questions, not an adaptive interview. The UI asks them and
+Thin by design: fixed questions, not an adaptive interview. The plugin asks them and
 writes the answers back into the idea (intake.idea.<key>).
 """
 

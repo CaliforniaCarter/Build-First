@@ -3,9 +3,9 @@
 
   "defaults": {
     "audience": {
-      "writing_for": "operators and execs going AI-native — the people the Tenex team writes for",
-      "goal": "leave them inspired and curious about how I could add value — without selling",
-      "play_to": "warm, lowercase, plain, hands-on; ships working software, allergic to AI-slop",
+      "writing_for": "operators, founders, and technical leaders taking their companies AI-native — pragmatic builders, post-hype, who care how AI actually gets adopted",
+      "goal": "leave them thinking 'I want this person building with us' — inspired and curious about the how, never sold to",
+      "play_to": "people who ship real things and can smell BS; lead with proof and the workflow, not the wow; allergic to AI-slop and buzzwords",
       "tone_refs": ["Alex Lieberman", "Arman Hezarkhani", "Brett Franklin"],
       "adapt_note": "These are reference moves, not a voice to imitate. If the draft starts sounding like Alex, that's the clone trap — he's allergic to AI-slop and spots imitation instantly. Run the move in your own register. The persona always wins. Never feed another person's posts in as voice samples.",
       "anatomy": [

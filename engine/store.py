@@ -88,8 +88,6 @@ def clear_local_data(profiles: Path, data: Path, posts: Path, runs: Path) -> lis
     removed: list[str] = []
     for p in (
         profiles / "voice.json",
-        profiles / "profile.md",
-        profiles / "context.md",
         data / "intake.json",
         data / "signals.json",
     ):
