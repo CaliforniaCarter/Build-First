@@ -5,7 +5,14 @@ import json
 from engine.blocks.intake import ContentIdea, Intake
 from engine.post import PostResult
 from engine.rubric.schemas import DIM_NAMES, GATE_NAMES, Score
-from engine.store import list_posts, posting_streak, save_post, set_status, shipped_count
+from engine.store import (
+    clear_local_data,
+    list_posts,
+    posting_streak,
+    save_post,
+    set_status,
+    shipped_count,
+)
 
 
 def _score() -> Score:
@@ -73,3 +80,26 @@ def test_shipped_count_and_streak_are_derived(tmp_path):
     assert shipped_count(posts) == 2
     assert posting_streak(posts) == 2  # 06-29 and 06-30 are consecutive posted days
     assert posting_streak([]) == 0
+
+
+def test_clear_local_data_resets_to_cold_start(tmp_path):
+    prof, data, posts, runs = (tmp_path / n for n in ("profiles", "data", "posts", "runs"))
+    for d in (prof, data, posts, runs):
+        d.mkdir()
+    (prof / "voice.json").write_text("{}")
+    (prof / ".gitkeep").write_text("")
+    (data / "intake.json").write_text("{}")
+    (data / "signals.json").write_text("[]")
+    (posts / "my-post").mkdir()
+    (posts / "my-post" / "final.md").write_text("hi")
+    (posts / ".gitkeep").write_text("")
+    (runs / "r1").mkdir()
+
+    removed = clear_local_data(prof, data, posts, runs)
+
+    assert not (prof / "voice.json").exists()
+    assert not (data / "intake.json").exists()
+    assert not (posts / "my-post").exists()
+    assert not (runs / "r1").exists()
+    assert (prof / ".gitkeep").exists() and (posts / ".gitkeep").exists()  # .gitkeep kept
+    assert "voice.json" in removed and "posts/my-post" in removed

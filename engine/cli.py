@@ -21,7 +21,7 @@ from .blocks.persona import VOICE_PATH, build_voice, load_voice, render_voice
 from .blocks.proof import check_text, load_proof_config
 from .blocks.probe import unfilled_gaps
 from .blocks.profile import write_profile_docs
-from .config import DATA_DIR, PROFILES_DIR, RUNS_DIR
+from .config import DATA_DIR, POSTS_DIR, PROFILES_DIR, RUNS_DIR
 from .learn import learn
 from .onboarding import load_onboarding, onboarding_summary
 from .post import ALL_INPUTS, PostResult, evaluate, make_options, make_post, polish
@@ -32,6 +32,7 @@ from .revise import revise
 from .rubric.schemas import DIM_NAMES, GATE_NAMES
 from .signals import mark_processed, pending_signals, record_signal
 from .store import (
+    clear_local_data,
     latest_final,
     list_posts,
     posting_streak,
@@ -578,6 +579,22 @@ def cmd_learn(args):
         print(f"(skipped: {'; '.join(skipped)})")
 
 
+def cmd_reset(args):
+    """Clear your local data (voice, profile, answers, posts, signals, runs) for a fresh cold
+    start. Configs (onboarding/proof/rubric/labs) and the synthetic sample are kept."""
+    removed = clear_local_data(PROFILES_DIR, DATA_DIR, POSTS_DIR, RUNS_DIR)
+    if args.json:
+        print(json.dumps({"reset": True, "removed": removed}, indent=2))
+        return
+    if not removed:
+        print("Already a cold start — nothing to clear.")
+        return
+    print(f"Reset to a cold start — cleared {len(removed)} item(s):")
+    for r in removed:
+        print(f"  - {r}")
+    print("\nRun `tb onboard` (or /timbre-onboard) to start fresh.")
+
+
 def cmd_doctor(args):
     intake = _intake(args)
     print(f"intake ok: {intake.name}, topic={intake.idea.topic[:60]!r}")
@@ -645,6 +662,7 @@ def main(argv=None):
         ("publish", cmd_publish),
         ("learn", cmd_learn),
         ("onboard", cmd_onboard),
+        ("reset", cmd_reset),
         ("ablate", cmd_ablate),
         ("report", cmd_report),
         ("labs", cmd_labs),

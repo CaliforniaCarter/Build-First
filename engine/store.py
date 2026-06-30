@@ -10,6 +10,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import re
+import shutil
 from pathlib import Path
 
 from .blocks.intake import Intake
@@ -78,6 +79,32 @@ def list_posts(base: Path = POSTS_DIR) -> list[dict]:
             data.setdefault("slug", d.name)  # tolerate posts saved before slug existed
             out.append(data)
     return out
+
+
+def clear_local_data(profiles: Path, data: Path, posts: Path, runs: Path) -> list[str]:
+    """Delete generated personal data — voice, profile docs, answers, signals, posts, runs —
+    for a fresh cold start. Keeps `.gitkeep` files and the committed configs/samples. Returns
+    the names of what was cleared."""
+    removed: list[str] = []
+    for p in (
+        profiles / "voice.json",
+        profiles / "profile.md",
+        profiles / "context.md",
+        data / "intake.json",
+        data / "signals.json",
+    ):
+        if p.exists():
+            p.unlink()
+            removed.append(p.name)
+    for d in (posts, runs):
+        if not d.exists():
+            continue
+        for child in sorted(d.iterdir()):
+            if child.name == ".gitkeep":
+                continue
+            shutil.rmtree(child) if child.is_dir() else child.unlink()
+            removed.append(f"{d.name}/{child.name}")
+    return removed
 
 
 def shipped_count(posts: list[dict]) -> int:
