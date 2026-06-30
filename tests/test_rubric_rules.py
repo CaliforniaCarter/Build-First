@@ -5,7 +5,9 @@ from engine.rubric.shared import find_slop, parse_score
 
 
 def test_find_slop_detects_banned():
-    hits = find_slop("We're thrilled to announce a game-changer that will leverage and supercharge it")
+    hits = find_slop(
+        "We're thrilled to announce a game-changer that will leverage and supercharge it"
+    )
     assert "leverage" in hits and "game-changer" in hits
 
 
