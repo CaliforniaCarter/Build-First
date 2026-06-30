@@ -23,7 +23,9 @@ def build_persona_prompt(intake: Intake) -> str:
     return (
         "Extract this person's writing VOICE from the material below. Read HOW they "
         "write, not what they say. Do NOT invent traits that aren't in evidence. Tag each "
-        "trait with a confidence label: HARD RULE / STRONG TENDENCY / LIGHT PREFERENCE.\n\n"
+        "trait with a confidence label: HARD RULE / STRONG TENDENCY / LIGHT PREFERENCE.\n"
+        "Write the profile in the SECOND PERSON ('you open on...', 'your sentences...') and stay "
+        "gender-neutral — never use he/she/him/her or assume a gender.\n\n"
         f"REAL WRITING SAMPLES (their actual work — the strongest signal; weight this most):\n{samples}\n\n"
         f"RAW ANSWERS (unpolished, may be voice-to-text):\n{answers}\n\n"
         f"Tone words they picked: {', '.join(v.tone_words) or '—'}\n"
