@@ -293,6 +293,30 @@ def cmd_persona(args):
         print(text)
 
 
+def cmd_sample(args):
+    """Add a writing sample (an existing post/essay) to your voice corpus — the strongest signal."""
+    path = Path(args.intake) if args.intake else (DATA_DIR / "intake.json")
+    intake = _intake(args)
+    text = args.text
+    if args.file:
+        if not Path(args.file).exists():
+            print(f"no such file: {args.file}", file=sys.stderr)
+            return
+        text = Path(args.file).read_text(encoding="utf-8")
+    text = (text or "").strip()
+    if not text:
+        print('nothing to add — pass --text "..." or --file <path>', file=sys.stderr)
+        return
+    if text in intake.voice.writing_samples:
+        print("already have that sample.")
+        return
+    intake.voice.writing_samples.append(text)
+    path.write_text(intake.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    n = len(intake.voice.writing_samples)
+    msg = f"Added a writing sample ({n} now). Run `tb onboard` to refold your voice."
+    print(json.dumps({"samples": n, "intake": str(path)}) if args.json else msg)
+
+
 def cmd_inspect(args):
     """Show exactly what Timbre knows about you + what it sends to the LLM. Nothing hidden."""
     intake = _intake(args)
@@ -465,6 +489,7 @@ def main(argv=None):
         ("revise", cmd_revise),
         ("gaps", cmd_gaps),
         ("persona", cmd_persona),
+        ("sample", cmd_sample),
         ("inspect", cmd_inspect),
         ("posts", cmd_posts),
         ("publish", cmd_publish),
@@ -497,6 +522,8 @@ def main(argv=None):
     parsers["pick"].add_argument(
         "--why", default=None, help="why you picked it (optional; feeds learning)"
     )
+    parsers["sample"].add_argument("--text", default=None, help="a post/essay you wrote, inline")
+    parsers["sample"].add_argument("--file", default=None, help="a file with your writing")
 
     args = parser.parse_args(argv)
     try:

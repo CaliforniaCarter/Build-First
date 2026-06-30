@@ -57,5 +57,13 @@ tokens on every interaction:
 
 `online.linkedin` / `online.x` set cold vs warm start. If the user has existing posts, those are
 the best voice corpus — they go into `voice.writing_samples`, which the persona extraction weights
-above the easy-question answers. Fetching them from a live profile is an agent/Cowork browser task
-(it writes into `writing_samples`), not engine code — see the note in chat.
+above the easy-question answers.
+
+Two ways to fill `writing_samples`:
+- **Paste path (works now):** `tb sample --text "<a post you wrote>"` (or `--file <path>`),
+  de-duplicated, then `tb onboard` refolds the voice. The UI does the same write on paste.
+- **Cowork browser flow:** in Cowork (or Claude Code with a browser tool), open the user's
+  *already-logged-in* LinkedIn/X profile, read their last several posts, and call
+  `tb sample --text "…"` for each. This needs the human's own session — Timbre never logs in or
+  stores credentials, and never auto-posts. The API's `/online/scan` is the same idea behind an
+  endpoint; until a browser is wired it returns `pending` honestly rather than faking a count.
