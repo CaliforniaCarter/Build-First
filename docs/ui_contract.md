@@ -16,8 +16,8 @@ Every command accepts `--provider {terminal,anthropic,stub}`, `--intake <path>`,
 | 2. Onboard | — | `tb onboard` | writes `profiles/{profile,context,persona}.md` |
 | 3. "That's me?" | Show persona, let the user edit + save | `tb persona --json` | reads/writes `profiles/persona.md` |
 | 4. Gap probe | Ask each unfilled question, write answers into the idea | `tb gaps --json` | writes `data/intake.json` (`idea.<key>`) |
-| 5. Make post | — | `tb post --json` | writes `posts/<slug>/`, clipboard |
-| 6. Approve | Show final, let the user edit/approve | — | reads `posts/<slug>/final.md` |
+| 5. Make post | show the 2 options, user picks one | `tb post --json`, then `tb pick --option <n>` | writes `posts/<slug>/`, clipboard |
+| 6. Approve / publish | show final, edit, mark posted | `tb publish <slug>` | reads/writes `posts/<slug>/` |
 | 7. Library | List past posts | `tb posts --json` | reads `posts/` |
 
 Editing `persona.md` (step 3) **is** the confirmation — the engine never over-trusts its
