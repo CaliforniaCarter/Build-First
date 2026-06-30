@@ -17,7 +17,7 @@ dependencies = [
 api = ["anthropic>=0.40"]
 
 [project.scripts]
-bf = "engine.cli:main"
+tb = "engine.cli:main"
 
 [build-system]
 requires = ["hatchling"]

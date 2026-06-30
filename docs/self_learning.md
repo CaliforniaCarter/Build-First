@@ -21,14 +21,14 @@ fields:
 - Per-post fields (the idea) are never touched — they aren't "you."
 
 ## How it runs
-`bf learn --edited <your-edited-post>` (original defaults to the last saved post):
+`tb learn --edited <your-edited-post>` (original defaults to the last saved post):
 1. The engine shows the model the draft, your edited version, and your current voice/profile
    fields.
 2. The model proposes conservative field updates: prefer **set** (replace), **add** only if
    genuinely new, return nothing if the edit is just content.
 3. The engine applies them to `data/intake.json` and prints exactly what changed, so you can
    see it stayed tight.
-4. The next `bf post` regenerates persona/profile from the richer source.
+4. The next `tb post` regenerates persona/profile from the richer source.
 
 ## Guards against clutter
 - A whitelist of learnable fields — the loop can't touch anything else.

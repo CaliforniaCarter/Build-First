@@ -2,7 +2,7 @@
 
 `posts/<date>-<slug>/` holds `final.md` (the post) and `post.json` (its metadata).
 No database, no cloud, no account (V1 spec: local-first). The UI lists posts via
-`list_posts()` or `bf posts --json`.
+`list_posts()` or `tb posts --json`.
 """
 
 from __future__ import annotations

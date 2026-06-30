@@ -2,7 +2,7 @@
 
 This is NOT a model. It returns fixed, schema-valid outputs so the whole pipeline
 runs end to end with zero manual steps and no network — enough to prove the spine
-works (`bf run --provider stub`). For a real draft use `--provider anthropic`; to
+works (`tb run --provider stub`). For a real draft use `--provider anthropic`; to
 drive the model by hand step by step use `--provider terminal`.
 
 Scores rise a little per level so the smoke report shows movement, but the content

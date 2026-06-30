@@ -156,7 +156,7 @@ def cmd_persona(args):
     """Show the extracted voice profile (the 'that's me?' artifact). Edit the file to confirm."""
     path = PROFILES_DIR / "persona.md"
     if not path.exists():
-        msg = "no persona yet — run `bf onboard` first"
+        msg = "no persona yet — run `tb onboard` first"
         print(json.dumps({"error": msg}) if args.json else msg)
         return
     text = path.read_text(encoding="utf-8")
@@ -173,7 +173,7 @@ def cmd_posts(args):
         print(json.dumps(posts, indent=2))
         return
     if not posts:
-        print("No saved posts yet. Run `bf post` to make one.")
+        print("No saved posts yet. Run `tb post` to make one.")
         return
     for p in posts:
         s = p["score"]
@@ -189,7 +189,7 @@ def cmd_learn(args):
     edited = Path(args.edited).read_text(encoding="utf-8")
     original = Path(args.original).read_text(encoding="utf-8") if args.original else latest_final()
     if not original:
-        print("no original draft — pass --original <file> or run `bf post` first", file=sys.stderr)
+        print("no original draft — pass --original <file> or run `tb post` first", file=sys.stderr)
         return
     applied, skipped = learn(original, edited, intake, _provider(args))
     if applied:
@@ -201,7 +201,7 @@ def cmd_learn(args):
         print("Learned (profile updated in place, no bloat):")
         for a in applied:
             print(f"  - {a}")
-        print(f"\nWrote {path}. The next `bf post` will use it.")
+        print(f"\nWrote {path}. The next `tb post` will use it.")
     else:
         print("Nothing to learn from this edit — no new voice/identity signal. Profile unchanged.")
     if skipped:
@@ -238,7 +238,7 @@ def main(argv=None):
         "--json", action="store_true", help="emit machine-readable JSON (for the UI)"
     )
 
-    parser = argparse.ArgumentParser(prog="bf", description="Brand Voice Content Engine")
+    parser = argparse.ArgumentParser(prog="tb", description="Brand Voice Content Engine")
     sub = parser.add_subparsers(dest="cmd", required=True)
     parsers = {}
     for name, fn in (
