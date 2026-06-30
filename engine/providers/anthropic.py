@@ -1,7 +1,10 @@
-"""Anthropic provider — DORMANT. The overnight build does not use this.
+"""Anthropic provider — the real-API path (model-agnostic via BF_MODEL).
 
-Enable the re-eval path with:  uv pip install -e '.[api]'  and  ANTHROPIC_API_KEY.
-Kept deliberately thin: it is the drop-in that lets the same evals re-run with a key.
+This is a first-class provider: `--provider anthropic` drafts, councils, scores, and learns
+against the live API. Enable it with `uv pip install -e '.[api]'` and `ANTHROPIC_API_KEY`
+(BF_MODEL picks the model; defaults to a current Claude). Kept thin on purpose — the prompts
+are already terse, so there is little repeated bulk to cache; most tokens go to real work, and
+picks/edits are logged token-free (engine/signals.py).
 """
 
 from __future__ import annotations

@@ -1,0 +1,10 @@
+{
+  "name": "timbre",
+  "displayName": "Timbre",
+  "version": "0.1.0",
+  "description": "Draft on-brand LinkedIn/X posts in your voice. Two options, real receipts, you pick — it never auto-posts and learns from every choice.",
+  "author": {
+    "name": "Carter Chasson"
+  },
+  "keywords": ["writing", "linkedin", "voice", "content", "personal-brand"]
+}
