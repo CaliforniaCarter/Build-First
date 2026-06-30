@@ -1,21 +1,53 @@
 ---
-description: Draft two on-brand post options to pick from (Timbre)
-argument-hint: "[what you want to post about]"
+description: Turn real work into two post options, pick one, polish it (Timbre)
+argument-hint: "[what you did — or a commit/file/notes to read]"
 allowed-tools: Bash Read Write Edit
 ---
 
-Draft a post with Timbre about: **$ARGUMENTS**
+Draft a post from the user's real work: **$ARGUMENTS**
 
-Follow the `timbre` skill flow:
-1. If `data/intake.json`/`profiles/voice.json` are missing, onboard first (run the
-   `/timbre-onboard` conversation, don't dump a form).
-2. Write the topic into `data/intake.json` at `idea.topic` if it isn't already there, and run
-   `uv run tb gaps --json` — ask the user any gap questions in plain words; never invent answers.
-3. Run `uv run tb post --provider anthropic --json` and present **both** options in full.
-   Read each `evaluation` privately; surface weak spots as plain guidance, never as scores.
-4. Ask which one feels more like them, and why.
-5. Run `uv run tb pick --option <0|1> --why "<reason>" --provider anthropic --json`, show the
-   final, and offer use-as-is / edit / let-me-help.
-6. Run `uv run tb learn --json` to fold the choice into their voice.
+Follow the `timbre` skill flow. Never invent facts; never auto-post — the human is the gate.
 
-Never auto-post. The human is the gate.
+1. **Onboard first if needed.** If `data/intake.json` or `profiles/voice.json` is missing, run
+   the `/timbre-onboard` conversation first.
+
+2. **Capture the work — two ways.** Either is fine:
+   - **They describe it** in plain words, or
+   - **They point you at a real artifact** — a commit (`git show <sha>`), a file, a PR, notes.
+     Read it and pull out what actually happened.
+
+   Write `idea.topic` into `data/intake.json`, and put the **real receipts** you found into
+   `idea.proof` — concrete, verifiable things only (a commit SHA + diff stat, a file path, a
+   real metric, a dated event). If you didn't see a receipt, don't write one.
+
+3. **Probe the gaps (never invent).** Run `uv run tb gaps --json`. For each gap (a real number,
+   the scene, the lesson, the only-you angle), ask the user in plain words and write the answer
+   into `idea.<key>`. A blank stays blank — the post is honestly weaker, not faked.
+
+4. **Draft two options.** Run `uv run tb post --provider anthropic --json` (drop `--provider
+   anthropic` if there's no key — you become the engine). Present them as **two stacked, labeled
+   blocks**, each with its receipts:
+
+   ```
+   ▌ POST 1
+   <the full draft, in their voice>
+   receipts: <the proof items for this option>
+
+   ▌ POST 2   (same facts, a different shape)
+   <the full draft>
+   receipts: <the proof items>
+   ```
+
+   Read each option's `evaluation` **privately**. If one is weak, say so in plain words ("the
+   second's missing a concrete number") — never show the 0–10 scores or the dimension names.
+
+5. **They pick.** Ask: **"which feels more like you — 1 or 2? (and why — optional)"** Then run
+   `uv run tb pick --option <0|1> --why "<their reason>" --provider anthropic --json`. This
+   polishes the chosen one (Writer's Council), saves it, copies it to the clipboard, and
+   **logs the choice as a token-free signal** — so every pick teaches the voice, with no AI
+   call. Show the final and offer three outs: **use it as-is**, **edit it yourself**, or
+   **let me help**. If they edit, save their version to the post's `final.md`.
+
+6. **Don't fold the voice yet.** Picks and edits accumulate as free signals; the fold into the
+   voice profile is **batched to the end of the session** and only on the user's yes (see the
+   learning loop) — so the voice never gets over-updated. Do **not** run `tb learn` here.
