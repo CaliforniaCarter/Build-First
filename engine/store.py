@@ -7,6 +7,7 @@ No database, no cloud, no account (V1 spec: local-first). The UI lists posts via
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 import re
 from pathlib import Path
@@ -77,6 +78,33 @@ def list_posts(base: Path = POSTS_DIR) -> list[dict]:
             data.setdefault("slug", d.name)  # tolerate posts saved before slug existed
             out.append(data)
     return out
+
+
+def shipped_count(posts: list[dict]) -> int:
+    """How many saved posts you actually posted. Derived from the store, so it can never drift."""
+    return sum(1 for p in posts if p.get("status") == "posted")
+
+
+def posting_streak(posts: list[dict]) -> int:
+    """Consecutive calendar days (ending at your most recent posted date) with a posted post.
+
+    A pure function of the store — recomputed every time, never a stored counter that can drift.
+    """
+    days: set[dt.date] = set()
+    for p in posts:
+        if p.get("status") == "posted":
+            stamp = p.get("updated") or p.get("created") or p.get("date") or ""
+            try:
+                days.add(dt.date.fromisoformat(stamp[:10]))
+            except ValueError:
+                pass
+    if not days:
+        return 0
+    streak, cur = 1, max(days)
+    while cur - dt.timedelta(days=1) in days:
+        streak += 1
+        cur -= dt.timedelta(days=1)
+    return streak
 
 
 def latest_final(base: Path = POSTS_DIR) -> str | None:

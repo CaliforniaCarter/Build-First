@@ -74,11 +74,13 @@ it. `tb pick --json` (and `tb revise --json`) return the single saved post:
 `score` is the overall 0–10 meter only. The full `evaluation` is for the LLM and Timbre Labs — the
 UI turns weak dimensions into plain guidance and never shows the user the scale.
 
-`tb posts --json` — the saved library
+`tb posts --json` — the saved library + the always-right tally (`shipped` + `streak` are
+derived from the store, never a stored counter)
 ```json
-[ { "date": "2026-06-29", "topic": "...", "channels": ["LinkedIn","X"],
-    "score": { "quality": 8.2, "gates_passed": 6, "gates_total": 6 },
-    "open_gates": [], "receipts": ["..."] } ]
+{ "posts": [ { "date": "2026-06-29", "topic": "...", "channels": ["LinkedIn","X"], "status": "posted",
+      "score": { "quality": 8.2, "gates_passed": 6, "gates_total": 6 },
+      "open_gates": [], "receipts": ["..."] } ],
+  "shipped": 1, "streak": 1 }
 ```
 
 ## `data/intake.json` (the input contract)

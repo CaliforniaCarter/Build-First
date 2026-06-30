@@ -63,9 +63,11 @@ identity — so the voice never bloats or drifts. This is the `/timbre-learn` fl
 
 ## Library + posting
 
-- `uv run tb posts --json` — their saved posts (status `draft` | `posted`).
-- When they tell you they actually posted one, celebrate it and run
-  `uv run tb publish <slug>` to mark it posted. Keep a light running tally ("that's 3 shipped").
+- `uv run tb posts --json` — their saved posts (`status` draft|posted), plus the **authoritative**
+  `shipped` count and `streak` (consecutive days posted). Show the library and the tally — but
+  **don't compute the count yourself**; the engine derives it from the store, so it's always right.
+- When they tell you they actually posted one, celebrate it and run `uv run tb publish <slug>` to
+  mark it posted (it returns the updated `shipped` + `streak`).
 
 ## Rules
 

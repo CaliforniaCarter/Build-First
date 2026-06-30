@@ -30,7 +30,15 @@ from .providers.base import NeedsCompletion
 from .report import RunReport, build_report, compute_places_to_refine, write_report
 from .revise import revise
 from .signals import mark_processed, pending_signals, record_signal
-from .store import latest_final, list_posts, recent_post_openings, save_post, set_status
+from .store import (
+    latest_final,
+    list_posts,
+    posting_streak,
+    recent_post_openings,
+    save_post,
+    set_status,
+    shipped_count,
+)
 from .takes import form_takes
 
 
@@ -463,17 +471,18 @@ def cmd_inspect(args):
 
 
 def cmd_posts(args):
-    """List the saved-post library. The UI reads --json."""
+    """List the saved-post library + the always-right tally (shipped + streak). UI reads --json."""
     posts = list_posts()
+    shipped, streak = shipped_count(posts), posting_streak(posts)
     if args.json:
-        print(json.dumps(posts, indent=2))
+        print(json.dumps({"posts": posts, "shipped": shipped, "streak": streak}, indent=2))
         return
     if not posts:
         print("No saved posts yet. Run `tb post` to make one.")
         return
-    shipped = sum(1 for p in posts if p.get("status") == "posted")
     plural = "s" if len(posts) != 1 else ""
-    print(f"📚 {len(posts)} post{plural} · {shipped} shipped\n")
+    streak_txt = f" · 🔥 {streak}-day streak" if streak > 1 else ""
+    print(f"📚 {len(posts)} post{plural} · {shipped} shipped{streak_txt}\n")
     for p in posts:
         when = p.get("updated") or p.get("created") or p.get("date", "")
         mark = "✅" if p.get("status") == "posted" else "📝"
@@ -486,14 +495,18 @@ def cmd_publish(args):
     if not set_status(args.slug, status):
         print(f"no such post: {args.slug}", file=sys.stderr)
         return
-    shipped = sum(1 for p in list_posts() if p.get("status") == "posted")
+    posts = list_posts()
+    shipped, streak = shipped_count(posts), posting_streak(posts)
     if args.json:
-        print(json.dumps({"slug": args.slug, "status": status, "shipped": shipped}))
+        print(
+            json.dumps({"slug": args.slug, "status": status, "shipped": shipped, "streak": streak})
+        )
         return
     if status == "posted":
         plural = "s" if shipped != 1 else ""
+        streak_txt = f" 🔥 {streak}-day streak —" if streak > 1 else ""
         print(
-            f"🎉 Shipped: {args.slug}. That's {shipped} post{plural} live — keep the streak going."
+            f"🎉 Shipped: {args.slug}. That's {shipped} post{plural} live —{streak_txt} keep going."
         )
     else:
         print(f"{args.slug} → back to draft. ({shipped} still live.)")

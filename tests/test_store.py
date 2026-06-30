@@ -5,7 +5,7 @@ import json
 from engine.blocks.intake import ContentIdea, Intake
 from engine.post import PostResult
 from engine.rubric.schemas import DIM_NAMES, GATE_NAMES, Score
-from engine.store import list_posts, save_post, set_status
+from engine.store import list_posts, posting_streak, save_post, set_status, shipped_count
 
 
 def _score() -> Score:
@@ -54,3 +54,22 @@ def test_status_defaults_draft_and_persists(tmp_path):
     meta2 = json.loads((pdir / "post.json").read_text(encoding="utf-8"))
     assert meta2["status"] == "posted"  # preserved across the update
     assert meta2["created"] == "2026-06-29" and meta2["updated"] == "2026-06-30"
+
+
+def test_shipped_count_and_streak_are_derived(tmp_path):
+    def _save(topic, date, status):
+        save_post(
+            PostResult(first_draft="d", final_draft="v", score=_score()),
+            Intake(name="T", idea=ContentIdea(topic=topic)),
+            date,
+            status=status,
+            base=tmp_path,
+        )
+
+    _save("post one", "2026-06-29", "posted")
+    _save("post two", "2026-06-30", "posted")
+    _save("post three", "2026-06-30", "draft")  # a draft doesn't count
+    posts = list_posts(base=tmp_path)
+    assert shipped_count(posts) == 2
+    assert posting_streak(posts) == 2  # 06-29 and 06-30 are consecutive posted days
+    assert posting_streak([]) == 0
