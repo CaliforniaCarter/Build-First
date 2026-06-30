@@ -23,6 +23,20 @@ Every command accepts `--provider {terminal,anthropic,stub}`, `--intake <path>`,
 Editing `persona.md` (step 3) **is** the confirmation — the engine never over-trusts its
 own extraction. Step 4 never invents an answer; a blank stays blank on purpose.
 
+## The conversation is the LLM's job, not the engine's
+
+The engine returns structured data (the post + the eval). It does **not** print menus or
+canned feedback. When the LLM (Claude Code / Cowork, or your UI's model) drives the engine, it:
+- presents the post in its own voice;
+- reads the structured eval (`evaluation.dimensions` + their reasons) and, if something is
+  weak, says so in plain language — never the dimension names or the 0–10 scale;
+- always offers an out: **use it as-is**, **edit it yourself**, or **let me help** (tell me
+  what to change, or I'll ask a couple of sharpening questions drawn from the weak spots);
+- if they want help, asks those questions, writes the answers back, and re-runs.
+
+`tb admin` is the one place the full eval scale is shown — it's for you, the builder, not the
+end user.
+
 ## JSON shapes
 
 `tb persona --json`

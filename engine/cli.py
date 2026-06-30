@@ -21,7 +21,7 @@ from .blocks.probe import unfilled_gaps
 from .blocks.profile import write_profile_docs
 from .config import DATA_DIR, PROFILES_DIR, RUNS_DIR
 from .learn import learn
-from .post import make_post, open_gaps
+from .post import make_post
 from .providers import get_provider
 from .providers.base import NeedsCompletion
 from .report import RunReport, build_report, compute_places_to_refine, write_report
@@ -76,6 +76,46 @@ def cmd_report(args):
     print(f"report -> {path}")
 
 
+def cmd_admin(args):
+    """Admin: the full eval scale + how your change moved it. Not user-facing."""
+    intake = _intake(args)
+    provider = _provider(args)
+    _onboard(intake, provider)
+    persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
+    s = make_post(intake, persona_md, provider, args.run_id).score
+    posts = list_posts()
+    baseline = posts[-1]["score"]["quality"] if posts else None
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "quality": s.quality_avg,
+                    "gates_passed": s.gates_passed,
+                    "gates_total": s.gates_total,
+                    "baseline_quality": baseline,
+                    "delta": round(s.quality_avg - baseline, 1) if baseline is not None else None,
+                    "dimensions": [
+                        {"name": d.name, "score": d.score, "reason": d.reason} for d in s.dimensions
+                    ],
+                    "gates": [
+                        {"name": g.name, "passed": g.passed, "reason": g.reason} for g in s.gates
+                    ],
+                },
+                indent=2,
+            )
+        )
+        return
+    print(f"EVAL (admin) — quality {s.quality_avg}/10, gates {s.gates_passed}/{s.gates_total}")
+    if baseline is not None:
+        print(f"vs last saved: {baseline} -> {s.quality_avg} ({s.quality_avg - baseline:+.1f})")
+    print("\nDimensions:")
+    for d in s.dimensions:
+        print(f"  {d.score:>2}/10  {d.name:22s} {d.reason}")
+    print("\nGates:")
+    for g in s.gates:
+        print(f"  {'PASS' if g.passed else 'FAIL'}  {g.name:24s} {g.reason}")
+
+
 def cmd_run(args):
     intake = _intake(args)
     provider = _provider(args)
@@ -96,7 +136,12 @@ def cmd_run(args):
 
 
 def cmd_post(args):
-    """The product: onboard, draft ONE post with every input, polish, and hand it to you."""
+    """The product: draft ONE post from every input, polish, save, and return structured output.
+
+    The engine hands back the post + the structured eval. Presenting it, suggesting
+    improvements, probing, and offering the outs (use as-is / edit / help) is the LLM's job,
+    not hardcoded here.
+    """
     intake = _intake(args)
     provider = _provider(args)
     _onboard(intake, provider)
@@ -110,12 +155,17 @@ def cmd_post(args):
             json.dumps(
                 {
                     "final": result.final_draft,
-                    "score": {
-                        "quality": result.score.quality_avg,
-                        "gates_passed": result.score.gates_passed,
-                        "gates_total": result.score.gates_total,
+                    "score": result.score.quality_avg,
+                    "evaluation": {
+                        "dimensions": [
+                            {"name": d.name, "score": d.score, "reason": d.reason}
+                            for d in result.score.dimensions
+                        ],
+                        "gates": [
+                            {"name": g.name, "passed": g.passed, "reason": g.reason}
+                            for g in result.score.gates
+                        ],
                     },
-                    "open_gates": [g.name for g in result.score.gates if not g.passed],
                     "receipts": result.proof,
                     "saved": str(saved),
                     "draft": str(out),
@@ -126,15 +176,7 @@ def cmd_post(args):
         return
 
     print(result.final_draft)
-    print(f"\n--- score: {result.score.headline()} ---")
-    gaps = open_gaps(result.score)
-    if gaps:
-        print("This post still needs (the engine won't fake these — add them, then re-run):")
-        for g in gaps:
-            print(f"  - {g}")
-    if result.proof:
-        print(f"receipts: {', '.join(result.proof)}")
-    print(f"\nSaved to {saved} · copied to clipboard · review draft: {out}")
+    print(f"\nScore: {result.score.quality_avg}/10 · saved to {saved} · copied to clipboard")
 
 
 def cmd_gaps(args):
@@ -250,6 +292,7 @@ def main(argv=None):
         ("onboard", cmd_onboard),
         ("ablate", cmd_ablate),
         ("report", cmd_report),
+        ("admin", cmd_admin),
         ("run", cmd_run),
         ("doctor", cmd_doctor),
     ):
