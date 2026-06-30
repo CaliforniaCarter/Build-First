@@ -40,10 +40,22 @@ duplication. This is the same mechanism a Cowork skill would use.
 
 ## Route 3 — Web UI (full onboarding + dashboard)
 
-A Next.js app over a thin FastAPI wrapper of the engine (separate worktree). Onboarding flow,
-a content dashboard (past posts, your voice profile, drafts, the opinions it's forming), and
-the two-option pick. The API shells out to / reads the same local files — see
-`docs/ui_contract.md` for the exact command ↔ endpoint mapping.
+A Next.js app over a thin FastAPI wrapper of the engine (imported in-process). Onboarding flow,
+a content dashboard (past posts, your voice profile, drafts), and the two-option pick.
+
+```bash
+# 1. backend — FastAPI over the engine (live generation needs ANTHROPIC_API_KEY in .env)
+uv pip install -e '.[api]'
+uv run python -m uvicorn api.main:app --port 8000
+
+# 2. frontend — Next.js, in a second terminal
+cd web && npm install && npm run dev        # http://localhost:3000
+```
+
+The web app calls `/api/*`, which Next proxies to the FastAPI backend (no CORS). Everything is
+local-first: intake, persona, and posts stay under `data/` and `profiles/`. The two-option
+flow and learning loop are wired through `/api/compose/options`, `/api/compose/pick`, and
+`/api/learn`; see `docs/ui_contract.md` for the full command ↔ endpoint mapping.
 
 ## Not built on purpose: OAuth
 
