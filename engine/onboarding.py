@@ -36,9 +36,16 @@ class Question(BaseModel):
 
 
 class AudienceDefault(BaseModel):
+    """The hardcoded audience (Tenex for V1). Editable JSON; rendered to the draft layer."""
+
     writing_for: str = ""
     goal: str = ""
     play_to: str = ""
+    tone_refs: list[str] = []  # reference voices to adapt MOVES from — never to imitate
+    adapt_note: str = ""  # the clone-trap guard
+    anatomy: list[str] = []  # the build-post shape
+    playbook: list[str] = []  # what to optimize toward
+    openers: list[str] = []  # real opener moves to adapt
 
 
 class Defaults(BaseModel):
@@ -62,18 +69,36 @@ def load_onboarding(path: Path | None = None) -> OnboardingConfig:
     return OnboardingConfig.model_validate_json(p.read_text(encoding="utf-8"))
 
 
-def apply_audience_default(cfg: OnboardingConfig, audience) -> bool:
-    """Fill an empty audience from the hardcoded default. Returns True if anything changed.
+def render_audience(a: AudienceDefault) -> str:
+    """Render the JSON audience to the prose 'audience layer' the draft pipeline reads.
 
-    Only fills blanks — a real answer the user gave always wins.
+    Same JSON-is-truth / prose-is-derived pattern as the voice profile. Empty fields are
+    skipped, so trimming the JSON trims the briefing.
     """
-    d = cfg.defaults.audience
-    changed = False
-    for field in ("writing_for", "goal", "play_to"):
-        if not getattr(audience, field) and getattr(d, field):
-            setattr(audience, field, getattr(d, field))
-            changed = True
-    return changed
+    out: list[str] = ["# Audience layer", ""]
+    lead = "Who you're writing for tilts topic and proof, not your voice."
+    if a.writing_for:
+        lead += f" Audience = {a.writing_for}."
+    if a.tone_refs:
+        lead += f" Tone modeled on {', '.join(a.tone_refs)}."
+    if a.goal:
+        lead += f" Goal: {a.goal}."
+    out += [lead, ""]
+    if a.play_to:
+        out += [f"What they value: {a.play_to}.", ""]
+    if a.adapt_note:
+        out += [f"> **Adapt the move, don't copy the post.** {a.adapt_note}", ""]
+    if a.anatomy:
+        out += ["## The build-post anatomy", *[f"{i}. {s}" for i, s in enumerate(a.anatomy, 1)], ""]
+    if a.playbook:
+        out += ["## The playbook (optimize toward these)", *[f"- {s}" for s in a.playbook], ""]
+    if a.openers:
+        out += [
+            "## Real openers (moves to adapt, not lines to copy)",
+            *[f"- {s}" for s in a.openers],
+            "",
+        ]
+    return "\n".join(out).rstrip() + "\n"
 
 
 def onboarding_summary(cfg: OnboardingConfig) -> str:

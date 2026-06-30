@@ -31,10 +31,11 @@ where each answer is stored). Ask those questions; never invent your own.
 
 4. **Store answers in `data/intake.json`** as you go (start from `data/intake.example.json` for
    the shape). Put each answer at the question's `writes_to` path (e.g. `voice.answers.weekend`).
-   Also copy `defaults.audience` from the config into the intake's `audience`. For the
-   background question: pull any X/LinkedIn URL into `online.linkedin` / `online.x`, and if they
-   share real posts, append them to `voice.writing_samples` (their own writing is the strongest
-   voice signal) — or run `uv run tb sample --text "…"` per post.
+   For the background question: pull any X/LinkedIn URL into `online.linkedin` / `online.x`, and
+   if they share real posts, append them to `voice.writing_samples` (their own writing is the
+   strongest voice signal) — or run `uv run tb sample --text "…"` per post. (The audience is
+   already hardcoded for Tenex in `engine/onboarding.json` and feeds drafts automatically — you
+   don't ask about it.)
 
 5. **Extract the voice.** Run `uv run tb onboard --json`. This is the only AI step — it reads
    *how* they wrote and writes `profiles/voice.json`. It invents nothing.

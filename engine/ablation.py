@@ -15,6 +15,7 @@ from .blocks import draft as draft_block
 from .blocks import receipts as receipts_block
 from .blocks.intake import Intake
 from .config import LAYERS_DIR, RUNS_DIR
+from .onboarding import load_onboarding, render_audience
 from .providers.base import Provider
 from .rubric.schemas import LevelResult
 from .rubric.shared import build_score_prompt, parse_score
@@ -40,8 +41,10 @@ LEVELS = [
 
 
 def load_layers() -> str:
+    """Format layer (a file) + the audience layer, rendered from the editable JSON in
+    onboarding.json (single source of truth — see engine/onboarding.json `defaults.audience`)."""
     fmt = (LAYERS_DIR / "format.md").read_text(encoding="utf-8")
-    aud = (LAYERS_DIR / "audience_tenex.md").read_text(encoding="utf-8")
+    aud = render_audience(load_onboarding().defaults.audience)
     return f"{fmt}\n\n{aud}"
 
 

@@ -22,7 +22,7 @@ from .blocks.probe import unfilled_gaps
 from .blocks.profile import write_profile_docs
 from .config import DATA_DIR, PROFILES_DIR, RUNS_DIR
 from .learn import learn
-from .onboarding import apply_audience_default, load_onboarding, onboarding_summary
+from .onboarding import load_onboarding, onboarding_summary
 from .post import ALL_INPUTS, PostResult, evaluate, make_options, make_post, polish
 from .providers import get_provider
 from .providers.base import NeedsCompletion
@@ -41,21 +41,7 @@ def _intake(args):
     return load_intake(Path(args.intake) if args.intake else None)
 
 
-def _apply_audience_default(intake):
-    """Fill an empty audience from the hardcoded default in onboarding.json (Tenex).
-
-    Best-effort: a missing or malformed config never breaks drafting — `tb doctor`
-    is where that gets flagged loudly.
-    """
-    try:
-        cfg = load_onboarding()
-    except (FileNotFoundError, ValueError):
-        return
-    apply_audience_default(cfg, intake.audience)
-
-
 def _onboard(intake, provider, force_persona=False):
-    _apply_audience_default(intake)
     paths = write_profile_docs(intake)
     persona_md = build_voice(intake, provider, force=force_persona)
     return paths, persona_md

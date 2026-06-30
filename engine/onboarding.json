@@ -3,9 +3,31 @@
 
   "defaults": {
     "audience": {
-      "writing_for": "AI-native builders & founders — the Tenex crowd",
-      "goal": "show I build real, useful things fast",
-      "play_to": "hands-on, ships working software, allergic to AI-slop"
+      "writing_for": "operators and execs going AI-native — the people the Tenex team writes for",
+      "goal": "leave them inspired and curious about how I could add value — without selling",
+      "play_to": "warm, lowercase, plain, hands-on; ships working software, allergic to AI-slop",
+      "tone_refs": ["Alex Lieberman", "Arman Hezarkhani", "Brett Franklin"],
+      "adapt_note": "These are reference moves, not a voice to imitate. If the draft starts sounding like Alex, that's the clone trap — he's allergic to AI-slop and spots imitation instantly. Run the move in your own register. The persona always wins. Never feed another person's posts in as voice samples.",
+      "anatomy": [
+        "Hook — a real moment or admission, or the build + an analogy. Front-loaded.",
+        "The pain / the turn — concrete, with a cost or a thing that didn't work.",
+        "The mechanism — in plain language, shown not claimed.",
+        "What it looks like in practice — scannable.",
+        "One spiky, ownable claim + the honest lesson, or the number.",
+        "A soft close (a real question), plus the proof/receipt."
+      ],
+      "playbook": [
+        "Open on a real moment, not a thesis. Vulnerability beats the flex (\"I was wrong\" > \"I crushed it\").",
+        "Lead with a number / ship receipts. One real metric beats ten adjectives.",
+        "\"How,\" not \"wow\" — explain the workflow; teach something saveable.",
+        "One spiky, ownable claim per post. Plain language, zero jargon.",
+        "Give the playbook away. Human and imperfect beats buffed and lifeless."
+      ],
+      "openers": [
+        "\"I was wrong.\" (admission -> trust + curiosity)",
+        "\"I reverse-engineered the X algorithm so you don't have to.\" (done-for-you value)",
+        "Bad: \"AI can analyze your writing style and save you tons of time!\""
+      ]
     }
   },
 
