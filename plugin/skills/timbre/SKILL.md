@@ -23,8 +23,9 @@ then speak in plain language.
 
 **1. Onboard (only if `data/intake.json` or `profiles/voice.json` is missing).**
 Don't make them fill a form — run the `/timbre-onboard` flow. Read `engine/onboarding.json` and
-ask its questions one at a time, in order, with a light progress bar and a human reaction
-between answers (full details in `commands/timbre-onboard.md`). Store answers in
+ask its questions **strictly one at a time**, in order, with a light progress bar and a human
+reaction between answers (full details in `commands/timbre-onboard.md`). For writing samples,
+have them **paste a post or two** — don't try to fetch login-walled LinkedIn/X profiles. Store answers in
 `data/intake.json` at each question's `writes_to` path (the audience is set in the config and
 feeds drafts automatically). Then run `uv run tb onboard --json` — the only AI
 step; it writes `profiles/voice.json`.

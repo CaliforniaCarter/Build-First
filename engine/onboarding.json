@@ -44,9 +44,17 @@
       "id": "background",
       "type": "deterministic",
       "order": 2,
-      "prompt": "Great, {name}. Now I'd love a bit about your background — paste a resume or just give me the short version. And if you've got an X or LinkedIn, drop the link so I can see how you write. If not, no worries.",
-      "purpose": "context + grab real writing samples (the strongest voice signal)",
+      "prompt": "Great, {name}. Tell me a bit about your background — paste a resume or just give me the short version. Got an X or LinkedIn? Drop the handle (no need to log in anywhere).",
+      "purpose": "context + your handles",
       "writes_to": "typed.background"
+    },
+    {
+      "id": "writing_samples",
+      "type": "deterministic",
+      "order": 2.5,
+      "prompt": "Any writing you're proud of — a post, an essay, anything you've published? Paste one or two and I'll weight them heavily; your own writing is the strongest signal for your voice. Totally optional — just say 'skip' if you'd rather not.",
+      "purpose": "real writing samples, weighted above the easy answers (optional — skippable)",
+      "writes_to": "voice.writing_samples"
     },
     {
       "id": "weekend",
@@ -68,8 +76,8 @@
       "id": "teach",
       "type": "deterministic",
       "order": 5,
-      "prompt": "Teach me something you're into — like I'm a friend.",
-      "purpose": "captures your words & tics",
+      "prompt": "Teach me how you'd make pasta — step by step, like a friend's in the kitchen with you.",
+      "purpose": "captures your words & tics + how you explain something",
       "writes_to": "voice.answers.teach"
     },
     {

@@ -15,9 +15,12 @@ where each answer is stored). Ask those questions; never invent your own.
 
 1. **Read `engine/onboarding.json`.** Print its `welcome` line, as written.
 
-2. **Ask the `questions` one at a time, in `order`** (skip any with `enabled: false`). Above
-   each question print a progress bar, e.g. `[▰▰▱▱▱▱▱] 2/7 · background`. Wait for the answer
-   before the next one. Substitute `{name}` in a prompt with their name once you have it.
+2. **Ask the `questions` STRICTLY one at a time, in `order`** (skip any with `enabled: false`) —
+   print one question, wait for the answer, then the next. **Never batch them.** Above each
+   question print a progress bar, e.g. `[▰▰▱▱▱▱▱] 2/7 · background`. Substitute `{name}` once you
+   have it. **Before the three voice questions (weekend / lunch / teach), say a short
+   transition:** *"Now I'll ask you 3 quick questions — just type or dictate in your real voice;
+   it's the best way for me to capture how you actually write."*
    - **`deterministic`** — ask the `prompt` verbatim.
    - **`ab_pick`** — show the TWO `options[].example` posts as **A** and **B** (the real little
      examples, not the labels), ask which sounds more like them, and store the chosen option's
@@ -31,10 +34,12 @@ where each answer is stored). Ask those questions; never invent your own.
 
 4. **Store answers in `data/intake.json`** as you go (start from `data/intake.example.json` for
    the shape). Put each answer at the question's `writes_to` path (e.g. `voice.answers.weekend`).
-   For the background question: pull any X/LinkedIn URL into `online.linkedin` / `online.x`, and
-   if they share real posts, append them to `voice.writing_samples` (their own writing is the
-   strongest voice signal) — or run `uv run tb sample --text "…"` per post. (The audience is
-   already set in `engine/onboarding.json` and feeds drafts automatically — you don't ask about it.)
+   For the **`writing_samples`** question: if they paste posts/essays, put each into
+   `voice.writing_samples` (weight these heavily) — or run `uv run tb sample --text "…"` per post;
+   if they say **skip**, leave it empty — no problem. For **`background`**, pull any handle/URL
+   into `online.linkedin` / `online.x` — **don't try to fetch a login-walled profile; pasting is
+   the way.** (The audience is already set in `engine/onboarding.json` and feeds drafts
+   automatically — you don't ask about it.)
 
 5. **Extract the voice.** Run `uv run tb onboard --json`. This is the only AI step — it reads
    *how* they wrote and writes `profiles/voice.json`. It invents nothing.
