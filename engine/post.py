@@ -14,8 +14,10 @@ from dataclasses import dataclass, field
 from .ablation import context_for, load_layers  # shared context helpers
 from .blocks import council
 from .blocks import draft as draft_block
+from .blocks import proof as proof_block
 from .blocks import receipts as receipts_block
 from .blocks.intake import Intake
+from .blocks.proof import ProofReport
 from .config import RUNS_DIR
 from .providers.base import Provider
 from .rubric.schemas import Score
@@ -33,6 +35,7 @@ class PostResult:
     proof: list[str] = field(default_factory=list)
     redactions: list[str] = field(default_factory=list)
     council_log: list[dict] = field(default_factory=list)
+    proof_report: ProofReport | None = None
 
 
 def evaluate(
@@ -43,13 +46,14 @@ def evaluate(
     provider: Provider,
     score_stage: str = "score_post",
     prev: str | None = None,
-) -> tuple[str, list[str], list[str], Score]:
-    """Attach receipts (+ redact) and score a piece of text. Shared by post and revise."""
+) -> tuple[str, list[str], list[str], Score, ProofReport]:
+    """Attach receipts (+ redact), run the deterministic proof check, and score. Shared by post and revise."""
     final_draft, proof, redactions = receipts_block.attach_receipts(text, intake)
+    report = proof_block.proof_report(final_draft, proof, redactions, intake)
     score = parse_score(
         provider.complete(score_stage, build_score_prompt(final_draft, persona_md, layers, prev))
     )
-    return final_draft, proof, redactions, score
+    return final_draft, proof, redactions, score, report
 
 
 def make_post(
@@ -76,7 +80,9 @@ def make_post(
     first_draft = draft_block.draft("draft_post", prompt, provider)
 
     polished, clog = council.revise(first_draft, persona_md, layers, provider)
-    final_draft, proof, redactions, score = evaluate(polished, intake, persona_md, layers, provider)
+    final_draft, proof, redactions, score, report = evaluate(
+        polished, intake, persona_md, layers, provider
+    )
 
     (run_dir / "first_draft.md").write_text(first_draft, encoding="utf-8")
     (run_dir / "final.md").write_text(final_draft, encoding="utf-8")
@@ -88,7 +94,7 @@ def make_post(
             json.dumps({"proof": proof, "redacted": redactions}, indent=2), encoding="utf-8"
         )
 
-    return PostResult(first_draft, final_draft, score, proof, redactions, clog)
+    return PostResult(first_draft, final_draft, score, proof, redactions, clog, report)
 
 
 def make_options(
@@ -120,10 +126,10 @@ def make_options(
             avoid,
         )
         text = draft_block.draft(f"draft_post_{i}", prompt, provider)
-        final, proof, redactions, score = evaluate(
+        final, proof, redactions, score, report = evaluate(
             text, intake, persona_md, layers, provider, f"score_post_{i}"
         )
-        results.append(PostResult(text, final, score, proof, redactions, []))
+        results.append(PostResult(text, final, score, proof, redactions, [], report))
         if text.strip():
             avoid = avoid + [text.splitlines()[0]]  # the next option must differ
         (run_dir / f"option_{i}.md").write_text(final, encoding="utf-8")
@@ -134,7 +140,7 @@ def polish(text: str, intake: Intake, persona_md: str, provider: Provider) -> Po
     """Run the Writer's Council on the chosen option, attach receipts, re-score. For `tb pick`."""
     layers = load_layers()
     polished, clog = council.revise(text, persona_md, layers, provider)
-    final, proof, redactions, score = evaluate(
+    final, proof, redactions, score, report = evaluate(
         polished, intake, persona_md, layers, provider, "score_pick"
     )
-    return PostResult(text, final, score, proof, redactions, clog)
+    return PostResult(text, final, score, proof, redactions, clog, report)

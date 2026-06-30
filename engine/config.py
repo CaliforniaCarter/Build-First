@@ -17,6 +17,10 @@ LAYERS_DIR = ENGINE / "layers"
 # Plain, hand-editable JSON; the plugin reads it to drive the conversation.
 ONBOARDING_PATH = ENGINE / "onboarding.json"
 
+# The anti-slop / anti-fabrication config — the universal slop list + check settings.
+# Editable JSON; feeds both the deterministic proof check and the LLM rubric prompt.
+PROOF_PATH = ENGINE / "proof.json"
+
 # Council target and stop behaviour (Reflexion: stop when revisions stop helping).
 COUNCIL_TARGET = 9.0
 COUNCIL_MAX_PASSES = 3

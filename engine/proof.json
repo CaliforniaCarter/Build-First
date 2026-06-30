@@ -1,0 +1,11 @@
+{
+  "slop_phrases": [
+    "delve",
+    "leverage",
+    "game-changer",
+    "thrilled to announce",
+    "supercharge"
+  ],
+  "grounding_scope": "numbers_and_specifics",
+  "on_flag": "warn"
+}

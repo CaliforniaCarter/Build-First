@@ -26,16 +26,27 @@ Follow the `timbre` skill flow. Never invent facts; never auto-post — the huma
 
 4. **Draft two options.** Run `uv run tb post --provider anthropic --json` (drop `--provider
    anthropic` if there's no key — you become the engine). Present them as **two stacked, labeled
-   blocks**, each with its receipts:
+   blocks**, each with its receipts and its proof check:
 
    ```
    ▌ POST 1
    <the full draft, in their voice>
    receipts: <the proof items for this option>
+   proof check: ✓ clean — no slop, every number traces to their material
 
    ▌ POST 2   (same facts, a different shape)
    <the full draft>
    receipts: <the proof items>
+   proof check: ✓ clean
+   ```
+
+   The `proof_check` field is a **deterministic code check** (against `engine/proof.json` + the
+   user's `voice.json` banned list), not the model's opinion. If it reports `slop_hits` or
+   `ungrounded` for an option, **surface it plainly under that block** and ask the user to give
+   the real number, cut it, or override — never ship a fabricated figure or a banned phrase:
+
+   ```
+   proof check: ⚠ "40%" isn't in anything you gave me — real number, or cut it?
    ```
 
    Read each option's `evaluation` **privately**. If one is weak, say so in plain words ("the
@@ -45,8 +56,9 @@ Follow the `timbre` skill flow. Never invent facts; never auto-post — the huma
    `uv run tb pick --option <0|1> --why "<their reason>" --provider anthropic --json`. This
    polishes the chosen one (Writer's Council), saves it, copies it to the clipboard, and
    **logs the choice as a token-free signal** — so every pick teaches the voice, with no AI
-   call. Show the final and offer three outs: **use it as-is**, **edit it yourself**, or
-   **let me help**. If they edit, save their version to the post's `final.md`.
+   call. Show the final **with its receipts and `proof_check`** (✓ clean, or the same
+   flag-and-ask if something slipped in), then offer three outs: **use it as-is**, **edit it
+   yourself**, or **let me help**. If they edit, save their version to the post's `final.md`.
 
 6. **Don't fold the voice yet.** Picks and edits accumulate as free signals; the fold into the
    voice profile is **batched to the end of the session** and only on the user's yes (see the

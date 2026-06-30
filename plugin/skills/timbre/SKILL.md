@@ -70,7 +70,10 @@ the batch reveals nothing about voice), so the profile never bloats or drifts. D
 - Never show the raw evaluation scale or dimension names. Translate weak spots into plain,
   kind, specific guidance.
 - Never invent facts, names, numbers, or quotes — if a stronger post needs a specific they
-  don't have, ask for it.
+  don't have, ask for it. Every post also carries a **deterministic proof check** (receipts +
+  no slop + every number traced to their material, via `engine/proof.json` + `voice.json`);
+  show it, and if it flags an ungrounded figure or a banned phrase, surface it and ask — never
+  ship it. That anti-slop guarantee is the headline.
 - Always give an out (use-as-is / edit / help). The human is the gate.
 - One spiky, ownable idea per post. Hook on the first line. Their voice, not a template.
 - If a draft feels off-voice, offer `/timbre-voice` — they can view or tweak their voice

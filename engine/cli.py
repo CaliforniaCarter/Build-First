@@ -18,6 +18,7 @@ from .blocks.draft import build_draft_prompt
 from .blocks.gate import human_gate
 from .blocks.intake import load_intake
 from .blocks.persona import VOICE_PATH, build_voice, load_voice, render_voice
+from .blocks.proof import check_text, load_proof_config
 from .blocks.probe import unfilled_gaps
 from .blocks.profile import write_profile_docs
 from .config import DATA_DIR, PROFILES_DIR, RUNS_DIR
@@ -138,6 +139,31 @@ def cmd_run(args):
     print(f"\n--- report written to {path} ---")
 
 
+def _proof_json(report):
+    """The deterministic proof check, for the UI. None if not computed."""
+    if report is None:
+        return None
+    return {
+        "clean": report.clean,
+        "slop_hits": report.slop_hits,
+        "ungrounded": report.ungrounded,
+        "redactions": report.redactions,
+    }
+
+
+def _print_proof(report):
+    """A plain-language proof-check line for non-JSON output."""
+    if report is None:
+        return
+    if report.clean:
+        print("Proof check: ✓ clean — no slop, every number traces to your material")
+        return
+    if report.slop_hits:
+        print(f"Proof check ⚠ slop/banned phrase(s): {', '.join(report.slop_hits)}")
+    if report.ungrounded:
+        print(f"Proof check ⚠ not in your material (fix or cut): {', '.join(report.ungrounded)}")
+
+
 def _emit_post(result, saved, out, args):
     """Return the post + structured eval. The LLM presents/suggests/probes from this."""
     if args.json:
@@ -157,6 +183,7 @@ def _emit_post(result, saved, out, args):
                         ],
                     },
                     "receipts": result.proof,
+                    "proof_check": _proof_json(result.proof_report),
                     "saved": str(saved),
                     "draft": str(out),
                 },
@@ -166,6 +193,7 @@ def _emit_post(result, saved, out, args):
         return
     print(result.final_draft)
     print(f"\nScore: {result.score.quality_avg}/10 · saved to {saved}")
+    _print_proof(result.proof_report)
 
 
 def cmd_post(args):
@@ -197,6 +225,7 @@ def cmd_post(args):
                                 ],
                             },
                             "receipts": r.proof,
+                            "proof_check": _proof_json(r.proof_report),
                         }
                         for i, r in enumerate(options)
                     ],
@@ -208,6 +237,9 @@ def cmd_post(args):
     for i, r in enumerate(options):
         print(f"=== OPTION {i} · {r.score.quality_avg}/10 ===")
         print(r.final_draft)
+        if r.proof:
+            print("\nreceipts: " + " · ".join(r.proof))
+        _print_proof(r.proof_report)
         print()
     print(f"Pick one: tb pick --run-id {args.run_id} --option <0/1>  (polishes it and saves)")
 
@@ -256,11 +288,16 @@ def cmd_revise(args):
         print("no post to revise — run `tb post` first or pass --post <file>", file=sys.stderr)
         return
     revised = revise(current, args.command, persona_md, layers, intake.output.hard_nevers, provider)
-    final, proof, redactions, score = evaluate(
+    final, proof, redactions, score, report = evaluate(
         revised, intake, persona_md, layers, provider, "score_revise", current
     )
     result = PostResult(
-        first_draft=revised, final_draft=final, score=score, proof=proof, redactions=redactions
+        first_draft=revised,
+        final_draft=final,
+        score=score,
+        proof=proof,
+        redactions=redactions,
+        proof_report=report,
     )
     out = human_gate(final, RUNS_DIR / args.run_id / "post")
     saved = save_post(result, intake, args.date)
@@ -298,6 +335,42 @@ def cmd_voice(args):
         )
     else:
         print(render_voice(vp))
+
+
+def cmd_proof(args):
+    """Run the deterministic proof check on a post (latest saved, or --post <file>): receipts,
+    banned/slop phrases, and any number/specific that doesn't trace to your material."""
+    intake = _intake(args)
+    if args.post:
+        if not Path(args.post).exists():
+            print(f"no such file: {args.post}", file=sys.stderr)
+            return
+        text = Path(args.post).read_text(encoding="utf-8")
+    else:
+        text = latest_final()
+        if not text:
+            print("no post to check — run `tb post` first or pass --post <file>", file=sys.stderr)
+            return
+    report = check_text(text, intake)
+    if args.json:
+        print(json.dumps({"receipts": report.receipts, **_proof_json(report)}, indent=2))
+        return
+    if report.receipts:
+        print("RECEIPTS")
+        for r in report.receipts:
+            print(f"  • {r}")
+        print()
+    print("PROOF CHECK")
+    if report.clean:
+        print("  ✓ no slop / banned phrases")
+        print("  ✓ every number traces to your material")
+    else:
+        if report.slop_hits:
+            print(f"  ⚠ slop/banned: {', '.join(report.slop_hits)}")
+        if report.ungrounded:
+            print(f"  ⚠ not in your material (fix or cut): {', '.join(report.ungrounded)}")
+    if report.redactions:
+        print(f"  ✓ redacted: {', '.join(report.redactions)}")
 
 
 def cmd_sample(args):
@@ -486,6 +559,14 @@ def cmd_doctor(args):
         print(onboarding_summary(load_onboarding()))
     except (FileNotFoundError, ValueError) as e:
         print(f"onboarding config ERROR: {e}")
+    try:
+        pc = load_proof_config()
+        print(
+            f"proof config ok: {len(pc.slop_phrases)} slop phrase(s), "
+            f"grounding={pc.grounding_scope}, on_flag={pc.on_flag}"
+        )
+    except ValueError as e:
+        print(f"proof config ERROR: {e}")
     print(f"voice profile: {'present' if load_voice() else 'not built yet (run `tb onboard`)'}")
 
 
@@ -524,6 +605,7 @@ def main(argv=None):
         ("revise", cmd_revise),
         ("gaps", cmd_gaps),
         ("voice", cmd_voice),
+        ("proof", cmd_proof),
         ("sample", cmd_sample),
         ("takes", cmd_takes),
         ("inspect", cmd_inspect),
@@ -560,6 +642,9 @@ def main(argv=None):
     )
     parsers["sample"].add_argument("--text", default=None, help="a post/essay you wrote, inline")
     parsers["sample"].add_argument("--file", default=None, help="a file with your writing")
+    parsers["proof"].add_argument(
+        "--post", default=None, help="the post to check (default: last saved)"
+    )
 
     args = parser.parse_args(argv)
     try:

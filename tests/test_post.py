@@ -26,11 +26,12 @@ def test_evaluate_and_revise_paths():
     intake = _intake()
     layers = load_layers()
     revised = revise("the post", "make it shorter", "persona", layers, [], StubProvider())
-    final, proof, redactions, score = evaluate(
+    final, proof, redactions, score, report = evaluate(
         revised, intake, "persona", layers, StubProvider(), "score_revise"
     )
     assert final
     assert len(score.dimensions) == 9
+    assert report is not None  # the proof check rides along with every evaluate
 
 
 def test_draft_prompt_varies_from_recent_posts():

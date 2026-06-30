@@ -10,17 +10,8 @@ from __future__ import annotations
 import json
 import re
 
+from ..blocks.proof import load_proof_config
 from .schemas import DIM_NAMES, GATE_NAMES, Score
-
-# must-not-contain: the biggest AI/LinkedIn slop offenders. Kept short on purpose
-# (top 5) so it's a sharp filter, not a dictionary; tune the list over time.
-SLOP_PHRASES = [
-    "delve",
-    "leverage",
-    "game-changer",
-    "thrilled to announce",
-    "supercharge",
-]
 
 GATE_DESCRIPTIONS = {
     "only_you": "an observation only this person could make (not a generic take)",
@@ -47,13 +38,14 @@ DIM_DESCRIPTIONS = {
 def rubric_text() -> str:
     gates = "\n".join(f"  - {n}: {GATE_DESCRIPTIONS[n]}" for n in GATE_NAMES)
     dims = "\n".join(f"  - {n}: {DIM_DESCRIPTIONS[n]}" for n in DIM_NAMES)
+    slop = load_proof_config().slop_phrases  # single source: engine/proof.json
     return (
         "HARD GATES (pass/fail, each needs a one-line reason):\n"
         f"{gates}\n\n"
         "QUALITY DIMENSIONS (score 0-10, each with a one-line reason):\n"
         f"{dims}\n\n"
         "BANNED SLOP PHRASES (presence fails no_slop):\n"
-        f"  {', '.join(SLOP_PHRASES)}"
+        f"  {', '.join(slop)}"
     )
 
 
