@@ -13,7 +13,8 @@ import json
 import sys
 from pathlib import Path
 
-from .ablation import run_ablation
+from .ablation import context_for, load_layers, run_ablation
+from .blocks.draft import build_draft_prompt
 from .blocks.gate import human_gate
 from .blocks.intake import load_intake
 from .blocks.persona import build_persona
@@ -21,10 +22,11 @@ from .blocks.probe import unfilled_gaps
 from .blocks.profile import write_profile_docs
 from .config import DATA_DIR, PROFILES_DIR, RUNS_DIR
 from .learn import learn
-from .post import make_post
+from .post import ALL_INPUTS, PostResult, evaluate, make_post
 from .providers import get_provider
 from .providers.base import NeedsCompletion
 from .report import RunReport, build_report, compute_places_to_refine, write_report
+from .revise import revise
 from .store import latest_final, list_posts, save_post
 
 
@@ -135,21 +137,8 @@ def cmd_run(args):
     print(f"\n--- report written to {path} ---")
 
 
-def cmd_post(args):
-    """The product: draft ONE post from every input, polish, save, and return structured output.
-
-    The engine hands back the post + the structured eval. Presenting it, suggesting
-    improvements, probing, and offering the outs (use as-is / edit / help) is the LLM's job,
-    not hardcoded here.
-    """
-    intake = _intake(args)
-    provider = _provider(args)
-    _onboard(intake, provider)
-    persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
-    result = make_post(intake, persona_md, provider, args.run_id)
-    out = human_gate(result.final_draft, RUNS_DIR / args.run_id / "post")
-    saved = save_post(result, intake, args.date)
-
+def _emit_post(result, saved, out, args):
+    """Return the post + structured eval. The LLM presents/suggests/probes from this."""
     if args.json:
         print(
             json.dumps(
@@ -174,9 +163,42 @@ def cmd_post(args):
             )
         )
         return
-
     print(result.final_draft)
     print(f"\nScore: {result.score.quality_avg}/10 · saved to {saved} · copied to clipboard")
+
+
+def cmd_post(args):
+    """The product: draft ONE post from every input, polish, save, return structured output."""
+    intake = _intake(args)
+    provider = _provider(args)
+    _onboard(intake, provider)
+    persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
+    result = make_post(intake, persona_md, provider, args.run_id)
+    out = human_gate(result.final_draft, RUNS_DIR / args.run_id / "post")
+    saved = save_post(result, intake, args.date)
+    _emit_post(result, saved, out, args)
+
+
+def cmd_revise(args):
+    """Revise the current post by your command, re-score, and save. The LLM does the rewrite."""
+    intake = _intake(args)
+    provider = _provider(args)
+    persona_md = (PROFILES_DIR / "persona.md").read_text(encoding="utf-8")
+    layers = load_layers()
+    current = Path(args.post).read_text(encoding="utf-8") if args.post else latest_final()
+    if not current:
+        print("no post to revise — run `tb post` first or pass --post <file>", file=sys.stderr)
+        return
+    revised = revise(current, args.command, persona_md, layers, intake.output.hard_nevers, provider)
+    final, proof, redactions, score = evaluate(
+        revised, intake, persona_md, layers, provider, "score_revise", current
+    )
+    result = PostResult(
+        first_draft=revised, final_draft=final, score=score, proof=proof, redactions=redactions
+    )
+    out = human_gate(final, RUNS_DIR / args.run_id / "post")
+    saved = save_post(result, intake, args.date)
+    _emit_post(result, saved, out, args)
 
 
 def cmd_gaps(args):
@@ -206,6 +228,46 @@ def cmd_persona(args):
         print(json.dumps({"path": str(path), "persona_md": text}, indent=2))
     else:
         print(text)
+
+
+def cmd_inspect(args):
+    """Show exactly what the LLM sees: your voice profile + the assembled prompt. Nothing hidden."""
+    intake = _intake(args)
+    persona_path = PROFILES_DIR / "persona.md"
+    persona_md = (
+        persona_path.read_text(encoding="utf-8")
+        if persona_path.exists()
+        else "(run `tb onboard` first)"
+    )
+    layers = load_layers()
+    ctx = context_for(ALL_INPUTS, intake)
+    prompt = build_draft_prompt(
+        intake.idea.topic,
+        ctx,
+        persona_md,
+        layers,
+        intake.output.hard_nevers,
+        intake.output.channels,
+    )
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "persona_md": persona_md,
+                    "context_block": ctx,
+                    "layers": layers,
+                    "draft_prompt": prompt,
+                },
+                indent=2,
+            )
+        )
+        return
+    print("=== PERSONA (your voice — what the LLM is told to match) ===")
+    print(persona_md)
+    print("\n=== CONTEXT (assembled from your intake) ===")
+    print(ctx)
+    print("\n=== THE EXACT PROMPT SENT TO THE LLM ===")
+    print(prompt)
 
 
 def cmd_posts(args):
@@ -285,8 +347,10 @@ def main(argv=None):
     parsers = {}
     for name, fn in (
         ("post", cmd_post),
+        ("revise", cmd_revise),
         ("gaps", cmd_gaps),
         ("persona", cmd_persona),
+        ("inspect", cmd_inspect),
         ("posts", cmd_posts),
         ("learn", cmd_learn),
         ("onboard", cmd_onboard),
@@ -302,6 +366,12 @@ def main(argv=None):
     parsers["learn"].add_argument("--edited", required=True, help="path to your edited post")
     parsers["learn"].add_argument(
         "--original", default=None, help="the engine's draft (default: last saved post)"
+    )
+    parsers["revise"].add_argument(
+        "--command", required=True, help="what to change, in plain words"
+    )
+    parsers["revise"].add_argument(
+        "--post", default=None, help="the post to revise (default: last saved)"
     )
 
     args = parser.parse_args(argv)

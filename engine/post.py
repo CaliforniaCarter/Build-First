@@ -35,6 +35,23 @@ class PostResult:
     council_log: list[dict] = field(default_factory=list)
 
 
+def evaluate(
+    text: str,
+    intake: Intake,
+    persona_md: str,
+    layers: str,
+    provider: Provider,
+    score_stage: str = "score_post",
+    prev: str | None = None,
+) -> tuple[str, list[str], list[str], Score]:
+    """Attach receipts (+ redact) and score a piece of text. Shared by post and revise."""
+    final_draft, proof, redactions = receipts_block.attach_receipts(text, intake)
+    score = parse_score(
+        provider.complete(score_stage, build_score_prompt(final_draft, persona_md, layers, prev))
+    )
+    return final_draft, proof, redactions, score
+
+
 def make_post(intake: Intake, persona_md: str, provider: Provider, run_id: str) -> PostResult:
     layers = load_layers()
     run_dir = RUNS_DIR / run_id / "post"
@@ -52,11 +69,7 @@ def make_post(intake: Intake, persona_md: str, provider: Provider, run_id: str) 
     first_draft = draft_block.draft("draft_post", prompt, provider)
 
     polished, clog = council.revise(first_draft, persona_md, layers, provider)
-    final_draft, proof, redactions = receipts_block.attach_receipts(polished, intake)
-
-    score = parse_score(
-        provider.complete("score_post", build_score_prompt(final_draft, persona_md, layers, None))
-    )
+    final_draft, proof, redactions, score = evaluate(polished, intake, persona_md, layers, provider)
 
     (run_dir / "first_draft.md").write_text(first_draft, encoding="utf-8")
     (run_dir / "final.md").write_text(final_draft, encoding="utf-8")

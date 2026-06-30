@@ -82,6 +82,8 @@ class StubProvider(Provider):
             return _PERSONA
         if stage == "learn":
             return "[]"  # offline: nothing learned
+        if stage == "revise":
+            return _draft_text(stage)
         if stage.startswith("score_"):
             return _score_json(stage)
         if stage.startswith("council_pass"):
