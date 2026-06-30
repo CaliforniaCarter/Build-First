@@ -86,7 +86,7 @@ class StubProvider(Provider):
     name = "stub"
 
     def complete(self, stage: str, prompt: str) -> str:
-        if stage == "persona":
+        if stage == "voice":
             return _PERSONA
         if stage == "learn":
             return "[]"  # offline: nothing learned

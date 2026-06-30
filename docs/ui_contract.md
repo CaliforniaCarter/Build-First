@@ -14,7 +14,7 @@ Every command accepts `--provider {terminal,anthropic,stub}`, `--intake <path>`,
 | --- | --- | --- | --- |
 | 1. Capture | Collect profile + voice + the idea, write `data/intake.json` | — | writes `data/intake.json` |
 | 2. Onboard | — | `tb onboard` | writes `profiles/{profile,context}.md` + `voice.json` |
-| 3. "That's me?" | Show the voice, let the user edit + save | `tb persona --json` | reads/writes `profiles/voice.json` |
+| 3. "That's me?" | Show the voice, let the user edit + save | `tb voice --json` | reads/writes `profiles/voice.json` |
 | 4. Gap probe | Ask each unfilled question, write answers into the idea | `tb gaps --json` | writes `data/intake.json` (`idea.<key>`) |
 | 5. Make post | show the 2 options, user picks one | `tb post --json`, then `tb pick --option <n>` | writes `posts/<slug>/`, clipboard |
 | 6. Approve / publish | show final, edit, mark posted | `tb publish <slug>` | reads/writes `posts/<slug>/` |
@@ -39,7 +39,7 @@ builder, not the end user.
 
 ## JSON shapes
 
-`tb persona --json` — the editable voice profile (JSON) + a prose render
+`tb voice --json` — the editable voice profile (JSON) + a prose render
 ```json
 { "path": "profiles/voice.json",
   "voice": { "signature": "...", "banned": ["..."], "humor": "...", "...": "..." },

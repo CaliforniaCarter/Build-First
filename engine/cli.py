@@ -282,7 +282,7 @@ def cmd_gaps(args):
         print(f"  [{g['key']}] {g['question']}")
 
 
-def cmd_persona(args):
+def cmd_voice(args):
     """Show the editable voice profile (the 'that's me?' artifact). Edit profiles/voice.json to confirm."""
     vp = load_voice()
     if vp is None:
@@ -523,7 +523,7 @@ def main(argv=None):
         ("pick", cmd_pick),
         ("revise", cmd_revise),
         ("gaps", cmd_gaps),
-        ("persona", cmd_persona),
+        ("voice", cmd_voice),
         ("sample", cmd_sample),
         ("takes", cmd_takes),
         ("inspect", cmd_inspect),

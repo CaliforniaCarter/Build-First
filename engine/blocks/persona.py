@@ -119,7 +119,7 @@ def build_voice(intake: Intake, provider: Provider, force: bool = False) -> str:
     existing = load_voice()
     if existing is not None and not force:
         return render_voice(existing)
-    vp = _parse_voice_json(provider.complete("persona", build_voice_prompt(intake)))
+    vp = _parse_voice_json(provider.complete("voice", build_voice_prompt(intake)))
     PROFILES_DIR.mkdir(parents=True, exist_ok=True)
     VOICE_PATH.write_text(vp.model_dump_json(indent=2) + "\n", encoding="utf-8")
     return render_voice(vp)

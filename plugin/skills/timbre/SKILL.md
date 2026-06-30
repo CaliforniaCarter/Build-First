@@ -67,3 +67,5 @@ it runs over the whole small batch at once.
   don't have, ask for it.
 - Always give an out (use-as-is / edit / help). The human is the gate.
 - One spiky, ownable idea per post. Hook on the first line. Their voice, not a template.
+- If a draft feels off-voice, offer `/timbre-voice` — they can view or tweak their voice
+  profile (`profiles/voice.json`) anytime, and the next draft uses it immediately.
