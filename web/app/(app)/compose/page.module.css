@@ -180,6 +180,129 @@
   color: var(--ink);
 }
 
+/* two-option pick */
+.choose {
+  margin-top: 22px;
+  animation: rise 0.5s ease;
+}
+.choosehd {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+.chooset {
+  font-family: var(--serif);
+  font-size: 22px;
+}
+.choosesub {
+  font-size: 13px;
+  color: var(--muted);
+}
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.opt {
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  cursor: pointer;
+  transition: 0.16s;
+  font-family: var(--body);
+  color: var(--ink);
+}
+.opt:hover {
+  border-color: var(--border-hi);
+}
+.opton {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(255, 229, 0, 0.12);
+}
+.opthd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.optlabel {
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  font-weight: 600;
+  font-family: var(--display);
+}
+.optpick {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--display);
+  font-weight: 600;
+}
+.opton .optpick {
+  color: var(--yellow);
+}
+.optbody {
+  font-size: 14px;
+  color: #ecece6;
+  line-height: 1.58;
+  white-space: pre-wrap;
+}
+.optproof {
+  margin-top: 13px;
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.opthint {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--dim);
+}
+.whybox {
+  margin-top: 16px;
+}
+.whyl {
+  display: block;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.whyl span {
+  font-weight: 500;
+  color: var(--dim);
+}
+.whyin {
+  width: 100%;
+  background: var(--card2);
+  border: 1px solid var(--border-hi);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  outline: none;
+  transition: 0.16s;
+}
+.whyin::placeholder {
+  color: #6e6e74;
+}
+.whyin:focus {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(255, 229, 0, 0.12);
+}
+.choosebar {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
 /* result */
 .result {
   margin-top: 22px;
@@ -323,6 +446,48 @@
   color: var(--yellow);
 }
 
+/* quiet "what timbre learned" line, under the polished post */
+.learn {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.learnpip {
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--yellow);
+  box-shadow: 0 0 7px var(--yellow);
+  flex: none;
+}
+
+/* "i posted it" streak celebration */
+.shipped {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid #3a3a22;
+  background: #16160c;
+  border-radius: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.shippedhd {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--yellow);
+}
+.shippedsub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
 /* eval */
 .eval {
   background: var(--card);
@@ -462,6 +627,9 @@
 
 @media (max-width: 980px) {
   .result {
+    grid-template-columns: 1fr;
+  }
+  .options {
     grid-template-columns: 1fr;
   }
   .eval {

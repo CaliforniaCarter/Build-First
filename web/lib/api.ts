@@ -56,10 +56,21 @@ export interface PostRecord {
   proof: string[];
   redactions: string[];
   council_log: { pass: number; critique: string; reason: string; stop: boolean }[];
-  status: "draft" | "approved";
+  status: "draft" | "approved" | "posted";
   topic: string;
   created_at: string;
   updated_at: string;
+}
+// One of the two options returned by /api/compose/options (no council yet).
+export interface OptionResult {
+  body: string;
+  score: SerializedScore;
+  proof: string[];
+}
+// A spiky, ownable opinion the user could post, grounded in their own material.
+export interface Take {
+  take: string; // one debatable sentence
+  based_on: string; // the belief/lesson it draws on
 }
 export interface Insight {
   observation: string;
@@ -111,10 +122,34 @@ export const api = {
       body: JSON.stringify({ work, save }),
     }),
 
-  listPosts: (status?: "draft" | "approved") =>
+  // Two options in different shapes to pick between (no council yet).
+  composeOptions: (work: string) =>
+    req<{ options: OptionResult[] }>("/api/compose/options", {
+      method: "POST",
+      body: JSON.stringify({ work }),
+    }),
+  // Polish the chosen option with the Writer's Council, save it, log the A-vs-B choice.
+  pick: (args: { chosen: string; rejected_opening: string; why: string; topic: string }) =>
+    req<{ post: PostRecord }>("/api/compose/pick", {
+      method: "POST",
+      body: JSON.stringify(args),
+    }),
+  // Fold recent picks + edits into the voice profile (one call, anti-bloat).
+  learn: () =>
+    req<{ applied: string[]; skipped: string[]; folded: number }>("/api/learn", {
+      method: "POST",
+      body: JSON.stringify({}),
+    }),
+  // Spiky, ownable opinions the user could post — grounded only in their material.
+  getTakes: () => req<{ takes: Take[] }>("/api/takes"),
+
+  listPosts: (status?: "draft" | "approved" | "posted") =>
     req<{ posts: PostRecord[] }>(`/api/posts${status ? `?status=${status}` : ""}`),
   getPost: (id: string) => req<PostRecord>(`/api/posts/${id}`),
   approvePost: (id: string) => req<PostRecord>(`/api/posts/${id}/approve`, { method: "POST" }),
+  // You posted it yourself — log it (Timbre never posts for you). Returns the shipped tally.
+  markPosted: (id: string) =>
+    req<{ post: PostRecord; shipped: number }>(`/api/posts/${id}/posted`, { method: "POST" }),
   patchPost: (id: string, body: { body?: string; rescore?: boolean }) =>
     req<PostRecord>(`/api/posts/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
 };

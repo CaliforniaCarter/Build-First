@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { api, type PostRecord } from "@/lib/api";
+import { api, type PostRecord, type Take } from "@/lib/api";
 import { getName, elapsedLabel } from "@/lib/onboarding-store";
 import styles from "./page.module.css";
 
@@ -44,6 +44,9 @@ export default function HomePage() {
   const [posts, setPosts] = useState<PostRecord[] | null>(null);
   const [tone, setTone] = useState<string[]>([]);
   const [toTuned, setToTuned] = useState("—");
+  // takes are a live LLM call — loaded on demand so they never slow the dashboard.
+  const [takes, setTakes] = useState<Take[] | null>(null);
+  const [takesState, setTakesState] = useState<"idle" | "loading" | "error">("idle");
 
   useEffect(() => {
     setLocalName(getName() || "there");
@@ -92,6 +95,24 @@ export default function HomePage() {
   function go() {
     const t = text.trim();
     router.push(t ? `/compose?work=${encodeURIComponent(t)}` : "/compose");
+  }
+
+  async function loadTakes() {
+    if (takesState === "loading") return;
+    setTakesState("loading");
+    try {
+      const { takes } = await api.getTakes();
+      setTakes(takes);
+      setTakesState("idle");
+    } catch {
+      setTakesState("error");
+    }
+  }
+
+  // Seed the compose box with a take, then bring it back into view up top.
+  function seedTake(t: Take) {
+    setText(t.take);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
@@ -149,6 +170,51 @@ export default function HomePage() {
             ))}
           </div>
 
+          {/* takes forming — spiky opinions grounded in your work (live, on-demand) */}
+          <div className={styles.sectt}>
+            takes forming
+            <span className={styles.note}>opinions you&apos;re starting to form — tap one to draft it</span>
+          </div>
+          {takes === null ? (
+            <div className={styles.takesidle}>
+              {takesState === "error" ? (
+                <span>
+                  couldn&apos;t form takes just now —{" "}
+                  <button type="button" onClick={loadTakes}>
+                    try again
+                  </button>
+                </span>
+              ) : (
+                <button
+                  className={styles.formtakes}
+                  type="button"
+                  onClick={loadTakes}
+                  disabled={takesState === "loading"}
+                >
+                  {takesState === "loading" ? "forming…" : "form takes from my work →"}
+                </button>
+              )}
+            </div>
+          ) : takes.length === 0 ? (
+            <div className={styles.empty}>
+              no takes yet — write a few posts and they&apos;ll start forming.
+            </div>
+          ) : (
+            <div className={styles.takes}>
+              {takes.map((t, i) => (
+                <button
+                  key={i}
+                  className={styles.take}
+                  type="button"
+                  onClick={() => seedTake(t)}
+                >
+                  <span className={styles.takeq}>{t.take}</span>
+                  <span className={styles.takebo}>↳ {t.based_on}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* recent posts */}
           <div className={styles.sectt}>recent</div>
           {posts === null ? (
@@ -165,7 +231,7 @@ export default function HomePage() {
                     <span className={styles.postbody}>{p.body}</span>
                     <span
                       className={`${styles.badge} ${
-                        p.status === "approved" ? styles.appr : styles.draft
+                        p.status === "draft" ? styles.draft : styles.appr
                       }`}
                     >
                       {p.status}

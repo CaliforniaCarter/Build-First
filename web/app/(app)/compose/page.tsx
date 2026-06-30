@@ -2,14 +2,14 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { api, ApiError, type PostRecord } from "@/lib/api";
+import { api, ApiError, type OptionResult, type PostRecord } from "@/lib/api";
 import { gateLabel, dimLabel } from "@/lib/score";
 import { getName } from "@/lib/onboarding-store";
 import { Waveform } from "@/components/Waveform";
 import styles from "./page.module.css";
 
 type Source = "say" | "paste";
-type Phase = "idle" | "drafting" | "done";
+type Phase = "idle" | "drafting" | "choosing" | "polishing" | "done";
 type GateErr = null | "onboarding" | "generic";
 
 const PLACEHOLDERS: Record<Source, string> = {
@@ -18,12 +18,53 @@ const PLACEHOLDERS: Record<Source, string> = {
     "paste your notes or a transcript — timbre reads the real work and only asks for what's missing.",
 };
 
+// Plain, honest hint for a weak dimension — never the number or the raw dimension name.
+const WEAK_HINTS: Record<string, string> = {
+  story_strength: "lighter on story",
+  opinion_edge: "the take could be sharper",
+  specificity_surprise: "could be more specific",
+  emotional_resonance: "reads a little flat",
+  ownability: "less distinctly yours",
+  voice_match: "a touch off your voice",
+  format_adherence: "looser structure",
+  audience_fit: "less dialed to your reader",
+  stakes_turn: "lower stakes",
+};
+
+// The weakest dimension, only if it's genuinely soft — otherwise say nothing.
+function weakHint(opt: OptionResult): string | null {
+  const dims = opt.score.dimensions;
+  if (!dims.length) return null;
+  const low = dims.reduce((a, b) => (b.score < a.score ? b : a));
+  if (low.score >= 6) return null;
+  return WEAK_HINTS[low.name] ?? null;
+}
+
+// Surface what timbre actually learned from the pick — its own words, lowercased to fit.
+function learnedLine(applied: string[]): string {
+  if (!applied.length) return "noted.";
+  let s = applied[0].trim();
+  s = s.replace(/^(add|update|remove|set)\s+[\w.]+:\s*/i, "");
+  s = s.replace(/^[+-]\s*/, "").replace(/^['"]|['"]$/g, "");
+  s = s.trim();
+  if (!s) return "noted.";
+  return `timbre learned: ${s.toLowerCase()}`;
+}
+
 function Compose() {
   const searchParams = useSearchParams();
   const [work, setWork] = useState(() => searchParams.get("work") ?? "");
   const [source, setSource] = useState<Source>("say");
   const [phase, setPhase] = useState<Phase>("idle");
+
+  const [options, setOptions] = useState<OptionResult[] | null>(null);
+  const [chosen, setChosen] = useState<number | null>(null);
+  const [why, setWhy] = useState("");
+
   const [post, setPost] = useState<PostRecord | null>(null);
+  const [learnNote, setLearnNote] = useState<string | null>(null);
+  const [shipped, setShipped] = useState<number | null>(null);
+  const [posting, setPosting] = useState(false);
 
   const [showErr, setShowErr] = useState(false);
   const [shake, setShake] = useState(false);
@@ -57,7 +98,16 @@ function Compose() {
 
   const initial = (name || "y").trim().charAt(0).toUpperCase();
 
-  async function runCompose() {
+  function fail(e: unknown, fallback: string) {
+    if (e instanceof ApiError && e.status === 409) {
+      setGateErr("onboarding");
+    } else {
+      setGateErr("generic");
+      setGenericMsg(e instanceof Error ? e.message : fallback);
+    }
+  }
+
+  async function runOptions() {
     if (!work.trim()) {
       setShowErr(true);
       setShake(true);
@@ -66,20 +116,48 @@ function Compose() {
     setShowErr(false);
     setGateErr(null);
     setEditing(false);
+    setPost(null);
+    setLearnNote(null);
+    setShipped(null);
+    setChosen(null);
+    setWhy("");
     setPhase("drafting");
     try {
-      const res = await api.compose(work.trim());
+      const res = await api.composeOptions(work.trim());
+      setOptions(res.options);
+      setPhase("choosing");
+    } catch (e) {
+      setPhase("idle");
+      fail(e, "something went wrong.");
+    }
+  }
+
+  async function pickChosen() {
+    if (options === null || chosen === null) return;
+    const chosenOpt = options[chosen];
+    const rejected = options[chosen === 0 ? 1 : 0];
+    const rejectedOpening = rejected?.body.split("\n")[0] ?? "";
+    setPhase("polishing");
+    try {
+      const res = await api.pick({
+        chosen: chosenOpt.body,
+        rejected_opening: rejectedOpening,
+        why: why.trim(),
+        topic: work.trim(),
+      });
       setPost(res.post);
       setShowDims(false);
       setPhase("done");
-    } catch (e) {
-      setPhase("idle");
-      if (e instanceof ApiError && e.status === 409) {
-        setGateErr("onboarding");
-      } else {
-        setGateErr("generic");
-        setGenericMsg(e instanceof Error ? e.message : "something went wrong.");
+      // Fold the choice into the voice profile and surface a quiet line of what it learned.
+      try {
+        const learned = await api.learn();
+        setLearnNote(learnedLine(learned.applied));
+      } catch {
+        /* learning is best-effort — never block the draft on it */
       }
+    } catch (e) {
+      setPhase("choosing");
+      fail(e, "couldn't polish that one.");
     }
   }
 
@@ -94,6 +172,21 @@ function Compose() {
       setGenericMsg(e instanceof Error ? e.message : "couldn't approve.");
     } finally {
       setApproving(false);
+    }
+  }
+
+  async function markPosted() {
+    if (!post || posting) return;
+    setPosting(true);
+    try {
+      const res = await api.markPosted(post.id);
+      setPost(res.post);
+      setShipped(res.shipped);
+    } catch (e) {
+      setGateErr("generic");
+      setGenericMsg(e instanceof Error ? e.message : "couldn't log that.");
+    } finally {
+      setPosting(false);
     }
   }
 
@@ -122,6 +215,7 @@ function Compose() {
   const qa = score ? score.quality_avg : 0;
   const barPct = Math.max(0, Math.min(100, (qa / 10) * 100));
   const approved = post?.status === "approved";
+  const posted = post?.status === "posted";
 
   return (
     <>
@@ -174,10 +268,10 @@ function Compose() {
             <button
               className={styles.draftbtn}
               type="button"
-              onClick={runCompose}
-              disabled={phase === "drafting"}
+              onClick={runOptions}
+              disabled={phase === "drafting" || phase === "polishing"}
             >
-              {phase === "drafting" ? "drafting…" : "draft it in my voice →"}
+              {phase === "drafting" ? "drafting…" : "draft two options →"}
             </button>
           </div>
           <div className={`err${showErr ? " show" : ""}`}>
@@ -204,19 +298,99 @@ function Compose() {
           <div className={styles.gate}>
             <h3>that didn&apos;t go through</h3>
             <p>{genericMsg || "something went wrong. give it another go."}</p>
-            <button className="cta" type="button" onClick={runCompose}>
+            <button className="cta" type="button" onClick={runOptions}>
               try again <span className="arrow">→</span>
             </button>
           </div>
         )}
 
-        {/* drafting loader */}
-        {phase === "drafting" && (
+        {/* drafting / polishing loader */}
+        {(phase === "drafting" || phase === "polishing") && (
           <div className={styles.drafting}>
             <div className={styles.draftbars}>
               <Waveform bars={22} />
             </div>
-            <div className={styles.dt}>writing it the way you&apos;d say it…</div>
+            <div className={styles.dt}>
+              {phase === "drafting"
+                ? "writing two ways to say it…"
+                : "polishing the one you picked…"}
+            </div>
+          </div>
+        )}
+
+        {/* two options — pick the one that sounds like you */}
+        {phase === "choosing" && options && (
+          <div className={styles.choose}>
+            <div className={styles.choosehd}>
+              <span className={styles.chooset}>two takes — pick the one that sounds like you</span>
+              <span className={styles.choosesub}>
+                same work, different shapes. timbre learns from which you reach for.
+              </span>
+            </div>
+
+            <div className={styles.options}>
+              {options.map((opt, i) => {
+                const on = chosen === i;
+                const hint = weakHint(opt);
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    className={`${styles.opt}${on ? " " + styles.opton : ""}`}
+                    onClick={() => setChosen(i)}
+                  >
+                    <div className={styles.opthd}>
+                      <span className={styles.optlabel}>
+                        option {i === 0 ? "a" : "b"}
+                      </span>
+                      <span className={styles.optpick}>{on ? "✓ picked" : "pick this"}</span>
+                    </div>
+                    <div className={styles.optbody}>{opt.body}</div>
+                    {opt.proof.length > 0 && (
+                      <div className={styles.optproof}>
+                        {opt.proof.slice(0, 3).map((p, j) => (
+                          <span key={j} className="chiprc">
+                            <span className="ic">▪</span> {p}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {hint && <div className={styles.opthint}>{hint}</div>}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className={styles.whybox}>
+              <label className={styles.whyl} htmlFor="why">
+                why this one? <span>optional — but it&apos;s how timbre learns your taste</span>
+              </label>
+              <input
+                id="why"
+                className={styles.whyin}
+                value={why}
+                placeholder="e.g. opens with the moment, not the lesson"
+                onChange={(e) => setWhy(e.target.value)}
+              />
+            </div>
+
+            <div className={styles.choosebar}>
+              <button
+                className={`${styles.pbtn} ${styles.primary}`}
+                type="button"
+                onClick={pickChosen}
+                disabled={chosen === null}
+              >
+                use this one →
+              </button>
+              <button
+                className={`${styles.pbtn} ${styles.ghost}`}
+                type="button"
+                onClick={runOptions}
+              >
+                two new options
+              </button>
+            </div>
           </div>
         )}
 
@@ -265,6 +439,12 @@ function Compose() {
                 </div>
               )}
 
+              {learnNote && (
+                <div className={styles.learn}>
+                  <span className={styles.learnpip} /> {learnNote}
+                </div>
+              )}
+
               <div className={styles.pa}>
                 {editing ? (
                   <>
@@ -286,14 +466,26 @@ function Compose() {
                   </>
                 ) : (
                   <>
-                    <button
-                      className={`${styles.pbtn} ${styles.primary}`}
-                      type="button"
-                      onClick={approve}
-                      disabled={approving || approved}
-                    >
-                      {approved ? "approved ✓" : approving ? "approving…" : "approve draft"}
-                    </button>
+                    {!posted && (
+                      <button
+                        className={`${styles.pbtn} ${styles.primary}`}
+                        type="button"
+                        onClick={approve}
+                        disabled={approving || approved}
+                      >
+                        {approved ? "approved ✓" : approving ? "approving…" : "approve draft"}
+                      </button>
+                    )}
+                    {!posted && (
+                      <button
+                        className={`${styles.pbtn} ${styles.ghost}`}
+                        type="button"
+                        onClick={markPosted}
+                        disabled={posting}
+                      >
+                        {posting ? "logging…" : "i posted it"}
+                      </button>
+                    )}
                     <button
                       className={`${styles.pbtn} ${styles.ghost}`}
                       type="button"
@@ -304,18 +496,29 @@ function Compose() {
                     <button
                       className={`${styles.pbtn} ${styles.ghost}`}
                       type="button"
-                      onClick={runCompose}
+                      onClick={runOptions}
                     >
-                      regenerate
+                      two new options
                     </button>
                   </>
                 )}
               </div>
 
-              {approved && (
-                <div className={styles.approved}>
-                  <span>✓</span> approved — drafts only; this never posts anywhere.
+              {posted ? (
+                <div className={styles.shipped}>
+                  <span className={styles.shippedhd}>
+                    🚀 shipped — that&apos;s {shipped ?? 1} live.
+                  </span>
+                  <span className={styles.shippedsub}>
+                    you posted it yourself. timbre never posts for you.
+                  </span>
                 </div>
+              ) : (
+                approved && (
+                  <div className={styles.approved}>
+                    <span>✓</span> approved — drafts only; this never posts anywhere.
+                  </div>
+                )
               )}
             </div>
 

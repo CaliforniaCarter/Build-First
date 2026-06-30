@@ -153,7 +153,7 @@ export default function FeedPage() {
           ) : (
             <div className="flex flex-col gap-3 max-w-[860px]">
               {shown.map((post) => {
-                const appr = post.status === "approved";
+                const appr = post.status === "approved" || post.status === "posted";
                 return (
                   <article
                     key={post.id}
