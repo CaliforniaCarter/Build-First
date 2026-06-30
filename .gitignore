@@ -5,15 +5,18 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 
-# Secrets (the API path is dormant; never commit a key)
+# Secrets — never commit a key
 .env
 
 # Personal, local-first data — never leaves the machine, never committed
 profiles/*.md
 !profiles/.gitkeep
 runs/
+posts/*
+!posts/.gitkeep
 data/intake.json
 data/posts.json
+data/signals.json
 data/transcripts/
 
 # Web app

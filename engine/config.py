@@ -9,6 +9,7 @@ ENGINE = Path(__file__).resolve().parent
 
 PROFILES_DIR = ROOT / "profiles"
 RUNS_DIR = ROOT / "runs"
+POSTS_DIR = ROOT / "posts"
 DATA_DIR = ROOT / "data"
 LAYERS_DIR = ENGINE / "layers"
 

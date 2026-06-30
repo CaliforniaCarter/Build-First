@@ -1,7 +1,8 @@
 """Intake — load and validate the user's inputs (the onboarding answers).
 
-The real file (`data/intake.json`) is personal and gitignored. `intake.example.json`
-shows the shape. Nothing here is invented: every field is something the user gave.
+The real file (`data/intake.json`) is personal and gitignored. `intake.example.json` shows the
+blank shape; `intake.sample.json` is a filled synthetic example used as the cold-start fallback.
+Nothing here is invented: every field is something the user gave.
 """
 
 from __future__ import annotations
@@ -48,6 +49,8 @@ class Typed(BaseModel):
 
 class Voice(BaseModel):
     answers: dict[str, str] = {}  # question -> raw, unpolished answer
+    # real work you're proud of (essays, chats, posts) — the strongest voice corpus
+    writing_samples: list[str] = []
     tone_words: list[str] = []
     look: str = ""
     sentence_length: str = ""
@@ -83,7 +86,11 @@ class Intake(BaseModel):
 
 
 def load_intake(path: Path | None = None) -> Intake:
-    path = path or (DATA_DIR / "intake.json")
+    if path is None:
+        # Personal intake.json wins if present; otherwise fall back to the committed
+        # synthetic sample so a fresh checkout runs cold with no setup.
+        primary = DATA_DIR / "intake.json"
+        path = primary if primary.exists() else (DATA_DIR / "intake.sample.json")
     if not path.exists():
         raise FileNotFoundError(f"intake not found at {path} — see data/intake.example.json")
     return Intake.model_validate_json(path.read_text(encoding="utf-8"))

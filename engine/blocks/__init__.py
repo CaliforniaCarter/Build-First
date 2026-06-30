@@ -1,1 +1,1 @@
-"""Pipeline blocks: intake, profile, persona, draft, receipts, council, gate."""
+"""Pipeline blocks: intake, profile, persona, probe, draft, receipts, council, gate."""

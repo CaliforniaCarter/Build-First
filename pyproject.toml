@@ -1,13 +1,12 @@
 [project]
-name = "build-first"
+name = "timbre"
 version = "0.1.0"
-description = "Brand Voice Content Engine — turns what you actually build into on-brand, in-voice LinkedIn posts, from a cold start."
+description = "Timbre — captures your authentic voice and drafts on-brand posts you approve, from a cold start."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "pydantic>=2.7",
     "python-dotenv>=1.0",
-    "rich>=13.7",
 ]
 
 # The 'api' extra powers the web path: the Anthropic SDK (live generation) plus the
@@ -20,8 +19,11 @@ api = [
     "uvicorn[standard]>=0.29",
 ]
 
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6"]
+
 [project.scripts]
-bf = "engine.cli:main"
+tb = "engine.cli:main"
 
 [build-system]
 requires = ["hatchling"]

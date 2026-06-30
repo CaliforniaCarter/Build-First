@@ -36,7 +36,7 @@ audit trail, and leaves a clean seam so an API re-score is a one-flag change.
 ## 3. The eval is the moat (V1)
 
 **Decision.** An ablation ladder (one input tier at a time) + a shared rubric (6 hard gates,
-9 scored dimensions) + a 2-pass Reflexion Writer's Council, calibrated to one human.
+9 scored dimensions) + a bounded (up to 3-pass) Reflexion Writer's Council, calibrated to one human.
 
 **Why.** Per Tenex's 5-stage framework, when agents can build anything the eval set is the moat.
 The ladder *is* the demo: each input visibly earns its score. Scores are calibration-pending by

@@ -1,0 +1,65 @@
+{
+  "name": "Maya Chen",
+  "idea": {
+    "topic": "How a 20-line eval harness caught a bug three senior engineers missed",
+    "take": "Evals aren't QA you bolt on at the end — they're the spec. Write the eval first and it tells you what to build.",
+    "scene": "Friday, 5pm. Our support bot calmly told a customer to delete their production database to 'clear the cache.' Nobody caught it in review — the answer read clean.",
+    "number": "The harness flagged 14% of answers as confidently wrong. Our 200-case manual QA had caught 0% of them.",
+    "lesson": "Reviewers grade fluency, not truth. A graded eval grades truth — and that gap is exactly where the worst bugs live.",
+    "only_you": "I spent six years as an air-traffic controller before I wrote a line of code. There, a confident-but-wrong call gets people killed. So I built the harness like an incident review, not a test suite.",
+    "mechanism": "Every answer gets scored by a second model against hard gates (is there a citation? does it contradict the docs?) plus a 0-10 quality score. Gates fail loud; the score is the dial you watch.",
+    "proof": [
+      "diff: +212 / -4 in evals/harness.py",
+      "before/after: 14% confidently-wrong dropped to 2% in one week",
+      "the Friday 5pm incident thread"
+    ],
+    "close": "We stopped asking 'does it sound right?' and started asking 'can it prove it?' Ship the eval first."
+  },
+  "online": {
+    "linkedin": "linkedin.com/in/maya-chen-builds",
+    "x": "@mayabuilds",
+    "other": "",
+    "existing_posts": "",
+    "cold_start": true
+  },
+  "docs": {
+    "resume": "Applied-AI engineer. Six years as an air-traffic controller (FAA) before switching to software at 29. Self-taught; three years building LLM features for a high-traffic SaaS support product. Ships eval-driven, not demo-driven.",
+    "portfolio": ""
+  },
+  "typed": {
+    "identity": "Applied-AI engineer who ships eval-driven LLM features.",
+    "known_for": "Turning fuzzy 'make the AI better' asks into measurable gates.",
+    "background": "Six years as an air-traffic controller before switching to software at 29.",
+    "beliefs": "Most AI 'quality' problems are eval problems wearing a costume. Vibes don't scale; rubrics do.",
+    "lessons": "Shipped a chatbot once with no evals. It invented a refund policy and cost us a $40k weekend. Never again."
+  },
+  "voice": {
+    "answers": {
+      "What did you do last weekend?": "Rebuilt my bike's brakes on the kitchen floor, got grease on everything, then rode it down the steepest hill near me to test them. Held. Mostly.",
+      "Whose posts make you cringe?": "The 'thrilled to announce' crowd. Ten adjectives, zero numbers. Just tell me what broke and what you learned from it.",
+      "Teach me something you know well": "Right of way at an uncontrolled intersection isn't first-come. Whoever's on the right wins the tie. Most drivers guess, and most guess wrong."
+    },
+    "writing_samples": [
+      "We shipped the eval harness today. Twenty lines. It already caught a confidently-wrong answer that three of us missed in review. The lesson isn't 'AI is risky.' The lesson is reviewers grade fluency, not truth. Build the thing that grades truth."
+    ],
+    "tone_words": ["direct", "dry", "concrete", "a little blunt"],
+    "look": "short paragraphs, no emojis, the occasional one-line punch",
+    "sentence_length": "short and varied; fragments allowed for emphasis",
+    "banned": ["thrilled to announce", "game-changer", "leverage", "delve"],
+    "signatures": ["Ship the eval first.", "Vibes don't scale."],
+    "emojis": "none",
+    "notes": "Writes like she talks: plain, fast, no warm-up."
+  },
+  "audience": {
+    "writing_for": "Builders shipping AI features — engineers and technical founders.",
+    "goal": "Be known for eval-driven rigor; attract teams who value measurement over demos.",
+    "play_to": "Respect for proof and specifics; an allergy to hype."
+  },
+  "output": {
+    "channels": ["LinkedIn"],
+    "length": "medium (120-200 words)",
+    "format": "hook, short body, one takeaway line",
+    "hard_nevers": ["no hashtags", "no emojis", "never fake a number"],
+    "off_limits": "employer name, customer names"
+  }
+}

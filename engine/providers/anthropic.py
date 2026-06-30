@@ -1,8 +1,10 @@
-"""Anthropic provider — the synchronous, real-model path.
+"""Anthropic provider — the real-API path (model-agnostic via BF_MODEL).
 
-Dormant during the overnight CLI build (TerminalProvider uses the local agent), this is
-the drop-in the web API (api/) uses for live generation. Enable with:
-  uv pip install -e '.[api]'  and  ANTHROPIC_API_KEY.
+A first-class provider used by both the web API (api/) for live generation and the CLI
+(`--provider anthropic`) for draft/council/score/learn. Enable with `uv pip install -e '.[api]'`
+and `ANTHROPIC_API_KEY` (BF_MODEL picks the model; defaults to a current Claude). Kept thin —
+prompts are terse so there is little repeated bulk to cache; long stages get more max_tokens so
+output is never truncated, and picks/edits are logged token-free (engine/signals.py).
 """
 
 from __future__ import annotations
