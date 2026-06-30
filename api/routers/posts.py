@@ -37,6 +37,16 @@ def approve(post_id: str) -> dict:
     return post
 
 
+@router.post("/{post_id}/posted")
+def mark_posted(post_id: str) -> dict:
+    """You posted it yourself — log it (Timbre never posts for you). Returns the shipped tally."""
+    post = store.update_post(post_id, status="posted")
+    if post is None:
+        raise HTTPException(status_code=404, detail="post not found")
+    shipped = sum(1 for p in store.list_posts() if p.get("status") == "posted")
+    return {"post": post, "shipped": shipped}
+
+
 @router.patch("/{post_id}")
 def patch_post(
     post_id: str,

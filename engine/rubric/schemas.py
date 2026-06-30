@@ -69,6 +69,11 @@ class Score(BaseModel):
     def quality_avg(self) -> float:
         return round(mean(d.score for d in self.dimensions), 1)
 
+    @property
+    def passes_threshold(self) -> bool:
+        """Clean on every hard gate and a solid quality dial — a draft worth your time."""
+        return self.gates_passed == self.gates_total and self.quality_avg >= 7.0
+
     def headline(self) -> str:
         return f"{self.quality_avg}/10  ·  gates {self.gates_passed}/{self.gates_total}"
 

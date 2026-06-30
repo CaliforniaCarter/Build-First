@@ -40,6 +40,17 @@ class ComposeRequest(BaseModel):
     save: bool = True
 
 
+class OptionsRequest(BaseModel):
+    work: str
+
+
+class PickRequest(BaseModel):
+    chosen: str  # the option body the user picked
+    rejected_opening: str = ""  # first line of the option they passed on
+    why: str = ""  # optional reason — the strongest learning signal
+    topic: str = ""  # what the post was about (for the saved record)
+
+
 class PostPatch(BaseModel):
     body: str | None = None
     rescore: bool = False

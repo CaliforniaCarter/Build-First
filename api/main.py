@@ -14,7 +14,7 @@ load_dotenv()  # before anything reads os.environ
 from fastapi import FastAPI  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 
-from .routers import compose, intake, online, persona, posts, profile  # noqa: E402
+from .routers import compose, intake, learn, online, persona, posts, profile  # noqa: E402
 
 app = FastAPI(title="Timbre API", version="0.1.0")
 
@@ -25,7 +25,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for module in (intake, online, profile, persona, compose, posts):
+for module in (intake, online, profile, persona, compose, posts, learn):
     app.include_router(module.router)
 
 
