@@ -69,10 +69,10 @@
   position: relative;
   z-index: 3;
   display: grid;
-  grid-template-columns: 1.08fr 0.92fr;
+  grid-template-columns: minmax(0, 760px);
   gap: 50px;
   align-items: center;
-  padding: 64px 0 56px;
+  padding: 64px 0 96px;
 }
 .h1 {
   font-size: clamp(48px, 6.2vw, 82px);
