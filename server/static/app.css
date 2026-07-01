@@ -1,0 +1,279 @@
+:root {
+  --bg: #000000;
+  --fg: #f4f4ef;
+  --muted: #8c8c84;
+  --faint: rgba(255, 255, 255, 0.14);
+  --yellow: #ffe500;
+  --serif: "Instrument Serif", Georgia, serif;
+  --ui: "Space Grotesk", -apple-system, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---------- top progress bar ---------- */
+#progress {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 10;
+}
+#progress-fill {
+  height: 100%;
+  width: 0;
+  background: var(--yellow);
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- stage / screens ---------- */
+#stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 28px 120px;
+}
+
+.screen {
+  width: 100%;
+  max-width: 680px;
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.screen--center {
+  text-align: center;
+  max-width: 620px;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* question marker, e.g. "1 →" */
+.marker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--yellow);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  margin-bottom: 18px;
+}
+
+.question {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(30px, 4.4vw, 48px);
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+  margin: 0 0 14px;
+}
+
+.desc {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0 0 30px;
+  max-width: 540px;
+}
+.screen--center .desc { margin-left: auto; margin-right: auto; }
+
+/* ---------- inputs ---------- */
+.field {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--faint);
+  color: var(--fg);
+  font-family: var(--ui);
+  font-size: clamp(20px, 2.6vw, 26px);
+  font-weight: 300;
+  padding: 10px 2px 12px;
+  caret-color: var(--yellow);
+  outline: none;
+  transition: border-color 0.25s ease;
+}
+.field::placeholder { color: rgba(255, 255, 255, 0.22); }
+.field:focus { border-bottom-color: var(--yellow); }
+
+textarea.field {
+  resize: none;
+  line-height: 1.4;
+  min-height: 64px;
+  overflow: hidden;
+}
+
+/* background sub-fields (handles + resume) */
+.subfields {
+  margin-top: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.subrow { display: flex; gap: 16px; flex-wrap: wrap; }
+.subrow .field { font-size: 17px; }
+.sublabel {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.subcol { flex: 1; min-width: 180px; }
+
+.resume {
+  display: inline-flex;
+  align-items: center;
+}
+.resume label {
+  cursor: pointer;
+  background: var(--yellow);
+  color: #000;
+  border: 1px solid var(--yellow);
+  border-radius: 10px;
+  padding: 14px 26px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: filter 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.resume label:hover { filter: brightness(1.06); }
+.resume input[type="file"] { display: none; }
+/* once a resume is read: a clean green check state */
+.resume.uploaded label {
+  background: rgba(74, 222, 128, 0.12);
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+.skip-note { margin-top: 18px; font-size: 14px; color: var(--muted); }
+
+/* ---------- big title / button screens (intro, sections, done) ---------- */
+.eyebrow {
+  color: var(--yellow);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(40px, 7vw, 76px);
+  line-height: 1.04;
+  margin: 0 0 18px;
+}
+.subtitle {
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.55;
+  margin: 0 auto 36px;
+  max-width: 500px;
+}
+
+/* big centered call-to-action (intro "Get started") */
+.cta {
+  font-family: var(--ui);
+  font-size: 18px;
+  font-weight: 500;
+  background: var(--yellow);
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  padding: 18px 46px;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.cta:hover { filter: brightness(1.06); transform: translateY(-2px); }
+
+/* ---------- intro typewriter ---------- */
+.intro .title { min-height: 1.12em; }
+.title.typing::after {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 0.8em;
+  margin-left: 6px;
+  background: var(--yellow);
+  vertical-align: -0.02em;
+  animation: caret 0.9s steps(1) infinite;
+}
+@keyframes caret { 50% { opacity: 0; } }
+
+/* intro subtitle + CTA fade in after the typing finishes */
+.reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.show { opacity: 1; transform: none; pointer-events: auto; }
+
+/* ---------- bottom nav ---------- */
+#nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  background: linear-gradient(to top, var(--bg) 55%, transparent);
+}
+/* must outrank the #nav display:flex above so hidden actually hides (intro/done) */
+#nav[hidden] { display: none; }
+.nav-right { display: flex; align-items: center; gap: 16px; }
+
+.nav-btn {
+  font-family: var(--ui);
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 9px;
+  padding: 11px 22px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.nav-back {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+}
+.nav-back:hover { color: var(--fg); }
+/* keep Back's slot so a lone Next stays pinned bottom-right (e.g. on the intro) */
+.nav-back[hidden] { display: inline-block; visibility: hidden; }
+
+/* Next: solid yellow once valid; ghost/disabled when empty */
+.nav-next {
+  background: var(--yellow);
+  color: #000;
+  border: 1px solid var(--yellow);
+}
+.nav-next:hover:not(:disabled) { filter: brightness(1.06); }
+.nav-next:disabled {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--faint);
+  cursor: not-allowed;
+}
+
+.hint { color: var(--muted); font-size: 13px; }
+
+@media (max-width: 560px) {
+  .hint { display: none; }
+  #stage { padding-bottom: 100px; }
+}

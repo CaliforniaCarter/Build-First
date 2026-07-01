@@ -1,5 +1,5 @@
 {
-  "welcome": "Hey — I'm Timbre. I'm here to help you find your voice, so the posts you make actually sound like you, never like AI slop. This'll take less than 10 minutes — just a few quick questions, and everything's editable after. Let's get into it.",
+  "welcome": "Hey, I'm Timbre — here to capture your voice so the content you make actually sounds like your unique, authentic self. Help me understand a bit more about you; this'll take less than 10 minutes.",
 
   "defaults": {
     "audience": {
@@ -44,7 +44,8 @@
       "id": "background",
       "type": "deterministic",
       "order": 2,
-      "prompt": "Awesome, {name} — I'd love to get a little background on you. Drop your resume or give me the short bio, and paste your LinkedIn or X handle if you've got one (no need to log in anywhere).",
+      "prompt": "Awesome, {name} — I'd love to get a little background on you.",
+      "subtext": "Upload your resume or paste a quick bio about yourself.",
       "purpose": "context + your handles",
       "writes_to": "typed.background"
     },
@@ -52,7 +53,8 @@
       "id": "writing_samples",
       "type": "deterministic",
       "order": 2.5,
-      "prompt": "Sweet, thank you. As I'm getting a feel for your voice — is there any writing you're really proud of? A post, an essay, anything you've put out. Drop it right here. If not, no worries — just say skip.",
+      "prompt": "Sweet, thank you. As I'm getting a feel for your voice is there any writing you're really proud of?",
+      "subtext": "A post, an essay, anything you've put out — one or a few, paste whatever you've got. We just wanna see your authentic voice and style.",
       "purpose": "real writing samples, weighted above the easy answers (optional — skippable)",
       "writes_to": "voice.writing_samples"
     },
@@ -61,6 +63,7 @@
       "type": "deterministic",
       "order": 3,
       "prompt": "First one — what'd you do last weekend?",
+      "subtext": "Try to give me at least a few sentences — the more you write, the better I hear your voice.",
       "purpose": "captures your natural rhythm",
       "writes_to": "voice.answers.weekend"
     },
@@ -69,6 +72,7 @@
       "type": "deterministic",
       "order": 4,
       "prompt": "What's your go-to lunch, and why?",
+      "subtext": "Yes, I know — another vague one. But give it to me straight and I can capture your voice.",
       "purpose": "captures your sentence shape",
       "writes_to": "voice.answers.lunch"
     },
@@ -77,6 +81,7 @@
       "type": "deterministic",
       "order": 5,
       "prompt": "Last one — teach me how you'd make a pasta dish, step by step.",
+      "subtext": "Okay, genuinely the last one — pinky promise. Go all in here: thorough, unfiltered, fully you. That's the good stuff.",
       "purpose": "captures your words & tics + how you explain something",
       "writes_to": "voice.answers.teach"
     },

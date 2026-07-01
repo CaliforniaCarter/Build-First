@@ -640,6 +640,46 @@ def cmd_doctor(args):
     print(f"voice profile: {'present' if load_voice() else 'not built yet (run `tb onboard`)'}")
 
 
+def cmd_welcome(args):
+    """Boot the local web intake — a no-key browser onboarding — and block until the user
+    clicks Done. The browser collects the deterministic answers into data/intake.json (no
+    model calls); when it's done the server stops and the terminal flow continues."""
+    import socket
+    import threading
+    import time
+    import webbrowser
+
+    from .config import ROOT
+
+    # Make the top-level `server` package importable however `tb` was launched.
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    try:
+        import uvicorn
+
+        from server.main import create_app
+    except ImportError as e:
+        print(f'web intake needs the web extra — run `uv pip install -e ".[web]"` ({e})', file=sys.stderr)
+        return
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(("127.0.0.1", 0))
+    port = sock.getsockname()[1]
+    sock.close()
+
+    app = create_app()
+    config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning")
+    server = uvicorn.Server(config)
+    app.state.server = server  # the /api/intake/complete handler flips server.should_exit
+
+    url = f"http://127.0.0.1:{port}/"
+    print(f"Timbre intake → {url}\nFill it out in the browser, then click Done…")
+    threading.Thread(target=lambda: (time.sleep(0.9), webbrowser.open(url)), daemon=True).start()
+
+    server.run()  # blocks until the Done click stops the server
+    print("Intake complete — answers saved to data/intake.json")
+
+
 def _load_env() -> None:
     """Best-effort: load .env so the anthropic path sees ANTHROPIC_API_KEY / BF_MODEL."""
     try:
@@ -683,6 +723,7 @@ def main(argv=None):
         ("publish", cmd_publish),
         ("learn", cmd_learn),
         ("onboard", cmd_onboard),
+        ("welcome", cmd_welcome),
         ("reset", cmd_reset),
         ("ablate", cmd_ablate),
         ("report", cmd_report),

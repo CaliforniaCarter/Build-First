@@ -4,58 +4,51 @@ argument-hint: "[your LinkedIn/X handle or a post you're proud of]"
 allowed-tools: Bash Read Write Edit
 ---
 
-Onboard the user into Timbre — a warm, one-question-at-a-time conversation that learns their
-voice. Context they gave: **$ARGUMENTS**
-
-**The flow is data, not improv.** Read `engine/onboarding.json` first — it holds the welcome
-line, the hardcoded audience default, and the exact questions (with their order, type, and
-where each answer is stored). Ask those questions; never invent your own.
+Onboard the user into Timbre. The noisy part — collecting their answers — happens in a clean
+**web page** (no API key, no terminal mechanics). You finish the job in the terminal: one
+personalized this-or-that, then the voice extraction and a short reveal. Context they gave: **$ARGUMENTS**
 
 ## How to run it
 
-1. **Read `engine/onboarding.json`.** Print its `welcome` line, as written.
+1. **Open the web intake and wait.** Run `uv run tb welcome` **in the background** (it opens a
+   browser page and returns the moment the user clicks **Done** — that can take a few minutes, so
+   the background runner is what keeps it from being cut off). Say **one** short line and nothing
+   else: *"I opened a quick setup page in your browser — fill it out and hit Done, and I'll take it
+   from there."* Then wait for the command to return. (The page writes the deterministic answers
+   straight into `data/intake.json` — name, background + handles, resume, writing samples, and the
+   weekend/lunch/teach answers. You do **not** re-ask any of these.)
 
-2. **Ask the `questions` STRICTLY one at a time, in `order`** (skip any with `enabled: false`) —
-   print one question, wait for the answer, then the next. **Never batch them.** Above each
-   question print a progress bar, e.g. `[▰▰▱▱▱▱▱] 2/7 · background`. Substitute `{name}` once you
-   have it. **Before the three voice questions (weekend / lunch / teach), say a short
-   transition:** *"Great. Now I've got a couple quick questions for you — just type or dictate
-   them (Wispr Flow is great for this) in your normal tone. Quick and easy; I just want to get a
-   feel for how you naturally explain things."*
-   - **`deterministic`** — ask the `prompt` verbatim.
-   - **`adaptive_ab`** — the personalized this-or-that. Print the `prompt` to set it up, then
-     follow the question's `generate` instruction: using their **resume + the answers so far**,
-     write the TWO short example posts yourself (real facts only — invent nothing), show them as
-     **A** and **B**, and ask which sounds more like them. **Never label the difference** (no
-     "dry vs warm") — let them feel it. Store the chosen example's **text** at `writes_to`.
+2. **The personalized this-or-that** (`style_pick`, the only question NOT in the web). Read
+   `engine/onboarding.json` for the `style_pick` question and `data/intake.json` for what they
+   gave. Follow that question's `generate` instruction: from **their own resume + answers**, write
+   TWO short example posts (2–4 lines each) about ONE real thing from their material — same facts,
+   only the *feel* differs. **Invent nothing**, and **never name the difference** (no "dry vs
+   warm"). Show them as **A** and **B**, ask which is more them, and store the chosen example's
+   **text** at `voice.style_pick` in `data/intake.json` (use Edit/Write on that one field only).
 
-3. **Be human, but brief, between questions.** A simple, warm acknowledgement — *"thank you,"
-   "love it," "got it"* — then move on. **Don't over-praise or invent enthusiasm** (no "sounds
-   fun!", no padding). At most **one** grounded micro-observation in the *whole* flow. The full
-   voice reveal waits for the end.
+3. **Extract the voice.** Run `uv run tb onboard`. This is the only AI step — it reads *how* they
+   wrote (from `data/intake.json`) and writes `profiles/voice.json`. It invents nothing.
 
-4. **Store answers in `data/intake.json`** as you go (start from `data/intake.example.json` for
-   the shape). Put each answer at the question's `writes_to` path (e.g. `voice.answers.weekend`).
-   For the **`writing_samples`** question: if they paste posts/essays, put each into
-   `voice.writing_samples` (weight these heavily) — or run `uv run tb sample --text "…"` per post;
-   if they say **skip**, leave it empty — no problem. For **`background`**, pull any handle/URL
-   into `online.linkedin` / `online.x` — **don't try to fetch a login-walled profile; pasting is
-   the way.** (The audience is already set in `engine/onboarding.json` and feeds drafts
-   automatically — you don't ask about it.)
+4. **The reveal — SHORT and warm.** Open with a genuine thanks. Read `profiles/voice.json` and
+   tell them, in 2–3 plain lines, how you'll keep it sounding like them. Don't dump the profile.
+   Then: *"It's always editable — tweak it anytime with `/timbre-voice` (or edit
+   `profiles/voice.json`), and your edit is the confirmation."*
 
-5. **Extract the voice.** Run `uv run tb onboard --json`. This is the only AI step — it reads
-   *how* they wrote and writes `profiles/voice.json`. It invents nothing.
+5. **Offer the first post:** *"Want to make your first post? Just say the word."* → `/timbre-post`.
 
-6. **The reveal — keep it SHORT and warm.** Open with a genuine thanks (*"Thanks for walking me
-   through all that — here's your voice."*). Read `profiles/voice.json` and tell them, in 2–3
-   plain lines, how you'll keep it sounding like them. Don't dump the whole profile. Then:
-   *"It's always editable — tweak it anytime with `/timbre-voice` (or edit `profiles/voice.json`),
-   and your edit is the confirmation."*
+## Fallback — no browser (terminal-only)
 
-7. **Offer the first post:** *"Want to make your first post? Just say the word."* → `/timbre-post`.
+If `tb welcome` can't run (no `web` extra) or the user would rather stay in the terminal, ask the
+**deterministic** questions from `engine/onboarding.json` **strictly one at a time, in order**
+(skip any `enabled: false`), with a short progress note and a brief human acknowledgement between
+answers. Substitute `{name}` once you have it. Store each answer at its `writes_to` path in
+`data/intake.json` (start from `data/intake.example.json` for the shape); for `writing_samples`,
+"skip" leaves it empty. Then do the `style_pick` (step 2), the extraction (step 3), and the
+reveal (steps 4–5).
 
 ## Rules
 
-- Don't make them fill a form — it's a conversation.
+- The web is **intake only** — it never calls a model. The AI steps (`style_pick`, `tb onboard`)
+  are yours, in the terminal, key-free via the default provider.
 - Never invent details about them. A blank stays blank.
 - The questions come from `engine/onboarding.json`. To change them, edit that file — not this.

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Timbre — find your voice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+  <div id="progress" aria-hidden="true"><div id="progress-fill"></div></div>
+
+  <main id="stage"><!-- screens injected by app.js --></main>
+
+  <footer id="nav" hidden>
+    <button id="back" class="nav-btn nav-back" type="button">← Back</button>
+    <div class="nav-right">
+      <span id="hint" class="hint"></span>
+      <button id="next" class="nav-btn nav-next" type="button" disabled>Next →</button>
+    </div>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

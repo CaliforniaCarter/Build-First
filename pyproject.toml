@@ -12,13 +12,23 @@ dependencies = [
 # The 'api' extra adds the Anthropic SDK so you can run against your own API key
 # (`--provider anthropic`). The CLI and the Claude Code plugin run with no key by
 # default (TerminalProvider). Install with:  uv pip install -e ".[api]"
+#
+# The 'web' extra adds the local intake server (`tb welcome`) — a no-key browser
+# onboarding that only collects answers into data/intake.json. No model calls here;
+# the AI steps stay in the terminal. Install with:  uv pip install -e ".[web]"
 [project.optional-dependencies]
 api = [
     "anthropic>=0.40",
 ]
+web = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pypdf>=4.0",
+    "python-multipart>=0.0.9",
+]
 
 [dependency-groups]
-dev = ["pytest>=8", "ruff>=0.6"]
+dev = ["pytest>=8", "ruff>=0.6", "httpx>=0.27"]
 
 [project.scripts]
 tb = "engine.cli:main"

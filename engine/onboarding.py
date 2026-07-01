@@ -23,6 +23,7 @@ class Question(BaseModel):
     type: QuestionType
     order: float
     prompt: str | None = None  # the framing shown to the user
+    subtext: str = ""  # optional sub-line under the prompt (e.g. the web onboarding hint)
     purpose: str = ""  # plain-English why, so the flow stays self-documenting
     writes_to: str = ""  # dotted path into intake.json (e.g. "voice.answers.weekend")
     # for `adaptive_ab`: how the model writes the two options FROM the person's own material —
