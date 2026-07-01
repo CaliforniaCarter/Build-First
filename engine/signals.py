@@ -4,8 +4,7 @@ Every pick (you chose option A over B, maybe with a why) and every edit is recor
 as plain text, with NO AI call — so most interactions cost zero tokens. The learning loop
 (engine/learn.py) reads the pending batch on demand, makes ONE call to update the profile
 in place, and marks them processed. Learning fires occasionally over a tiny batch, never
-per keystroke. The profile is the long-term memory; this log is capped. See
-docs/self_learning.md.
+per keystroke. The profile is the long-term memory; this log is capped.
 """
 
 from __future__ import annotations

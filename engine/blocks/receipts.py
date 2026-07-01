@@ -28,6 +28,4 @@ def attach_receipts(draft: str, intake: Intake) -> tuple[str, list[str], list[st
     """Return (redacted_draft, proof_items, redactions)."""
     redacted, redactions = redact(draft)
     proof = list(intake.idea.proof)
-    if intake.online.linkedin:
-        proof.append(f"profile: {intake.online.linkedin}")
     return redacted, proof, redactions

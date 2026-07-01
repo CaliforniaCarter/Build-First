@@ -27,8 +27,6 @@ class ContentIdea(BaseModel):
 
 
 class Online(BaseModel):
-    linkedin: str = ""
-    x: str = ""
     other: str = ""
     existing_posts: str = ""
     cold_start: bool = True

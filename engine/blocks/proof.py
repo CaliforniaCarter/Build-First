@@ -66,8 +66,6 @@ def source_corpus(intake: Intake) -> str:
         t.lessons,
         d.resume,
         d.portfolio,
-        o.linkedin,
-        o.x,
         o.other,
         o.existing_posts,
         *v.answers.values(),

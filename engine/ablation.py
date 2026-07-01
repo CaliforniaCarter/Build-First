@@ -153,7 +153,7 @@ _FULL_INPUTS = ["online", "docs", "typed", "persona", "specifics"]
 _ABLATE_SECTIONS = ("idea", "typed", "docs", "online")
 # Skip the topic (the seed of the post) and the raw handles (footprint, not draft material — a
 # leave-one-out showed +0.0, so they no longer enter the draft context).
-_ABLATE_SKIP = {"idea.topic", "online.linkedin", "online.x"}
+_ABLATE_SKIP = {"idea.topic"}
 
 
 def ablatable_fields(intake: Intake) -> list[str]:

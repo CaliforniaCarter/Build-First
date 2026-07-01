@@ -4,8 +4,7 @@ Every pick (option A over B, maybe with a why) and every edit reveals something 
 voice. Those are logged token-free (engine/signals.py). This reads the pending batch and, in
 ONE call, updates `profiles/voice.json` — the profile your drafts actually obey and you edit
 by hand. It updates in place (replace) and only adds genuinely new info, so the voice never
-bloats or drifts. The voice signature and your identity are never auto-rewritten. See
-docs/self_learning.md.
+bloats or drifts. The voice signature and your identity are never auto-rewritten.
 """
 
 from __future__ import annotations

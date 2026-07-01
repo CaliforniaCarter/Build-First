@@ -1,52 +1,79 @@
 # Timbre
 
-Drafts on-brand LinkedIn/X posts **in your voice**, from a cold start. Two options every
-time, real receipts attached, and it **never auto-posts** — you're always the gate. Every pick
-and edit teaches it your voice.
+**Using AI to increase the distribution of your *actual* voice.**
+
+## What
+
+A Claude Code plugin that learns your voice and writing style, then highlights your
+authenticity as you create content — so the posts you make sound like you, never like AI slop.
+
+## Quickstart
 
 ```bash
-uv pip install -e '.[api]'        # or skip [api] and use --provider terminal (no key)
-uv run tb onboard                 # capture your voice
-uv run tb post --provider anthropic   # → two options, in different shapes
-uv run tb pick --option 0 --why "punchier opening"   # polish + save the one you like
-uv run tb learn                   # fold your pick into your voice profile
+# from the repo root
+uv pip install -e ".[web]"       # the engine + the local onboarding page
+claude --plugin-dir ./plugin     # load the Timbre commands into Claude Code
 ```
 
-> **Local-first by design.** Your posts, your voice profile, and everything Timbre learns about
-> you stay as plain files on your machine (`data/`, `profiles/`, `posts/`) — they're gitignored
-> and never uploaded. The only thing that ever leaves is the redacted text a single model call
-> needs, and Timbre never posts anywhere for you. Your work, your machine, your call.
+Then, inside Claude Code:
 
-## What makes it different
+- **`/timbre-onboard`** — a browser page opens; a quick ~10-minute onboarding captures your
+  voice into local files. No account, no API key.
+- **`/timbre-post`** — turn what you shipped into a post in your voice. Two options, receipts
+  attached; you pick and approve. It never auto-posts.
 
-- **Your voice, not a template.** Onboarding extracts a voice profile from your real writing;
-  you confirm it by editing it. Drafts vary their shape — no two posts follow the same mold.
-- **Two options, then you pick.** Every `tb post` returns two drafts in different shapes. The
-  choice you make (and *why*) is itself a signal — it teaches the profile.
-- **It won't make things up.** The draft and the editor use only your real material. If a
-  stronger post needs a specific you don't have, it asks — it never invents a number, a name,
-  or a story. It would rather hand you an honest 7 than a fake 9.
-- **It learns, token-free.** Picks and edits are logged with no AI call; `tb learn` folds the
-  whole batch into your profile at once, in place, without bloat.
-- **Local-first.** Everything lives as plain files on your machine (`data/`, `profiles/`,
-  `posts/`). The only thing that leaves is the redacted text each model call needs.
+Everything stays as plain files on your machine (`data/`, `profiles/`, `posts/`) — nothing
+leaves your laptop.
 
-## How it works
+## Why
 
-`intake → voice profile → draft (×2 shapes) → Writer's Council (revise to a bar) → receipts →
-eval (6 gates + 9 dimensions) → you pick → it learns`. The engine returns structured data; the
-interface (Claude Code or your own) presents it and owns the conversation.
+- AI is becoming a great companion to help you write content.
+- But people will tune out if every post is written in the same AI-slop way.
 
-## Run it two ways
+Timbre keeps the leverage of AI while protecting the thing that actually earns attention: your
+authentic voice.
 
-Standalone CLI with your own key, or a **Claude Code plugin** (`plugin/`) where the chat is the
-interface — no API key needed.
+## How
 
-## Docs
+- A quick **10-minute onboarding** grabs the pieces that make you unique — how you actually
+  write, pulled from raw answers and your real writing samples.
+- It **keeps learning** from the way you edit and, ultimately, from what you end up posting.
+- **Anti-slop by design:** every draft carries a proof check — receipts required, banned phrases
+  blocked, every number traced back to your own material. If it can't ground a claim, it asks
+  instead of inventing.
 
-- [`docs/ui_contract.md`](docs/ui_contract.md) — how the plugin drives the engine (commands ↔ JSON).
-- [`docs/self_learning.md`](docs/self_learning.md) — the picks + edits learning loop.
-- [`docs/storage.md`](docs/storage.md) — the local file layout.
+## Impact
 
-`tb labs` is the builder's bench — an ablation harness that shows what each input is worth.
-Drafts only. You decide what ships.
+- Increase the amount of authentic content you can produce.
+
+## Tech choices & trade-offs
+
+- **Plugin-first.** I wanted to meet the team where they already work. I traded the broad reach
+  of a full front-end (and the API key it would need) for focus and simplicity — the AI runs
+  key-free through Claude Code itself. For a company-wide push like the Tenex Content Showcase, a
+  plugin felt like the right fit.
+- **Onboarding: a clean local UI, intake-only.** I started with a full web onboarding, but a
+  hosted app added complexity — a separate web app, an API key, copy that was harder to edit. So
+  the onboarding page is *pure intake*: it collects your answers into JSON locally and hands off
+  to the terminal for the AI steps. A clean first impression, no key, no cloud.
+- **JSON as the source of truth.** Your intake, voice profile, and posts are all plain,
+  hand-editable JSON. Your edit *is* the confirmation; the model never over-trusts its own
+  extraction.
+- **Deterministic, with the LLM only where it counts.** The flow is deterministic code; the
+  model is reserved for the few steps that genuinely need judgment (voice extraction, drafting).
+  Cheaper, more predictable, and easier to trust.
+- **A simple stack, on purpose.** I skipped heavier agent frameworks (e.g. LangGraph) so anyone
+  on the team can read the stack and trust it.
+- **Evaluation built in.** `tb labs` measures what each input is actually worth, so onboarding
+  earns its questions instead of guessing.
+
+## Roadmap
+
+- **MCP / model-agnostic** — run Timbre in any terminal, IDE, or agent, with any model.
+- **Local idea-mining** — a local model quietly ingests what you're already working on and ranks
+  it for novelty and interestingness, surfacing content ideas from your real workflow with no
+  effort from you.
+- **Analytics + posting** — pull performance straight from LinkedIn, X, and other platforms
+  (and, opt-in, auto-post).
+- **Zero housekeeping** — just confirm the posts you actually put online, so your library and
+  streaks stay honest with no manual bookkeeping.

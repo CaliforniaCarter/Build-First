@@ -1,6 +1,6 @@
 ---
 description: Capture your writing voice from a cold start (Timbre)
-argument-hint: "[your LinkedIn/X handle or a post you're proud of]"
+argument-hint: "[optional: anything about you, or a post you're proud of]"
 allowed-tools: Bash Read Write Edit
 ---
 
@@ -15,7 +15,7 @@ personalized this-or-that, then the voice extraction and a short reveal. Context
    the background runner is what keeps it from being cut off). Say **one** short line and nothing
    else: *"I opened a quick setup page in your browser — fill it out and hit Done, and I'll take it
    from there."* Then wait for the command to return. (The page writes the deterministic answers
-   straight into `data/intake.json` — name, background + handles, resume, writing samples, and the
+   straight into `data/intake.json` — name, background, resume, writing samples, and the
    weekend/lunch/teach answers. You do **not** re-ask any of these.)
 
 2. **The personalized this-or-that** (`style_pick`, the only question NOT in the web). Read
