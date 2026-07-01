@@ -1,15 +1,22 @@
 # Timbre — Claude Code plugin
 
-Make Claude Code your writing partner: it learns your voice and drafts on-brand LinkedIn/X
-posts you approve. Two options every time, real receipts, never auto-posts, learns from every
-pick.
+Make Claude Code your writing partner: it learns your voice and drafts on-brand posts you
+approve. Two options every time, real receipts, never auto-posts, learns from every pick.
 
-## Install (local, for testing)
+## Install
 
-From the Timbre repo:
+Install the `tb` engine globally, then register the plugin as a local marketplace — it persists
+across sessions and works from any directory:
 
 ```bash
-claude --plugin-dir ./plugin
+uv tool install --editable .     # from the repo root — puts `tb` on your PATH
+```
+
+Then, inside Claude Code:
+
+```
+/plugin marketplace add ./.claude-plugin
+/plugin install timbre@timbre-local
 ```
 
 Verify it loaded:
@@ -17,6 +24,9 @@ Verify it loaded:
 ```
 /plugin list      # look for "timbre"
 ```
+
+> Quick local dev without installing: `claude --plugin-dir ./plugin`.
+> After editing plugin files, run `/reload-plugins` to pick up the changes.
 
 ## Use
 
