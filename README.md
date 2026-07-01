@@ -40,8 +40,7 @@ leaves your laptop.
 - AI is becoming a great companion to help you write content.
 - But people will tune out if every post is written in the same AI-slop way.
 
-Timbre keeps the leverage of AI while protecting the thing that actually earns attention: your
-authentic voice.
+Timbre keeps the leverage of AI while protecting the thing that actually earns attention: your authentic voice.
 
 ## How
 
@@ -65,15 +64,14 @@ authentic voice.
 - **Onboarding: a clean local UI, intake-only.** I started with a full web onboarding, but a
   hosted app added complexity — a separate web app, an API key, copy that was harder to edit. So
   the onboarding page is *pure intake*: it collects your answers into JSON locally and hands off
-  to the terminal for the AI steps. A clean first impression, no key, no cloud.
+  to the terminal for the AI steps. A clean first impression, no key, no cloud. For now...
 - **JSON as the source of truth.** Your intake, voice profile, and posts are all plain,
   hand-editable JSON. Your edit *is* the confirmation; the model never over-trusts its own
   extraction.
 - **Deterministic, with the LLM only where it counts.** The flow is deterministic code; the
   model is reserved for the few steps that genuinely need judgment (voice extraction, drafting).
   Cheaper, more predictable, and easier to trust.
-- **A simple stack, on purpose.** I skipped heavier agent frameworks (e.g. LangGraph) so anyone
-  on the team can read the stack and trust it.
+- **A simple stack, on purpose.** I skipped heavier agent frameworks (e.g. LangGraph) to have structure be more interpretable 
 - **Evaluation built in.** `tb labs` measures what each input is actually worth, so onboarding
   earns its questions instead of guessing.
 
@@ -87,3 +85,4 @@ authentic voice.
   (and, opt-in, auto-post).
 - **Zero housekeeping** — just confirm the posts you actually put online, so your library and
   streaks stay honest with no manual bookkeeping.
+- **Brand** - have it start to build your brand vs just a voice (more context)
