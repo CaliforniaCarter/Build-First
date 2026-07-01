@@ -22,9 +22,6 @@ Then, inside Claude Code:
 - **`/timbre-post`** — turn what you shipped into a post in your voice. Two options, receipts
   attached; you pick and approve. It never auto-posts.
 
-Everything stays as plain files on your machine (`data/`, `profiles/`, `posts/`) — nothing
-leaves your laptop.
-
 ## Commands
 
 | Command | What it does |
