@@ -25,6 +25,16 @@ Then, inside Claude Code:
 Everything stays as plain files on your machine (`data/`, `profiles/`, `posts/`) — nothing
 leaves your laptop.
 
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `/timbre-onboard` | Capture your voice from a cold start — opens a quick ~10-minute browser onboarding. |
+| `/timbre-post` | Turn real work into two post options in your voice; you pick and approve. Never auto-posts. |
+| `/timbre-voice` | View and edit your voice profile in plain words — your edit *is* the confirmation. |
+| `/timbre-learn` | Fold this session's picks + edits into your voice (batched, on your consent). |
+| `/timbre-reset` | Clear all local Timbre data for a fresh cold start (handy for demos). |
+
 ## Why
 
 - AI is becoming a great companion to help you write content.
