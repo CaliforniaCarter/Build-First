@@ -135,7 +135,7 @@ def build_voice(intake: Intake, provider: Provider, force: bool = False) -> str:
 
     If voice.json already exists, keep it — your hand-edit IS the confirmation — unless
     force=True (an explicit `tb onboard`). Callers get prose, so the draft pipeline is
-    unchanged; the JSON is what you (and `/timbre-voice`) edit.
+    unchanged; the JSON is what you (and `/timbre:voice`) edit.
     """
     existing = load_voice()
     if existing is not None and not force:

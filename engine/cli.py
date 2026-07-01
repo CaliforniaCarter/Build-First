@@ -613,7 +613,7 @@ def cmd_reset(args):
     print(f"Reset to a cold start — cleared {len(removed)} item(s):")
     for r in removed:
         print(f"  - {r}")
-    print("\nRun `tb onboard` (or /timbre-onboard) to start fresh.")
+    print("\nRun `tb onboard` (or /timbre:onboard) to start fresh.")
 
 
 def cmd_doctor(args):
@@ -654,13 +654,28 @@ def cmd_welcome(args):
     # Make the top-level `server` package importable however `tb` was launched.
     if str(ROOT) not in sys.path:
         sys.path.insert(0, str(ROOT))
-    try:
+
+    def _import_server():
         import uvicorn
 
         from server.main import create_app
-    except ImportError as e:
-        print(f'web intake needs the web extra — run `uv pip install -e ".[web]"` ({e})', file=sys.stderr)
-        return
+
+        return uvicorn, create_app
+
+    try:
+        uvicorn, create_app = _import_server()
+    except ImportError:
+        # Self-heal: the web deps aren't installed yet — install once and retry, so onboarding
+        # just works on the first run instead of dead-ending.
+        import subprocess
+
+        print("Setting up the onboarding page (one-time install)…", file=sys.stderr)
+        subprocess.run(["uv", "pip", "install", "-e", "."], cwd=str(ROOT), check=False)
+        try:
+            uvicorn, create_app = _import_server()
+        except ImportError as e:
+            print(f"couldn't start the web intake — run `uv pip install -e .` and retry ({e})", file=sys.stderr)
+            raise SystemExit(2) from e
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(("127.0.0.1", 0))

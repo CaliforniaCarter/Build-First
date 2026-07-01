@@ -22,14 +22,14 @@ then speak in plain language.
 ## The flow
 
 **1. Onboard (only if `data/intake.json` or `profiles/voice.json` is missing).**
-Don't make them fill a form — run the `/timbre-onboard` flow. Read `engine/onboarding.json` and
+Don't make them fill a form — run the `/timbre:onboard` flow. Read `engine/onboarding.json` and
 ask its questions **strictly one at a time**, in order, with a light progress bar and a human
-reaction between answers (full details in `commands/timbre-onboard.md`). For writing samples,
+reaction between answers (full details in `commands/onboard.md`). For writing samples,
 have them **paste a post or two** — don't try to fetch login-walled LinkedIn/X profiles. Store answers in
 `data/intake.json` at each question's `writes_to` path (the audience is set in the config and
 feeds drafts automatically). Then run `uv run tb onboard --json` — the only AI
 step; it writes `profiles/voice.json`.
-Show a SHORT reveal of how you'll match their voice, and point them to `/timbre-voice` (or
+Show a SHORT reveal of how you'll match their voice, and point them to `/timbre:voice` (or
 editing `profiles/voice.json`) — that edit IS the confirmation.
 
 **2. Capture the work + sharpen.** Get the work two ways: they describe it, or they point you
@@ -60,7 +60,7 @@ or after a good run of picks), run `uv run tb learn --check`; if anything's pend
 today's N picks into your voice?"* and fold **only on yes** (`uv run tb learn` → updates
 `profiles/voice.json`). The fold is deliberately conservative (replace-in-place, add only if
 genuinely new, nothing if the batch reveals nothing) and never touches the voice signature or
-identity — so the voice never bloats or drifts. This is the `/timbre-learn` flow.
+identity — so the voice never bloats or drifts. This is the `/timbre:learn` flow.
 
 ## Library + posting
 
@@ -81,5 +81,5 @@ identity — so the voice never bloats or drifts. This is the `/timbre-learn` fl
   ship it. That anti-slop guarantee is the headline.
 - Always give an out (use-as-is / edit / help). The human is the gate.
 - One spiky, ownable idea per post. Hook on the first line. Their voice, not a template.
-- If a draft feels off-voice, offer `/timbre-voice` — they can view or tweak their voice
+- If a draft feels off-voice, offer `/timbre:voice` — they can view or tweak their voice
   profile (`profiles/voice.json`) anytime, and the next draft uses it immediately.

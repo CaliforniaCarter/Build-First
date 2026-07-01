@@ -10,7 +10,7 @@ plain words or by editing the file. Optional change they asked for: **$ARGUMENTS
 ## How to run it
 
 1. **Read the voice.** Run `uv run tb voice --json` (it returns the `voice` fields, a `rendered`
-   prose version, and the `path`). If it says no profile yet, tell them to run `/timbre-onboard`
+   prose version, and the `path`). If it says no profile yet, tell them to run `/timbre:onboard`
    first and stop.
 
 2. **Show it cleanly** — a readable view, not a raw JSON dump. Map the fields to plain labels,
@@ -41,7 +41,7 @@ plain words or by editing the file. Optional change they asked for: **$ARGUMENTS
 4. **Save + confirm.** After an edit, run `uv run tb voice --json` again to confirm it still
    parses, then tell them in one line what changed (e.g. *"Added 'circle back' to your banned
    list."*). Note: **the next draft uses it immediately** — `voice.json` is the source of
-   truth, and your edit is never overwritten unless you re-run `/timbre-onboard`.
+   truth, and your edit is never overwritten unless you re-run `/timbre:onboard`.
 
 ## Rules
 

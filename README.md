@@ -11,15 +11,15 @@ authenticity as you create content — so the posts you make sound like you, nev
 
 ```bash
 # from the repo root
-uv pip install -e ".[web]"       # the engine + the local onboarding page
+uv pip install -e .       # the engine + the local onboarding page
 claude --plugin-dir ./plugin     # load the Timbre commands into Claude Code
 ```
 
 Then, inside Claude Code:
 
-- **`/timbre-onboard`** — a browser page opens; a quick ~10-minute onboarding captures your
+- **`/timbre:onboard`** — a browser page opens; a quick ~10-minute onboarding captures your
   voice into local files. No account, no API key.
-- **`/timbre-post`** — turn what you shipped into a post in your voice. Two options, receipts
+- **`/timbre:post`** — turn what you shipped into a post in your voice. Two options, receipts
   attached; you pick and approve. It never auto-posts.
 
 Everything stays as plain files on your machine (`data/`, `profiles/`, `posts/`) — nothing
@@ -29,11 +29,11 @@ leaves your laptop.
 
 | Command | What it does |
 | --- | --- |
-| `/timbre-onboard` | Capture your voice from a cold start — opens a quick ~10-minute browser onboarding. |
-| `/timbre-post` | Turn real work into two post options in your voice; you pick and approve. Never auto-posts. |
-| `/timbre-voice` | View and edit your voice profile in plain words — your edit *is* the confirmation. |
-| `/timbre-learn` | Fold this session's picks + edits into your voice (batched, on your consent). |
-| `/timbre-reset` | Clear all local Timbre data for a fresh cold start (handy for demos). |
+| `/timbre:onboard` | Capture your voice from a cold start — opens a quick ~10-minute browser onboarding. |
+| `/timbre:post` | Turn real work into two post options in your voice; you pick and approve. Never auto-posts. |
+| `/timbre:voice` | View and edit your voice profile in plain words — your edit *is* the confirmation. |
+| `/timbre:learn` | Fold this session's picks + edits into your voice (batched, on your consent). |
+| `/timbre:reset` | Clear all local Timbre data for a fresh cold start (handy for demos). |
 
 ## Why
 

@@ -9,7 +9,7 @@ Draft a post from the user's real work: **$ARGUMENTS**
 Follow the `timbre` skill flow. Never invent facts; never auto-post — the human is the gate.
 
 1. **Onboard first if needed.** If `data/intake.json` or `profiles/voice.json` is missing, run
-   the `/timbre-onboard` conversation first.
+   the `/timbre:onboard` conversation first.
 
 2. **Capture the work — two ways.** Either is fine:
    - **They describe it** in plain words, or

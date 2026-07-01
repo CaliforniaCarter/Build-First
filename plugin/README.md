@@ -23,8 +23,8 @@ Verify it loaded:
 Just talk to it — the `timbre` skill auto-invokes when you ask to write a post. Or use the
 commands:
 
-- `/timbre-onboard` — capture your voice from a cold start (opens a quick browser onboarding).
-- `/timbre-post <what you want to post about>` — draft two options, pick one, learn from it.
+- `/timbre:onboard` — capture your voice from a cold start (opens a quick browser onboarding).
+- `/timbre:post <what you want to post about>` — draft two options, pick one, learn from it.
 
 ## How it works
 

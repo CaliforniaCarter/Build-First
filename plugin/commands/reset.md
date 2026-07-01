@@ -12,4 +12,4 @@ Reset Timbre to a cold start so the user can run onboarding fresh — handy for 
    `data/intake.json`, `data/signals.json`, and everything under `posts/` and `runs/`. The
    editable configs (`onboarding.json`, `proof.json`, `rubric.json`, `labs.json`) and the
    synthetic sample are kept.
-3. Tell them it's a clean slate and offer to run `/timbre-onboard` to start over.
+3. Tell them it's a clean slate and offer to run `/timbre:onboard` to start over.

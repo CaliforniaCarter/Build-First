@@ -31,10 +31,10 @@ personalized this-or-that, then the voice extraction and a short reveal. Context
 
 4. **The reveal — SHORT and warm.** Open with a genuine thanks. Read `profiles/voice.json` and
    tell them, in 2–3 plain lines, how you'll keep it sounding like them. Don't dump the profile.
-   Then: *"It's always editable — tweak it anytime with `/timbre-voice` (or edit
+   Then: *"It's always editable — tweak it anytime with `/timbre:voice` (or edit
    `profiles/voice.json`), and your edit is the confirmation."*
 
-5. **Offer the first post:** *"Want to make your first post? Just say the word."* → `/timbre-post`.
+5. **Offer the first post:** *"Want to make your first post? Just say the word."* → `/timbre:post`.
 
 ## Fallback — no browser (terminal-only)
 
