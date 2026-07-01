@@ -10,17 +10,27 @@ authenticity as you create content — so the posts you make sound like you, nev
 ## Quickstart
 
 ```bash
-# from the repo root
-uv pip install -e .       # the engine + the local onboarding page
-claude --plugin-dir ./plugin     # load the Timbre commands into Claude Code
+git clone https://github.com/CaliforniaCarter/Build-First.git
+cd Build-First
+uv tool install --editable .    # installs the `tb` command globally — works in any terminal
 ```
 
-Then, inside Claude Code:
+Then install the plugin into Claude Code (one time). Launch `claude` from the repo folder and run:
+
+```
+/plugin marketplace add ./.claude-plugin
+/plugin install timbre@timbre-local
+```
+
+From now on, in **any** Claude Code session, from **any** directory:
 
 - **`/timbre:onboard`** — a browser page opens; a quick ~10-minute onboarding captures your
   voice into local files. No account, no API key.
 - **`/timbre:post`** — turn what you shipped into a post in your voice. Two options, receipts
   attached; you pick and approve. It never auto-posts.
+
+> Keep the cloned folder where it is — the global `tb` and the plugin both point back to it.
+> After editing plugin files, run `/reload-plugins` in Claude Code to pick up the changes.
 
 ## Commands
 

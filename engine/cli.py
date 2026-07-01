@@ -674,7 +674,7 @@ def cmd_welcome(args):
         try:
             uvicorn, create_app = _import_server()
         except ImportError as e:
-            print(f"couldn't start the web intake — run `uv pip install -e .` and retry ({e})", file=sys.stderr)
+            print(f"couldn't start the web intake — reinstall Timbre (`uv tool install -e .`) and retry ({e})", file=sys.stderr)
             raise SystemExit(2) from e
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

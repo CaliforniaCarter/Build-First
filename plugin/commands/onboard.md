@@ -10,7 +10,7 @@ personalized this-or-that, then the voice extraction and a short reveal. Context
 
 ## How to run it
 
-1. **Open the web intake and wait.** Run `uv run tb welcome` **in the background** (it opens a
+1. **Open the web intake and wait.** Run `tb welcome` **in the background** (it opens a
    browser page and returns the moment the user clicks **Done** — that can take a few minutes, so
    the background runner is what keeps it from being cut off). Say **one** short line and nothing
    else: *"I opened a quick setup page in your browser — fill it out and hit Done, and I'll take it
@@ -26,7 +26,7 @@ personalized this-or-that, then the voice extraction and a short reveal. Context
    warm"). Show them as **A** and **B**, ask which is more them, and store the chosen example's
    **text** at `voice.style_pick` in `data/intake.json` (use Edit/Write on that one field only).
 
-3. **Extract the voice.** Run `uv run tb onboard`. This is the only AI step — it reads *how* they
+3. **Extract the voice.** Run `tb onboard`. This is the only AI step — it reads *how* they
    wrote (from `data/intake.json`) and writes `profiles/voice.json`. It invents nothing.
 
 4. **The reveal — SHORT and warm.** Open with a genuine thanks. Read `profiles/voice.json` and

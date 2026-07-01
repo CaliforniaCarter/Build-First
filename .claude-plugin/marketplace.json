@@ -1,0 +1,13 @@
+{
+  "name": "timbre-local",
+  "owner": {
+    "name": "Carter Chasson"
+  },
+  "plugins": [
+    {
+      "name": "timbre",
+      "source": "./plugin",
+      "description": "Timbre — capture your writing voice and draft on-brand posts in it, from a cold start."
+    }
+  ]
+}
