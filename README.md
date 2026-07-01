@@ -7,6 +7,10 @@
 A Claude Code plugin that learns your voice and writing style, then highlights your
 authenticity as you create content — so the posts you make sound like you, never like AI slop.
 
+<p align="center">
+  <img src="docs/flows/onboarding.png" alt="Onboarding flow: a short conversation captures your voice into plain, editable JSON" width="100%">
+</p>
+
 ## Quickstart
 
 ```bash
@@ -42,6 +46,10 @@ From now on, in **any** Claude Code session, from **any** directory:
 | `/timbre:learn` | Fold this session's picks + edits into your voice (batched, on your consent). |
 | `/timbre:reset` | Clear all local Timbre data for a fresh cold start (handy for demos). |
 
+<p align="center">
+  <img src="docs/flows/make-a-post.png" alt="Make-a-post flow: from real work to two drafts, each scored and proof-checked — you pick, it polishes, you approve" width="100%">
+</p>
+
 ## Why
 
 - AI is becoming a great companion to help you write content.
@@ -54,9 +62,18 @@ Timbre keeps the leverage of AI while protecting the thing that actually earns a
 - A quick **10-minute onboarding** grabs the pieces that make you unique — how you actually
   write, pulled from raw answers and your real writing samples.
 - It **keeps learning** from the way you edit and, ultimately, from what you end up posting.
+
+<p align="center">
+  <img src="docs/flows/how-it-learns.png" alt="How it learns: it learns from what you pick and your notes, then updates your voice files — every post sounds a little more like you" width="100%">
+</p>
+
 - **Anti-slop by design:** every draft carries a proof check — receipts required, banned phrases
   blocked, every number traced back to your own material. If it can't ground a claim, it asks
   instead of inventing.
+
+<p align="center">
+  <img src="docs/flows/eval-engine.png" alt="Eval engine: how a draft earns its score — Writer's Council, receipts + proof check, rubric score, pass the bar" width="100%">
+</p>
 
 ## Impact
 
@@ -81,6 +98,10 @@ Timbre keeps the leverage of AI while protecting the thing that actually earns a
 - **A simple stack, on purpose.** I skipped heavier agent frameworks (e.g. LangGraph) to have structure be more interpretable 
 - **Evaluation built in.** `tb labs` measures what each input is actually worth, so onboarding
   earns its questions instead of guessing.
+
+<p align="center">
+  <img src="docs/flows/ablation-ladder.png" alt="Timbre Labs: an ablation ladder holds the idea constant and adds one input tier at a time (L0 to L5) to prove each input makes the output better" width="660">
+</p>
 
 ## Roadmap
 
