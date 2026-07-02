@@ -4,8 +4,7 @@
 
 ## What
 
-A Claude Code plugin that learns your voice and writing style, then highlights your
-authenticity as you create content — so the posts you make sound like you, never like AI slop.
+A Claude Code plugin that learns your voice and writing style, so the posts you make sound like you, not like AI slop.
 
 <p align="center">
   <img src="docs/flows/onboarding.png" alt="Onboarding flow: a short conversation captures your voice into plain, editable JSON" width="100%">
@@ -25,16 +24,6 @@ Then install the plugin into Claude Code (one time). Launch `claude` from the re
 /plugin marketplace add ./.claude-plugin
 /plugin install timbre@timbre-local
 ```
-
-From now on, in **any** Claude Code session, from **any** directory:
-
-- **`/timbre:onboard`** — a browser page opens; a quick ~10-minute onboarding captures your
-  voice into local files. No account, no API key.
-- **`/timbre:post`** — turn what you shipped into a post in your voice. Two options, receipts
-  attached; you pick and approve. It never auto-posts.
-
-> Keep the cloned folder where it is — the global `tb` and the plugin both point back to it.
-> After editing plugin files, run `/reload-plugins` in Claude Code to pick up the changes.
 
 ## Commands
 
